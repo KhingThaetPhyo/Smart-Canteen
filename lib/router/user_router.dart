@@ -6,19 +6,24 @@ import 'package:smartcanteen/view/wallet_info_screen.dart';
 final router = GoRouter(
   initialLocation: "/",
   routes: [
-    GoRoute(path: "/student_info",
-    builder: (context, state) => const StudentInfoScreen(),
+    GoRoute(
+      path: "/student_info",
+      builder: (context, state) => const StudentRegisterScreen(
+        name: '',
+        email: '',
+        password: '',
+        phone: '',
+      ),
     ),
-    GoRoute(path: "/wallet_info",
-    builder: (context, state) => const WalletInfoScreen(),
+    GoRoute(
+      path: "/wallet_info",
+      builder: (context, state) => const WalletInfoScreen(),
     ),
     // GoRoute(path: "/student_info",
     // builder: (context, state) => const StudentInfoScreen(),
     // ),
   ],
-  
-  
-  );
+);
 
 class UserRouter extends StatefulWidget {
   const UserRouter({super.key});
@@ -28,7 +33,6 @@ class UserRouter extends StatefulWidget {
 }
 
 class _UserRouterState extends State<UserRouter> {
- 
   @override
   void initState() {
     super.initState();

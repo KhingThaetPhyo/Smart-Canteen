@@ -49,8 +49,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool get isPasswordMatching {
     if (isLogin) return true;
     if (passwordController.text.isEmpty ||
-        confirmPasswordController.text.isEmpty)
+        confirmPasswordController.text.isEmpty) {
       return false;
+    }
     return passwordController.text == confirmPasswordController.text;
   }
 
@@ -120,6 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
             backgroundColor: Colors.green,
           ),
         );
+        // Login အောင်မြင်ပါက သွားလိုသော Screen သို့ ဤနေရာတွင် ရွှေ့နိုင်သည်
+        // context.go('/wallet_info');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -127,6 +130,8 @@ class _LoginScreenState extends State<LoginScreen> {
             backgroundColor: Colors.green,
           ),
         );
+        // Teacher Account ဆောက်ပြီးပါက သွားလိုသော Screen သို့ ရွှေ့ရန်
+        context.go('/wallet_info');
       }
     }
   }
@@ -186,10 +191,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text(
-                "Order. Earn points. Enjoy.",
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
+              // const Text(
+              //   "Order. Earn points. Enjoy.",
+              //   style: TextStyle(color: Colors.grey, fontSize: 16),
+              // ),
               const SizedBox(height: 30),
               Container(
                 height: 56,
@@ -296,7 +301,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-
                         TextFormField(
                           controller: phoneController,
                           keyboardType: TextInputType.number,
@@ -304,15 +308,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            // 👇 အစဆုံးဂဏန်းကို 6, 7, 9, 4 သာ လက်ခံရန် တားမြစ်ချက်ထည့်ခြင်း
                             FilteringTextInputFormatter.allow(
                               RegExp(r'^[6794]\d*'),
                             ),
                           ],
                           style: const TextStyle(fontSize: 16),
                           decoration: _buildInputDecoration(
-                            hintText:
-                                "712345678", // ဥပမာကိုပါ 6,7,9,4 တစ်ခုခုနဲ့စပြတာ ပိုကောင်းပါတယ်
+                            hintText: "712345678",
                             prefixIcon: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -346,7 +348,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 20),
                       ],
                       Align(
@@ -493,43 +494,39 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 Expanded(
                                   child: RadioListTile<String>(
-  title: const Text(
-    "Student",
-    style: TextStyle(fontSize: 14),
-  ),
-  value: "Student",
-  groupValue: selectedRole,
-  activeColor: themeColor,
-  contentPadding: EdgeInsets.zero,
-  onChanged: (value) {
-    setState(() {
-      selectedRole = value!;
-    });
-
-    // Save role only
-    print("Selected Role: $selectedRole");
-  },
-),
+                                    title: const Text(
+                                      "Student",
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    value: "Student",
+                                    groupValue: selectedRole,
+                                    activeColor: themeColor,
+                                    contentPadding: EdgeInsets.zero,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedRole = value!;
+                                      });
+                                      print("Selected Role: $selectedRole");
+                                    },
+                                  ),
                                 ),
                                 Expanded(
                                   child: RadioListTile<String>(
-  title: const Text(
-    "Teacher",
-    style: TextStyle(fontSize: 14),
-  ),
-  value: "Teacher",
-  groupValue: selectedRole,
-  activeColor: themeColor,
-  contentPadding: EdgeInsets.zero,
-  onChanged: (value) {
-    setState(() {
-      selectedRole = value!;
-    });
-
-    // Save role only
-    print("Selected Role: $selectedRole");
-  },
-),
+                                    title: const Text(
+                                      "Teacher",
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    value: "Teacher",
+                                    groupValue: selectedRole,
+                                    activeColor: themeColor,
+                                    contentPadding: EdgeInsets.zero,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedRole = value!;
+                                      });
+                                      print("Selected Role: $selectedRole");
+                                    },
+                                  ),
                                 ),
                               ],
                             ),
@@ -538,41 +535,45 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                       const SizedBox(height: 35),
                       SizedBox(
-  width: double.infinity,
-  height: 56,
-  child: ElevatedButton.icon(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: themeColor,
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-      ),
-    ),
-    onPressed: () {
-      if (selectedRole == "Student") {
-        context.go('/student_info');
-      } else if (selectedRole == "Teacher") {
-        context.go('/wallet_info');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select a role'),
-          ),
-        );
-      }
-    },
-    icon: Icon(
-      isLogin ? Icons.login : Icons.person_add_alt_1,
-    ),
-    label: Text(
-      isLogin ? 'Sign in' : 'Create account',
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
-),
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: themeColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (isLogin) {
+                              submitForm();
+                            } else {
+                              if (selectedRole == "Student") {
+                                navigateToStudentPage();
+                              } else if (selectedRole == "Teacher") {
+                                submitForm();
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Please select a role'),
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          icon: Icon(
+                            isLogin ? Icons.login : Icons.person_add_alt_1,
+                          ),
+                          label: Text(
+                            isLogin ? 'Sign in' : 'Create account',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                       if (isLogin) ...[
                         const SizedBox(height: 25),
                         const Text(
@@ -585,11 +586,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 25),
-              const Text(
-                "By continuing you agree to our Terms & Privacy Policy",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
-              ),
+              // const Text(
+              //   "By continuing you agree to our Terms & Privacy Policy",
+              //   textAlign: TextAlign.center,
+              //   style: TextStyle(color: Colors.grey),
+              // ),
             ],
           ),
         ),
@@ -598,422 +599,422 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-// StudentRegisterScreen အား နဂိုအတိုင်း ဆက်လက်ထိန်းသိမ်းထားပါသည်
-class StudentRegisterScreen extends StatefulWidget {
-  final String name;
-  final String email;
-  final String password;
-  final String phone;
+// // StudentRegisterScreen အား နဂိုအတိုင်း ဆက်လက်ထိန်းသိမ်းထားပါသည်
+// class StudentRegisterScreen extends StatefulWidget {
+//   final String name;
+//   final String email;
+//   final String password;
+//   final String phone;
 
-  const StudentRegisterScreen({
-    super.key,
-    required this.name,
-    required this.email,
-    required this.password,
-    required this.phone,
-  });
+//   const StudentRegisterScreen({
+//     super.key,
+//     required this.name,
+//     required this.email,
+//     required this.password,
+//     required this.phone,
+//   });
 
-  @override
-  State<StudentRegisterScreen> createState() => _StudentRegisterScreenState();
-}
+//   @override
+//   State<StudentRegisterScreen> createState() => _StudentRegisterScreenState();
+// }
 
-class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
-  String? selectedYearCode;
-  String? selectedYearLevel;
-  String? selectedSemester;
+// class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
+//   String? selectedYearCode;
+//   String? selectedYearLevel;
+//   String? selectedSemester;
 
-  final List<String> academicYears = [
-    "(18-19)",
-    "(19-20)",
-    "(22-23)",
-    "(22-23) J",
-    "(23-24)",
-    "(24-25)",
-  ];
-  final List<String> yearLevels = [
-    "First Year",
-    "Second Year",
-    "Third Year",
-    "Fourth Year",
-    "Final Year",
-  ];
-  final List<String> semesters = [
-    "I",
-    "II",
-    "III",
-    "IV",
-    "V",
-    "VI",
-    "VII",
-    "VIII",
-    "IX",
-    "X",
-  ];
+//   final List<String> academicYears = [
+//     "(18-19)",
+//     "(19-20)",
+//     "(22-23)",
+//     "(22-23) J",
+//     "(23-24)",
+//     "(24-25)",
+//   ];
+//   final List<String> yearLevels = [
+//     "First Year",
+//     "Second Year",
+//     "Third Year",
+//     "Fourth Year",
+//     "Final Year",
+//   ];
+//   final List<String> semesters = [
+//     "I",
+//     "II",
+//     "III",
+//     "IV",
+//     "V",
+//     "VI",
+//     "VII",
+//     "VIII",
+//     "IX",
+//     "X",
+//   ];
 
-  final _studentFormKey = GlobalKey<FormState>();
-  final rollNumberController = TextEditingController();
+//   final _studentFormKey = GlobalKey<FormState>();
+//   final rollNumberController = TextEditingController();
 
-  @override
-  void dispose() {
-    rollNumberController.dispose();
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     rollNumberController.dispose();
+//     super.dispose();
+//   }
 
-  void completeRegistration() {
-    if (_studentFormKey.currentState!.validate()) {
-      String fullRollNo =
-          "UCSTT-$selectedYearCode-${rollNumberController.text.trim()}";
+//   void completeRegistration() {
+//     if (_studentFormKey.currentState!.validate()) {
+//       String fullRollNo =
+//           "UCSTT-$selectedYearCode-${rollNumberController.text.trim()}";
 
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 30),
-              SizedBox(width: 10),
-              Text("Success", style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: Text(
-            "Hello ${widget.name},\nYour student account has been created successfully!\n\n"
-            "Phone: ${widget.phone}\n"
-            "Roll No: $fullRollNo\n"
-            "Level: $selectedYearLevel\n"
-            "Semester: $selectedSemester",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: const Text(
-                "OK",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-  }
+//       showDialog(
+//         context: context,
+//         builder: (context) => AlertDialog(
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(20),
+//           ),
+//           title: const Row(
+//             children: [
+//               Icon(Icons.check_circle, color: Colors.green, size: 30),
+//               SizedBox(width: 10),
+//               Text("Success", style: TextStyle(fontWeight: FontWeight.bold)),
+//             ],
+//           ),
+//           content: Text(
+//             "Hello ${widget.name},\nYour student account has been created successfully!\n\n"
+//             "Phone: ${widget.phone}\n"
+//             "Roll No: $fullRollNo\n"
+//             "Level: $selectedYearLevel\n"
+//             "Semester: $selectedSemester",
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.pop(context);
+//                 Navigator.pop(context);
+//               },
+//               child: const Text(
+//                 "OK",
+//                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+//               ),
+//             ),
+//           ],
+//         ),
+//       );
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    final themeColor = const Color(0xff0F7C90);
+//   @override
+//   Widget build(BuildContext context) {
+//     final themeColor = const Color(0xff0F7C90);
 
-    return Scaffold(
-      backgroundColor: const Color(0xfff7f7f7),
-      appBar: AppBar(
-        title: const Text(
-          "Student Profile Setup",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.black,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _studentFormKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Welcome, ${widget.name}! 👋",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: themeColor,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "Complete your student profile information to finish registration.",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                ),
-                const SizedBox(height: 25),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.grey.shade200),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.05),
-                        spreadRadius: 5,
-                        blurRadius: 15,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Roll Number",
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: TextFormField(
-                              readOnly: true,
-                              initialValue: "UCSTT",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade800,
-                                fontSize: 14,
-                              ),
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                fillColor: Colors.grey.shade100,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 5,
-                            child: DropdownButtonFormField<String>(
-                              value: selectedYearCode,
-                              hint: const Center(
-                                child: Text(
-                                  "Aca Year",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                              isExpanded: true,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                  horizontal: 10,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              items: academicYears.map((String year) {
-                                return DropdownMenuItem<String>(
-                                  value: year,
-                                  child: Center(
-                                    child: Text(
-                                      year,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) =>
-                                  setState(() => selectedYearCode = value),
-                              validator: (value) =>
-                                  value == null ? "Required" : null,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 4,
-                            child: TextFormField(
-                              controller: rollNumberController,
-                              keyboardType: TextInputType.number,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              style: const TextStyle(fontSize: 14),
-                              decoration: InputDecoration(
-                                hintText: "No.",
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
-                                  ? "Required"
-                                  : null,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Year Level",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade700,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                DropdownButtonFormField<String>(
-                                  value: selectedYearLevel,
-                                  hint: const Text(
-                                    "Select Year",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  isExpanded: true,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  decoration: InputDecoration(
-                                    prefixIcon: const Icon(
-                                      Icons.school_outlined,
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                      horizontal: 10,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  items: yearLevels.map((String level) {
-                                    return DropdownMenuItem<String>(
-                                      value: level,
-                                      child: Text(
-                                        level,
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) =>
-                                      setState(() => selectedYearLevel = value),
-                                  validator: (value) => value == null
-                                      ? "Please select year"
-                                      : null,
-                                ),
-                              ],
-                            ),
-                          ),
+//     return Scaffold(
+//       backgroundColor: const Color(0xfff7f7f7),
+//       appBar: AppBar(
+//         title: const Text(
+//           "Student Profile Setup",
+//           style: TextStyle(fontWeight: FontWeight.bold),
+//         ),
+//         backgroundColor: Colors.transparent,
+//         elevation: 0,
+//         foregroundColor: Colors.black,
+//       ),
+//       body: SafeArea(
+//         child: SingleChildScrollView(
+//           padding: const EdgeInsets.all(20),
+//           child: Form(
+//             key: _studentFormKey,
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   "Welcome, ${widget.name}! 👋",
+//                   style: TextStyle(
+//                     fontSize: 26,
+//                     fontWeight: FontWeight.bold,
+//                     color: themeColor,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 6),
+//                 Text(
+//                   "Complete your student profile information to finish registration.",
+//                   style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+//                 ),
+//                 const SizedBox(height: 25),
+//                 Container(
+//                   padding: const EdgeInsets.all(20),
+//                   decoration: BoxDecoration(
+//                     color: Colors.white,
+//                     borderRadius: BorderRadius.circular(24),
+//                     border: Border.all(color: Colors.grey.shade200),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.grey.withOpacity(0.05),
+//                         spreadRadius: 5,
+//                         blurRadius: 15,
+//                       ),
+//                     ],
+//                   ),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Text(
+//                         "Roll Number",
+//                         style: TextStyle(
+//                           color: Colors.grey.shade700,
+//                           fontWeight: FontWeight.w600,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 8),
+//                       Row(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Expanded(
+//                             flex: 3,
+//                             child: TextFormField(
+//                               readOnly: true,
+//                               initialValue: "UCSTT",
+//                               textAlign: TextAlign.center,
+//                               style: TextStyle(
+//                                 fontWeight: FontWeight.bold,
+//                                 color: Colors.grey.shade800,
+//                                 fontSize: 14,
+//                               ),
+//                               decoration: InputDecoration(
+//                                 contentPadding: const EdgeInsets.symmetric(
+//                                   vertical: 16,
+//                                 ),
+//                                 fillColor: Colors.grey.shade100,
+//                                 filled: true,
+//                                 border: OutlineInputBorder(
+//                                   borderRadius: BorderRadius.circular(30),
+//                                 ),
+//                                 enabledBorder: OutlineInputBorder(
+//                                   borderRadius: BorderRadius.circular(30),
+//                                   borderSide: BorderSide(
+//                                     color: Colors.grey.shade300,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                           const SizedBox(width: 8),
+//                           Expanded(
+//                             flex: 5,
+//                             child: DropdownButtonFormField<String>(
+//                               value: selectedYearCode,
+//                               hint: const Center(
+//                                 child: Text(
+//                                   "Aca Year",
+//                                   style: TextStyle(
+//                                     fontSize: 14,
+//                                     color: Colors.grey,
+//                                   ),
+//                                 ),
+//                               ),
+//                               isExpanded: true,
+//                               autovalidateMode:
+//                                   AutovalidateMode.onUserInteraction,
+//                               decoration: InputDecoration(
+//                                 contentPadding: const EdgeInsets.symmetric(
+//                                   vertical: 14,
+//                                   horizontal: 10,
+//                                 ),
+//                                 border: OutlineInputBorder(
+//                                   borderRadius: BorderRadius.circular(30),
+//                                 ),
+//                               ),
+//                               items: academicYears.map((String year) {
+//                                 return DropdownMenuItem<String>(
+//                                   value: year,
+//                                   child: Center(
+//                                     child: Text(
+//                                       year,
+//                                       style: const TextStyle(fontSize: 14),
+//                                     ),
+//                                   ),
+//                                 );
+//                               }).toList(),
+//                               onChanged: (value) =>
+//                                   setState(() => selectedYearCode = value),
+//                               validator: (value) =>
+//                                   value == null ? "Required" : null,
+//                             ),
+//                           ),
+//                           const SizedBox(width: 8),
+//                           Expanded(
+//                             flex: 4,
+//                             child: TextFormField(
+//                               controller: rollNumberController,
+//                               keyboardType: TextInputType.number,
+//                               autovalidateMode:
+//                                   AutovalidateMode.onUserInteraction,
+//                               inputFormatters: [
+//                                 FilteringTextInputFormatter.digitsOnly,
+//                               ],
+//                               style: const TextStyle(fontSize: 14),
+//                               decoration: InputDecoration(
+//                                 hintText: "No.",
+//                                 contentPadding: const EdgeInsets.symmetric(
+//                                   horizontal: 16,
+//                                   vertical: 16,
+//                                 ),
+//                                 border: OutlineInputBorder(
+//                                   borderRadius: BorderRadius.circular(30),
+//                                 ),
+//                               ),
+//                               validator: (value) =>
+//                                   (value == null || value.trim().isEmpty)
+//                                   ? "Required"
+//                                   : null,
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                       const SizedBox(height: 20),
+//                       Row(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Expanded(
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   "Year Level",
+//                                   style: TextStyle(
+//                                     color: Colors.grey.shade700,
+//                                     fontWeight: FontWeight.w600,
+//                                   ),
+//                                 ),
+//                                 const SizedBox(height: 8),
+//                                 DropdownButtonFormField<String>(
+//                                   value: selectedYearLevel,
+//                                   hint: const Text(
+//                                     "Select Year",
+//                                     style: TextStyle(
+//                                       fontSize: 14,
+//                                       color: Colors.grey,
+//                                     ),
+//                                   ),
+//                                   isExpanded: true,
+//                                   autovalidateMode:
+//                                       AutovalidateMode.onUserInteraction,
+//                                   decoration: InputDecoration(
+//                                     prefixIcon: const Icon(
+//                                       Icons.school_outlined,
+//                                     ),
+//                                     contentPadding: const EdgeInsets.symmetric(
+//                                       vertical: 14,
+//                                       horizontal: 10,
+//                                     ),
+//                                     border: OutlineInputBorder(
+//                                       borderRadius: BorderRadius.circular(30),
+//                                     ),
+//                                   ),
+//                                   items: yearLevels.map((String level) {
+//                                     return DropdownMenuItem<String>(
+//                                       value: level,
+//                                       child: Text(
+//                                         level,
+//                                         style: const TextStyle(fontSize: 14),
+//                                       ),
+//                                     );
+//                                   }).toList(),
+//                                   onChanged: (value) =>
+//                                       setState(() => selectedYearLevel = value),
+//                                   validator: (value) => value == null
+//                                       ? "Please select year"
+//                                       : null,
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
 
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Semester",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade700,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                DropdownButtonFormField<String>(
-                                  value: selectedSemester,
-                                  hint: const Text(
-                                    "Select Sem",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  isExpanded: true,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  decoration: InputDecoration(
-                                    prefixIcon: const Icon(
-                                      Icons.calendar_month_outlined,
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                      horizontal: 10,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  items: semesters.map((String sem) {
-                                    return DropdownMenuItem<String>(
-                                      value: sem,
-                                      child: Text(
-                                        sem,
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) =>
-                                      setState(() => selectedSemester = value),
-                                  validator: (value) => value == null
-                                      ? "Please select sem"
-                                      : null,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: themeColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          onPressed: completeRegistration,
-                          child: const Text(
-                            "Complete Setup",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//                           const SizedBox(width: 12),
+//                           Expanded(
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   "Semester",
+//                                   style: TextStyle(
+//                                     color: Colors.grey.shade700,
+//                                     fontWeight: FontWeight.w600,
+//                                   ),
+//                                 ),
+//                                 const SizedBox(height: 8),
+//                                 DropdownButtonFormField<String>(
+//                                   value: selectedSemester,
+//                                   hint: const Text(
+//                                     "Select Sem",
+//                                     style: TextStyle(
+//                                       fontSize: 14,
+//                                       color: Colors.grey,
+//                                     ),
+//                                   ),
+//                                   isExpanded: true,
+//                                   autovalidateMode:
+//                                       AutovalidateMode.onUserInteraction,
+//                                   decoration: InputDecoration(
+//                                     prefixIcon: const Icon(
+//                                       Icons.calendar_month_outlined,
+//                                     ),
+//                                     contentPadding: const EdgeInsets.symmetric(
+//                                       vertical: 14,
+//                                       horizontal: 10,
+//                                     ),
+//                                     border: OutlineInputBorder(
+//                                       borderRadius: BorderRadius.circular(30),
+//                                     ),
+//                                   ),
+//                                   items: semesters.map((String sem) {
+//                                     return DropdownMenuItem<String>(
+//                                       value: sem,
+//                                       child: Text(
+//                                         sem,
+//                                         style: const TextStyle(fontSize: 14),
+//                                       ),
+//                                     );
+//                                   }).toList(),
+//                                   onChanged: (value) =>
+//                                       setState(() => selectedSemester = value),
+//                                   validator: (value) => value == null
+//                                       ? "Please select sem"
+//                                       : null,
+//                                 ),
+//                               ],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                       const SizedBox(height: 30),
+//                       SizedBox(
+//                         width: double.infinity,
+//                         height: 56,
+//                         child: ElevatedButton(
+//                           style: ElevatedButton.styleFrom(
+//                             backgroundColor: themeColor,
+//                             foregroundColor: Colors.white,
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius: BorderRadius.circular(30),
+//                             ),
+//                           ),
+//                           onPressed: completeRegistration,
+//                           child: const Text(
+//                             "Complete Setup",
+//                             style: TextStyle(
+//                               fontSize: 18,
+//                               fontWeight: FontWeight.bold,
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
