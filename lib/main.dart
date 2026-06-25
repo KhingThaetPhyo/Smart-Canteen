@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(), // Widget Class နာမည်အသစ်ကို ခေါ်သုံးထားခြင်း
+      home: LoginScreen(), // Widget Class နာမည်အသစ်ကို ခေါ်သုံးထားခြင်း
     );
   }
 }

@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _screens = [
       _buildHomeContent(), // Index 0: Home Content
-      const Historyscreen(), // Index 1: History Screen (သင်ဆောက်ထားတဲ့ class နာမည်ထည့်ရန်)
+      HistoryScreen(), // Index 1: History Screen (သင်ဆောက်ထားတဲ့ class နာမည်ထည့်ရန်)
       const OrderScreen(), // Index 2: Order Screen (သင်ဆောက်ထားတဲ့ class နာမည်ထည့်ရန်)
       const ProfileScreen(), // Index 3: Profile Screen (သင်ဆောက်ထားတဲ့ class နာမည်ထည့်ရန်)
     ];
