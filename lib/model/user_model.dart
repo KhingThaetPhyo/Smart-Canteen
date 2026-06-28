@@ -1,21 +1,30 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'student_model.dart'; // Assuming this exists
 
 part 'user_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true, fieldRename: FieldRename.snake)
 class UserModel {
-  final String user_name;
-  final String user_phone;
-  final String user_email;
-  final String user_password;
-  final String role_name;
+  final int userId;
+  final String userName;
+  final String userPhone;
+  final String userEmail;
+  final String roleName;
+  final String? fcmToken;
+  final String updatedAt;
+  final String createdAt;
+  final StudentModel? student;
 
   UserModel({
-    required this.user_name,
-    required this.user_phone,
-    required this.user_email,
-    required this.user_password,
-    required this.role_name,
+    required this.userId,
+    required this.userName,
+    required this.userPhone,
+    required this.userEmail,
+    required this.roleName,
+    this.fcmToken,
+    required this.updatedAt,
+    required this.createdAt,
+    this.student,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

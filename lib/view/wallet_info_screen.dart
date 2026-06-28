@@ -8,8 +8,17 @@ class WalletInfoScreen extends StatefulWidget {
 }
 
 class _WalletInfoScreenState extends State<WalletInfoScreen> {
+  TextEditingController text = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      body: Column(
+        children: [
+          TextField(controller: text),
+          SizedBox(height: 10),
+          ElevatedButton(onPressed: () {}, child: Text('Click me')),
+        ],
+      ),
+    );
   }
 }

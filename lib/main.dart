@@ -1,6 +1,7 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:smartcanteen/view/homescreen.dart';
+import 'package:smartcanteen/view/wallet_info_screen.dart';
 import 'view/loginscreen.dart'; // import လမ်းကြောင်းအသစ်
 
 void main() {
