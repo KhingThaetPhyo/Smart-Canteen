@@ -1,26 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/view/register_screen.dart';
 import 'package:smartcanteen/view/student_info_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Smart Canteen',
-      theme: ThemeData(primaryColor: const Color(0xff0F7C90)),
-      home: const LoginScreen(),
-    );
-  }
-}
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -79,11 +62,11 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => StudentRegisterScreen(
-            name: nameController.text.trim(),
-            email: emailController.text.trim(),
-            password: passwordController.text,
-            phone: "09${phoneController.text.trim()}",
+          builder: (context) => LoginScreen(
+            // name: nameController.text.trim(),
+            // email: emailController.text.trim(),
+            // password: passwordController.text,
+            // phone: "09${phoneController.text.trim()}",
           ),
         ),
       );

@@ -1,435 +1,412 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-// class StudentInfoScreen extends StatefulWidget {
-//   const StudentInfoScreen({super.key});
-
-//   @override
-//   State<StudentInfoScreen> createState() => _StudentInfoScreenState();
-// }
-
-// class _StudentInfoScreenState extends State<StudentInfoScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Placeholder();
-//   }
-// }
-// ဒီအပိုင်းတစ်ခုလုံးကို ဖြတ်ထုတ်ပြီး student_info page မှာ သွားထည့်ပေးရပါမယ်
-
-class StudentRegisterScreen extends StatefulWidget {
-  final String name;
-  final String email;
-  final String password;
-  final String phone;
-
-  const StudentRegisterScreen({
-    super.key,
-    required this.name,
-    required this.email,
-    required this.password,
-    required this.phone,
-  });
+class StudentInfoScreen extends StatefulWidget {
+  const StudentInfoScreen({super.key});
 
   @override
-  State<StudentRegisterScreen> createState() => _StudentRegisterScreenState();
+  State<StudentInfoScreen> createState() => _StudentInfoScreenState();
 }
 
-class _StudentRegisterScreenState extends State<StudentRegisterScreen> {
-  String? selectedYearCode;
-  String? selectedYearLevel;
+class _StudentInfoScreenState extends State<StudentInfoScreen> {
+  String? selectedYearBatch = '22-23';
   String? selectedSemester;
+  String? selectedYearLevel;
 
-  final List<String> academicYears = [
-    "(18-19)",
-    "(19-20)",
-    "(22-23)",
-    "(22-23) J",
-    "(23-24)",
-    "(24-25)",
-  ];
-  final List<String> yearLevels = [
-    "First Year",
-    "Second Year",
-    "Third Year",
-    "Fourth Year",
-    "Final Year",
-  ];
-  final List<String> semesters = [
-    "I",
-    "II",
-    "III",
-    "IV",
-    "V",
-    "VI",
-    "VII",
-    "VIII",
-    "IX",
-    "X",
-  ];
-
-  final _studentFormKey = GlobalKey<FormState>();
-  final rollNumberController = TextEditingController();
+  final TextEditingController _rollNoController = TextEditingController();
 
   @override
   void dispose() {
-    rollNumberController.dispose();
+    _rollNoController.dispose();
     super.dispose();
-  }
-
-  void completeRegistration() {
-    if (_studentFormKey.currentState!.validate()) {
-      String fullRollNo =
-          "UCSTT-$selectedYearCode-${rollNumberController.text.trim()}";
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green, size: 30),
-              SizedBox(width: 10),
-              Text("Success", style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: Text(
-            "Hello ${widget.name},\nYour student account has been created successfully!\n\n"
-            "Phone: ${widget.phone}\n"
-            "Roll No: $fullRollNo\n"
-            "Level: $selectedYearLevel\n"
-            "Semester: $selectedSemester",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: const Text(
-                "OK",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final themeColor = const Color(0xff0F7C90);
+    final size = MediaQuery.of(context).size;
+    final w = size.width;
+    final h = size.height;
 
-    return Scaffold(
-      backgroundColor: const Color(0xfff7f7f7),
-      appBar: AppBar(
-        title: const Text(
-          "Student Profile Setup",
-          style: TextStyle(fontWeight: FontWeight.bold),
+    const primaryBlue = Color(0xff004197);
+    const backgroundBlue = Color(0xfff0f4fd);
+    const lightBlueInput = Color(0xffeaf4ff);
+
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+
+        appBar: AppBar(
+          backgroundColor: const Color(0xfff8fafe),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: primaryBlue,
+              size: w * 0.06,
+            ),
+            onPressed: () {},
+          ),
+          title: Text(
+            'Student Details',
+            style: TextStyle(
+              color: const Color(0xff0f2942),
+              fontWeight: FontWeight.bold,
+              fontSize: w * 0.05,
+            ),
+          ),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.black,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _studentFormKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Welcome, ${widget.name}! 👋",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: themeColor,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "Complete your student profile information to finish registration.",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                ),
-                const SizedBox(height: 25),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.grey.shade200),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.05),
-                        spreadRadius: 5,
-                        blurRadius: 15,
-                      ),
-                    ],
-                  ),
+
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: w * 0.06),
+
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Roll Number",
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: h * 0.02),
+
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            flex: 3,
-                            child: TextFormField(
-                              readOnly: true,
-                              initialValue: "UCSTT",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade800,
-                                fontSize: 14,
-                              ),
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                fillColor: Colors.grey.shade100,
-                                filled: true,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: BorderSide(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                              ),
+                          Text(
+                            "Step 2 of 2",
+                            style: TextStyle(
+                              color: primaryBlue,
+                              fontWeight: FontWeight.w600,
+                              fontSize: w * 0.038,
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 5,
-                            child: DropdownButtonFormField<String>(
-                              value: selectedYearCode,
-                              hint: const Center(
-                                child: Text(
-                                  "Aca Year",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                              isExpanded: true,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                  horizontal: 10,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              items: academicYears.map((String year) {
-                                return DropdownMenuItem<String>(
-                                  value: year,
-                                  child: Center(
-                                    child: Text(
-                                      year,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) =>
-                                  setState(() => selectedYearCode = value),
-                              validator: (value) =>
-                                  value == null ? "Required" : null,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 4,
-                            child: TextFormField(
-                              controller: rollNumberController,
-                              keyboardType: TextInputType.number,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              style: const TextStyle(fontSize: 14),
-                              decoration: InputDecoration(
-                                hintText: "No.",
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 16,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              validator: (value) =>
-                                  (value == null || value.trim().isEmpty)
-                                  ? "Required"
-                                  : null,
+                          Text(
+                            "Personalization",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: w * 0.035,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
+
+                      SizedBox(height: h * 0.015),
+
+                      const LinearProgressIndicator(
+                        value: 1,
+                        minHeight: 6,
+                        backgroundColor: backgroundBlue,
+                        valueColor: AlwaysStoppedAnimation(primaryBlue),
+                      ),
+
+                      SizedBox(height: h * 0.03),
+
+                      Text(
+                        "Finalize Profile",
+                        style: TextStyle(
+                          fontSize: w * 0.065,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xff0f2942),
+                        ),
+                      ),
+
+                      SizedBox(height: h * 0.015),
+
+                      Text(
+                        "Please provide your academic credentials to finish your canteen registration.",
+                        style: TextStyle(
+                          fontSize: w * 0.038,
+                          color: Colors.black54,
+                          height: 1.4,
+                        ),
+                      ),
+
+                      SizedBox(height: h * 0.03),
+
+                      Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 500),
+
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(w * 0.05),
+
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(w * 0.06),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.blue.withOpacity(0.08),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Year Level",
+                                  "Roll Number",
                                   style: TextStyle(
-                                    color: Colors.grey.shade700,
                                     fontWeight: FontWeight.w600,
+                                    color: Colors.blueAccent,
+                                    fontSize: w * 0.04,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                DropdownButtonFormField<String>(
-                                  value: selectedYearLevel,
-                                  hint: const Text(
-                                    "Select Year",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  isExpanded: true,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  decoration: InputDecoration(
-                                    prefixIcon: const Icon(
-                                      Icons.school_outlined,
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                      horizontal: 10,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  items: yearLevels.map((String level) {
-                                    return DropdownMenuItem<String>(
-                                      value: level,
-                                      child: Text(
-                                        level,
-                                        style: const TextStyle(fontSize: 14),
+
+                                SizedBox(height: h * 0.015),
+
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: w * 0.04,
+                                        vertical: h * 0.018,
                                       ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) =>
-                                      setState(() => selectedYearLevel = value),
-                                  validator: (value) => value == null
-                                      ? "Please select year"
-                                      : null,
+                                      decoration: BoxDecoration(
+                                        color: lightBlueInput,
+                                        borderRadius:
+                                            BorderRadius.circular(w * 0.03),
+                                      ),
+                                      child: Text(
+                                        "UCSTT",
+                                        style: TextStyle(
+                                          fontSize: w * 0.037,
+                                          color: Colors.black54,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+
+                                    SizedBox(width: w * 0.02),
+
+                                    Expanded(
+                                      child: DropdownButtonFormField<String>(
+                                        value: selectedYearBatch,
+                                        isExpanded: true,
+                                        decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: lightBlueInput,
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: w * 0.03,
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(w * 0.03),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                        ),
+                                        items: ["22-23", "23-24", "24-25"]
+                                            .map((e) => DropdownMenuItem(
+                                                  value: e,
+                                                  child: Text(
+                                                    e,
+                                                    style: TextStyle(
+                                                      fontSize: w * 0.037,
+                                                    ),
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedYearBatch = value;
+                                          });
+                                        },
+                                      ),
+                                    ),
+
+                                    SizedBox(width: w * 0.02),
+
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _rollNoController,
+                                        decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: lightBlueInput,
+                                          hintText: "Roll No",
+                                          contentPadding: EdgeInsets.symmetric(
+                                            horizontal: w * 0.04,
+                                            vertical: h * 0.018,
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(w * 0.03),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+
+                                SizedBox(height: h * 0.025),
+
                                 Text(
                                   "Semester",
                                   style: TextStyle(
-                                    color: Colors.grey.shade700,
                                     fontWeight: FontWeight.w600,
+                                    fontSize: w * 0.04,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+
+                                SizedBox(height: h * 0.012),
+
                                 DropdownButtonFormField<String>(
                                   value: selectedSemester,
-                                  hint: const Text(
-                                    "Select Sem",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
                                   isExpanded: true,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
                                   decoration: InputDecoration(
-                                    prefixIcon: const Icon(
-                                      Icons.calendar_month_outlined,
+                                    filled: true,
+                                    fillColor: lightBlueInput,
+                                    prefixIcon: Icon(
+                                      Icons.calendar_today_outlined,
+                                      size: w * 0.05,
                                     ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 14,
-                                      horizontal: 10,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: w * 0.04,
+                                      vertical: h * 0.018,
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
+                                      borderRadius:
+                                          BorderRadius.circular(w * 0.03),
+                                      borderSide: BorderSide.none,
                                     ),
                                   ),
-                                  items: semesters.map((String sem) {
-                                    return DropdownMenuItem<String>(
-                                      value: sem,
-                                      child: Text(
-                                        sem,
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) =>
-                                      setState(() => selectedSemester = value),
-                                  validator: (value) => value == null
-                                      ? "Please select sem"
-                                      : null,
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: "First Semester",
+                                      child: Text("First Semester"),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: "Second Semester",
+                                      child: Text("Second Semester"),
+                                    ),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedSemester = value;
+                                    });
+                                  },
+                                ),
+
+                                SizedBox(height: h * 0.025),
+
+                                Text(
+                                  "Year Level",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: w * 0.04,
+                                  ),
+                                ),
+
+                                SizedBox(height: h * 0.012),
+
+                                DropdownButtonFormField<String>(
+                                  value: selectedYearLevel,
+                                  isExpanded: true,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: lightBlueInput,
+                                    prefixIcon: Icon(
+                                      Icons.school_outlined,
+                                      size: w * 0.05,
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: w * 0.04,
+                                      vertical: h * 0.018,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(w * 0.03),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: "First Year",
+                                      child: Text("First Year"),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: "Second Year",
+                                      child: Text("Second Year"),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: "Third Year",
+                                      child: Text("Third Year"),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: "Fourth Year",
+                                      child: Text("Fourth Year"),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: "Fifth Year",
+                                      child: Text("Fifth Year"),
+                                    ),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedYearLevel = value;
+                                    });
+                                  },
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 30),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: themeColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          onPressed: completeRegistration,
-                          child: const Text(
-                            "Complete Setup",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ),
                       ),
+
+                      SizedBox(height: h * 0.03),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              SafeArea(
+                top: false,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: w * 0.06,
+                    vertical: h * 0.02,
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: h * 0.07,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(w * 0.08),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Complete Registration",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: w * 0.04,
+                            ),
+                          ),
+                          SizedBox(width: w * 0.02),
+                          Icon(
+                            Icons.check_circle_outline,
+                            color: Colors.white,
+                            size: w * 0.05,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
+
