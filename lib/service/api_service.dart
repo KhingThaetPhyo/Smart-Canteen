@@ -50,7 +50,7 @@ import 'package:smartcanteen/model/register_model.dart'; // Make sure this path 
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "http://192.168.1.9:8000/api";
+  static const String baseUrl = "http://192.168.1.21:8000/api";
 
   final Dio _dio = Dio(
     BaseOptions(
@@ -65,36 +65,70 @@ class ApiService {
   );
 
   Future<RegisterModel?> registerUser({
-    required String name,
-    required String email,
-    required String phone,
-    required String password,
-    required String role,
-  }) async {
+  required String name,
+  required String email,
+  required String phone,
+  required String password,
+  required String role,
+   String? studentId,
+   String? semester,
+   String? academicYear,
+   String? yearLevel,
+  required String walletPin,
+}) async {
     try {
+      print({
+  'user_name': name,
+  'user_email': email,
+  'user_phone': phone,
+  'user_password': password,
+  'role_name': role,
+  'student_id': studentId,
+  'semester': semester,
+  'academic_year': academicYear,
+  'year_level': yearLevel,
+  'wallet_pin': walletPin,
+});
       final response = await _dio.post(
         "/register",
         data: {
-          'user_name': name,
-          'user_email': email,
-          'user_phone': phone,
-          'user_password': password,
-          'role_name': role, // default based on your JSON example
-        },
+  'user_name': name,
+  'user_phone': phone,
+  'user_email': email,
+  'user_password': password,
+  'role_name': role,
+  'student_id': studentId,
+  'semester': semester,
+  'academic_year': academicYear,
+  'year_level': yearLevel,
+  'wallet_pin': walletPin,
+},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Dio automatically parses JSON string responses into a Map/List,
         // so response.data can be passed directly to your fromJson factory.
         final responseData = response.data;
+        print("Response Data:");
+print(response.data);
         return RegisterModel.fromJson(responseData);
       } else {
         print('Server Error: ${response.statusCode} - ${response.data}');
         return null;
       }
-    } catch (e) {
-      print('Network Error: $e');
-      return null;
-    }
+    } on DioException catch (e) {
+  print("========== DIO ERROR ==========");
+  print("Type: ${e.type}");
+  print("Message: ${e.message}");
+  print("Status Code: ${e.response?.statusCode}");
+  print("Response: ${e.response?.data}");
+  print("===============================");
+
+  if (e.response != null) {
+    throw e.response!.data["message"];
+  }
+
+  throw "Unable to connect to server.";
+}
   }
 }

@@ -5,21 +5,25 @@ part 'user_model.g.dart';
 
 @JsonSerializable(explicitToJson: true, fieldRename: FieldRename.snake)
 class UserModel {
-  final int userId;
+  final int? userId;
   final String userName;
   final String userPhone;
   final String userEmail;
+  final String userPassword;
   final String roleName;
   final String? fcmToken;
   final String updatedAt;
   final String createdAt;
-  final StudentModel? student;
+  //final StudentModel? student;
+  @JsonKey(name: 'student_academic')
+final StudentModel? student;
 
   UserModel({
-    required this.userId,
+    this.userId,
     required this.userName,
     required this.userPhone,
     required this.userEmail,
+    required this.userPassword,
     required this.roleName,
     this.fcmToken,
     required this.updatedAt,

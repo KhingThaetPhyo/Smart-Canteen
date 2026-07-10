@@ -4,7 +4,7 @@ part 'student_model.g.dart';
 
 @JsonSerializable(explicitToJson: true, fieldRename: FieldRename.snake)
 class StudentModel {
-  final int academicId;
+  final int? academicId;
   final int userId;
   final String studentId;
   final String academicYear;
@@ -14,7 +14,7 @@ class StudentModel {
   final String updatedAt;
 
   StudentModel({
-    required this.academicId,
+     this.academicId,
     required this.userId,
     required this.studentId,
     required this.academicYear,

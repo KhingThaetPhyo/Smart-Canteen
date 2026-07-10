@@ -7,7 +7,7 @@ part of 'student_model.dart';
 // **************************************************************************
 
 StudentModel _$StudentModelFromJson(Map<String, dynamic> json) => StudentModel(
-  academicId: (json['academic_id'] as num).toInt(),
+  academicId: (json['academic_id'] as num?)?.toInt(),
   userId: (json['user_id'] as num).toInt(),
   studentId: json['student_id'] as String,
   academicYear: json['academic_year'] as String,

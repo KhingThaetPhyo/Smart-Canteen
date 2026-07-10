@@ -1,29 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
 import 'package:smartcanteen/view/student_info_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
 
 final router = GoRouter(
-  initialLocation: "/student_info",
+  initialLocation: "/register",
   routes: [
     GoRoute(
       path: "/login",
-      builder: (context, state) => const LoginScreen(),
+      builder: (context, state) => const Loginscreen(),
     ),
+    // GoRoute(
+    //   path: "/student_info",
+    //   builder: (context, state) => const StudentInfoScreen(
+    //     // name: '',
+    //     // email: '',
+    //     // password: '',
+    //     // phone: '',
+    //   ),
+    // ),
     GoRoute(
-      path: "/student_info",
-      builder: (context, state) => const StudentInfoScreen(
-        // name: '',
-        // email: '',
-        // password: '',
-        // phone: '',
-      ),
-    ),
+  path: "/student_info",
+  builder: (context, state) {
+
+    final user = state.extra as UserModel;
+
+    return StudentInfoScreen(
+      user: user,
+    );
+  },
+),
     GoRoute(
       path: "/wallet_info",
-      builder: (context, state) => const WalletInfoScreen(),
+      builder: (context, state) {
+
+    final user = state.extra as UserModel;
+
+    return WalletInfoScreen(
+      user: user,
+    );
+  },
     ),
     GoRoute(path: "/register",
     builder: (context, state) => const RegisterScreen(),

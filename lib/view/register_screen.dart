@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/model/user_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -102,9 +103,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     if (!RegExp(
-      r'^[a-zA-Z0-9._%+-]+@ucstt\.edu\.mm$',
+      r'^[a-zA-Z0-9._%+-]+@gmail\.com$',
     ).hasMatch(value)) {
-      return "Use username@ucstt.edu.mm";
+      return "Use username@gmail.com";
     }
 
     return null;
@@ -273,7 +274,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               decoration: decoration(
                                 "Email Address",
                                 Icons.email_outlined,
-                                "you@ucstt.edu.mm",
+                                "you@gmail.com",
                               ),
                             ),
 
@@ -446,32 +447,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                                 12),
                                   ),
                                 ),
-                                // onPressed: () {
-                                //   if (_formKey
-                                //       .currentState!
-                                //       .validate()) {
-                                //         print("going to next page.");
-                                //     context.go('/student_info');
-
-                                //   }
-                                // },
                                 onPressed: () {
-  print("Button pressed");
 
   final valid = _formKey.currentState!.validate();
-  print("Valid = $valid");
 
   if (valid) {
-    print("Before navigation");
 
-    try {
-      context.go('/student_info');
-      print("After navigation");
-    } catch (e, stackTrace) {
-      print(e);
-      print(stackTrace);
+    final user = UserModel(
+      //userId: 0,
+      userName: nameController.text,
+      userPhone: phoneController.text,
+      userEmail: emailController.text,
+      roleName: isStudent ? "student" : "teacher",
+      fcmToken: null,
+      updatedAt: DateTime.now().toString(),
+      createdAt: DateTime.now().toString(),
+      student: null, 
+      userPassword: passwordController.text,
+    );
+
+
+    if (isStudent) {
+
+      // Register -> Student Info
+      context.go(
+        '/student_info',
+        extra: user,
+      );
+
+
+    } else {
+
+      // Register -> Wallet Info
+      context.go(
+        '/wallet_info',
+        extra: user,
+      );
+
     }
+
   }
+
 },
                                 child: Text(
                                   "Continue",
