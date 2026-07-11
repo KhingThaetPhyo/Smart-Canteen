@@ -403,6 +403,7 @@
 //   }
 // }
 import 'dart:ui';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
@@ -451,7 +452,21 @@ class _WalletInfoScreenState extends State<WalletInfoScreen> {
     }
   }
 
-
+void _showRegistrationFailedDialog(String message) {
+  AwesomeDialog(
+    context: context,
+    dialogType: DialogType.error,
+    animType: AnimType.scale,
+    title: "Registration Failed",
+    desc: message,
+    dismissOnTouchOutside: false,
+    dismissOnBackKeyPress: false,
+    btnOkText: "OK",
+    btnOkOnPress: () {
+      context.go("/register");
+    },
+  ).show();
+}
   void _handleComplete() async {
 
   print("========== HANDLE COMPLETE ==========");
@@ -471,39 +486,53 @@ class _WalletInfoScreenState extends State<WalletInfoScreen> {
     setState(() {
   _isLoading = true;
 });
-
 try {
   final result = await ApiService().registerUser(
     name: widget.user.userName,
     email: widget.user.userEmail,
     phone: widget.user.userPhone,
-    password: widget.user.userPassword,
+    password: widget.user.userPassword ?? "",
     role: widget.user.roleName,
     studentId: widget.user.student!.studentId,
     semester: widget.user.student!.semester,
     academicYear: widget.user.student!.academicYear,
     yearLevel: widget.user.student!.yearLevel,
-    walletPin: _pin, 
+    walletPin: _pin,
   );
 
-  print("registerUser returned: $result");
+  setState(() {
+    _isLoading = false;
+  });
 
+  // Registration Success
   if (result != null && result.success) {
     setState(() {
-      _isLoading = false;
       _isSuccess = true;
     });
+
+    if (!mounted) return;
+
+    // Go directly to HomeScreen
+    context.go("/home"); // Change "/home" if your home route is different.
+  }
+
+  // Registration Failed
+  else {
+    if (!mounted) return;
+
+    _showRegistrationFailedDialog(
+  result?.message ?? "Registration failed.",
+);
   }
 } catch (e) {
   setState(() {
     _isLoading = false;
   });
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(e.toString()),
-      backgroundColor: Colors.red,
-    ),
+  if (!mounted) return;
+
+  _showRegistrationFailedDialog(
+    e.toString(),
   );
 }
 

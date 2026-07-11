@@ -9,7 +9,7 @@ class UserModel {
   final String userName;
   final String userPhone;
   final String userEmail;
-  final String userPassword;
+  final String? userPassword;
   final String roleName;
   final String? fcmToken;
   final String updatedAt;
@@ -23,7 +23,7 @@ final StudentModel? student;
     required this.userName,
     required this.userPhone,
     required this.userEmail,
-    required this.userPassword,
+    this.userPassword,
     required this.roleName,
     this.fcmToken,
     required this.updatedAt,

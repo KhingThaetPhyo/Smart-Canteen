@@ -50,7 +50,7 @@ import 'package:smartcanteen/model/register_model.dart'; // Make sure this path 
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "http://192.168.1.21:8000/api";
+  static const String baseUrl = "http://192.168.1.4:8000/api";
 
   final Dio _dio = Dio(
     BaseOptions(
@@ -116,7 +116,7 @@ print(response.data);
         print('Server Error: ${response.statusCode} - ${response.data}');
         return null;
       }
-    } on DioException catch (e) {
+    }on DioException catch (e) {
   print("========== DIO ERROR ==========");
   print("Type: ${e.type}");
   print("Message: ${e.message}");
@@ -125,7 +125,23 @@ print(response.data);
   print("===============================");
 
   if (e.response != null) {
-    throw e.response!.data["message"];
+    final data = e.response!.data;
+
+    // Validation errors (422)
+    if (data["errors"] != null) {
+      String errorMessage = "";
+
+      (data["errors"] as Map<String, dynamic>).forEach((key, value) {
+        if (value is List && value.isNotEmpty) {
+          errorMessage += "${value.first}\n";
+        }
+      });
+
+      throw errorMessage.trim();
+    }
+
+    // Other server errors
+    throw data["message"] ?? "Registration failed.";
   }
 
   throw "Unable to connect to server.";

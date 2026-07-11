@@ -11,7 +11,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   userName: json['user_name'] as String,
   userPhone: json['user_phone'] as String,
   userEmail: json['user_email'] as String,
-  userPassword: json['user_password'] as String,
+  userPassword: json['user_password'] as String?,
   roleName: json['role_name'] as String,
   fcmToken: json['fcm_token'] as String?,
   updatedAt: json['updated_at'] as String,
