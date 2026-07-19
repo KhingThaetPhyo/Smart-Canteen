@@ -452,20 +452,121 @@ class _WalletInfoScreenState extends State<WalletInfoScreen> {
     }
   }
 
-void _showRegistrationFailedDialog(String message) {
-  AwesomeDialog(
+void _showRegistrationFailedDialog(
+  BuildContext context,
+  String message,
+) {
+  showDialog(
     context: context,
-    dialogType: DialogType.error,
-    animType: AnimType.scale,
-    title: "Registration Failed",
-    desc: message,
-    dismissOnTouchOutside: false,
-    dismissOnBackKeyPress: false,
-    btnOkText: "OK",
-    btnOkOnPress: () {
-      context.go("/register");
+    barrierDismissible: false,
+    builder: (_) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Container(
+          width: 300,
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.08),
+                blurRadius: 30,
+                spreadRadius: 5,
+                offset: const Offset(0, 15),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              /// Emoji
+              Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  color: Colors.yellow.shade300,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.yellow.withOpacity(.5),
+                      blurRadius: 20,
+                    ),
+                  ],
+                ),
+                child: const Center(
+                  child: Text(
+                    "☹️",
+                    style: TextStyle(fontSize: 48),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Registration Failed!!!",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff2E3A59),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 15,
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xff64B5F6),
+                      Color(0xff1976D2),
+                    ],
+                  ),
+                ),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    minimumSize: const Size(double.infinity, 48),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    context.go("/register");
+                  },
+                  child: const Text(
+                    "OK",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     },
-  ).show();
+  );
 }
   void _handleComplete() async {
 
@@ -487,19 +588,30 @@ void _showRegistrationFailedDialog(String message) {
   _isLoading = true;
 });
 try {
+  // final result = await ApiService().registerUser(
+  //   name: widget.user.userName,
+  //   email: widget.user.userEmail,
+  //   phone: widget.user.userPhone,
+  //   password: widget.user.userPassword ?? "",
+  //   role: widget.user.roleName,
+  //   studentId: widget.user.student!.studentId,
+  //   semester: widget.user.student!.semester,
+  //   academicYear: widget.user.student!.academicYear,
+  //   yearLevel: widget.user.student!.yearLevel,
+  //   walletPin: _pin,
+  // );
   final result = await ApiService().registerUser(
-    name: widget.user.userName,
-    email: widget.user.userEmail,
-    phone: widget.user.userPhone,
-    password: widget.user.userPassword ?? "",
-    role: widget.user.roleName,
-    studentId: widget.user.student!.studentId,
-    semester: widget.user.student!.semester,
-    academicYear: widget.user.student!.academicYear,
-    yearLevel: widget.user.student!.yearLevel,
-    walletPin: _pin,
-  );
-
+  name: widget.user.userName,
+  email: widget.user.userEmail,
+  phone: widget.user.userPhone,
+  password: widget.user.userPassword ?? "",
+  role: widget.user.roleName,
+  studentId: widget.user.student?.studentId,
+  semester: widget.user.student?.semester,
+  academicYear: widget.user.student?.academicYear,
+  yearLevel: widget.user.student?.yearLevel,
+  walletPin: _pin,
+);
   setState(() {
     _isLoading = false;
   });
@@ -521,6 +633,7 @@ try {
     if (!mounted) return;
 
     _showRegistrationFailedDialog(
+  context,
   result?.message ?? "Registration failed.",
 );
   }
@@ -532,6 +645,7 @@ try {
   if (!mounted) return;
 
   _showRegistrationFailedDialog(
+     context,
     e.toString(),
   );
 }
@@ -553,12 +667,11 @@ try {
     print(widget.user.userId);
     print(widget.user.userPassword);
     print("rolename"+widget.user.roleName);
-    print("studentid"+widget.user.student!.studentId);
-    print(widget.user.student!.academicId);
-    print("academic year"+widget.user.student!.academicYear);
-    print("name"+widget.user.student!.semester);
-    print(widget.user.student!.userId);
-
+print("studentid: ${widget.user.student?.studentId}");
+print("academicId: ${widget.user.student?.academicId}");
+print("academic year: ${widget.user.student?.academicYear}");
+print("semester: ${widget.user.student?.semester}");
+print("userId: ${widget.user.student?.userId}");
     return Scaffold(
             appBar: AppBar(
         leading: IconButton(

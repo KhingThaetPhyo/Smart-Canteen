@@ -16,30 +16,59 @@ final router = GoRouter(
     ),
     GoRoute(
       path: "/home",
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) => const Homescreen(),
     ),
-    GoRoute(
+//     GoRoute(
+//   path: "/student_info",
+//   builder: (context, state) {
+
+//     final user = state.extra as UserModel;
+
+//     return StudentInfoScreen(
+//       user: user,
+//     );
+//   },
+// ),
+//     GoRoute(
+//       path: "/wallet_info",
+//       builder: (context, state) {
+
+//     final user = state.extra as UserModel;
+
+//     return WalletInfoScreen(
+//       user: user,
+//     );
+//   },
+//     ),
+GoRoute(
   path: "/student_info",
   builder: (context, state) {
+    final user = state.extra as UserModel?;
 
-    final user = state.extra as UserModel;
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text("User data not found")),
+      );
+    }
 
-    return StudentInfoScreen(
-      user: user,
-    );
+    return StudentInfoScreen(user: user);
   },
 ),
-    GoRoute(
-      path: "/wallet_info",
-      builder: (context, state) {
 
-    final user = state.extra as UserModel;
+GoRoute(
+  path: "/wallet_info",
+  builder: (context, state) {
+    final user = state.extra as UserModel?;
 
-    return WalletInfoScreen(
-      user: user,
-    );
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text("User data not found")),
+      );
+    }
+
+    return WalletInfoScreen(user: user);
   },
-    ),
+),
     GoRoute(path: "/register",
     builder: (context, state) => const RegisterScreen(),
     ),

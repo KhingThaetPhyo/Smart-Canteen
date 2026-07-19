@@ -1,354 +1,160 @@
 import 'package:flutter/material.dart';
-import 'package:smartcanteen/view/historyscreen.dart';
-import 'package:smartcanteen/view/orderscreen.dart';
-import 'package:smartcanteen/view/profilescreen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class Homescreen extends StatefulWidget {
+  const Homescreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<Homescreen> createState() => _HomescreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-  String _selectedCategory = "Hot Drinks";
+class _HomescreenState extends State<Homescreen> {
+  int _selectedCategoryIndex = 0;
 
-  final List<Map<String, dynamic>> _categories = [
-    {"name": "Hot Drinks"},
-    {"name": "Iced"},
-    {"name": "Lattee"},
-    {"name": "Frappe"},
+  final List<String> categories = [
+    'All',
+    'Snack',
+    'Drinks',
+    'Dessert',
+    'Bakery',
+    'Candy',
+    'Ice Cream',
+    'Smoothies',
+    'Fast Food',
+    'Coffee',
   ];
 
-  late final List<Widget> _screens;
+  final List<Map<String, String>> horizontalIceCreams = [
+    {'name': 'Matcha Delight', 'price': '\$ 12.34'},
+    {'name': 'Mango Smoothie', 'price': '\$ 10.50'},
+    {'name': 'Strawberry Twist', 'price': '\$ 11.99'},
+    {'name': 'Vanilla Bean', 'price': '\$ 9.00'},
+    {'name': 'Chocolate Fudge', 'price': '\$ 13.00'},
+    {'name': 'Taro Heaven', 'price': '\$ 11.50'},
+    {'name': 'Berry Blast', 'price': '\$ 12.00'},
+    {'name': 'Coconut Dream', 'price': '\$ 10.00'},
+    {'name': 'Avocado Cream', 'price': '\$ 14.00'},
+    {'name': 'Durian Special', 'price': '\$ 15.50'},
+  ];
 
-  @override
-  void initState() {
-    super.initState();
-    _screens = [
-      _buildHomeContent(),
-      HistoryScreen(),
-      const OrderScreen(),
-      const ProfileScreen(),
-    ];
-  }
+  final List<Map<String, String>> verticalIceCreams = [
+    {'name': 'Mint Chocolate Chip', 'price': '\$3.99'},
+    {'name': 'Caramel Crunch', 'price': '\$4.50'},
+    {'name': 'Cookie Dough Special', 'price': '\$4.99'},
+    {'name': 'Coffee Almond Fudge', 'price': '\$5.20'},
+    {'name': 'Pistachio Perfection', 'price': '\$4.80'},
+    {'name': 'Rocky Road Classic', 'price': '\$4.60'},
+    {'name': 'Banana Split Cup', 'price': '\$6.00'},
+    {'name': 'Blueberry Cheesecake', 'price': '\$5.50'},
+    {'name': 'Mango Tango Gelato', 'price': '\$4.20'},
+    {'name': 'Red Velvet Scoop', 'price': '\$5.00'},
+  ];
 
   @override
   Widget build(BuildContext context) {
-    const Color primaryColor = Color(0xFF0A7083);
+    const customTealColor = Color(
+      0xFF0F7B8E,
+    ); // Good morning ရဲ့ နောက်ခံ Teal အရောင်
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEFECE5),
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          selectedItemColor: primaryColor,
-          unselectedItemColor: Colors.black38,
-          showUnselectedLabels: true,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: const TextStyle(fontSize: 12),
-          items: [
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _selectedIndex == 0
-                        ? const Color(0xFFE4F2F5)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.home_outlined),
-                ),
-              ),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _selectedIndex == 1
-                        ? const Color(0xFFE4F2F5)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.history),
-                ),
-              ),
-              label: 'History',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _selectedIndex == 2
-                        ? const Color(0xFFE4F2F5)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.shopping_bag_outlined),
-                ),
-              ),
-              label: 'Orders',
-            ),
-            BottomNavigationBarItem(
-              icon: Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _selectedIndex == 3
-                        ? const Color(0xFFE4F2F5)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Icons.person_outline),
-                ),
-              ),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHomeContent() {
-    const Color tealColor = Color(0xFF0A7083);
-    const Color darkBrownColor = Color(0xFF321E14);
-
-    final List<Map<String, dynamic>> products = [
-      {
-        'title': 'Caramel Cappuccino',
-        'rating': 5,
-        'reviews': '(15)',
-        'price': '\$12.5',
-      },
-      {
-        'title': 'French Vanilla Cappuccino',
-        'rating': 5,
-        'reviews': '(21)',
-        'price': '\$15.00',
-      },
-    ];
-
-    return SafeArea(
-      top: false,
-      child: SingleChildScrollView(
+      extendBody: true,
+      body: SafeArea(
+        top: true,
+        bottom: false,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- HEADER CONTAINER (BANNER) ---
+            // ၁။ Header Card
             Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                color: darkBrownColor,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
+              decoration: BoxDecoration(
+                color: customTealColor,
+                borderRadius: const BorderRadius.only(
                   bottomRight: Radius.circular(40),
                 ),
-              ),
-              padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Hello,',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Htet Lin Kyaw 👋',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Stack(
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(10),
-                            child: const Icon(
-                              Icons.notifications_none_outlined,
-                              color: Colors.black87,
-                              size: 24,
-                            ),
-                          ),
-                          Positioned(
-                            right: 10,
-                            top: 10,
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Colors.redAccent,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                boxShadow: [
+                  BoxShadow(
+                    color: customTealColor.withOpacity(0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
-                  const SizedBox(height: 24),
-
-                  // --- POINTS CARD BLOCK ---
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: tealColor,
-                      borderRadius: BorderRadius.circular(24),
+                ],
+              ),
+              padding: const EdgeInsets.only(
+                top: 20.0,
+                left: 24.0,
+                right: 24.0,
+                bottom: 20.0,
+              ),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.white24,
+                    child: Icon(
+                      Icons.person_outline,
+                      size: 22,
+                      color: Colors.white,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: const [
-                            Icon(
-                              Icons.auto_awesome,
-                              color: Colors.white70,
-                              size: 16,
-                            ),
-                            SizedBox(width: 6),
                             Text(
-                              'MY POINTS',
+                              'Good morning',
                               style: TextStyle(
                                 color: Colors.white70,
-                                fontWeight: FontWeight.bold,
                                 fontSize: 12,
-                                letterSpacing: 1.1,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          textBaseline: TextBaseline.alphabetic,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          children: const [
+                            SizedBox(height: 1),
                             Text(
-                              '1,525',
+                              'Wa Thon',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 36,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              'pts',
-                              style: TextStyle(
-                                color: Colors.white70,
                                 fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            ElevatedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.card_giftcard,
-                                size: 16,
-                                color: tealColor,
-                              ),
-                              label: const Text(
-                                'Exchange food',
-                                style: TextStyle(
-                                  color: tealColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                elevation: 0,
+                            const Text(
+                              'MY POINTS',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.0,
+                                fontSize: 10,
                               ),
                             ),
-                            const SizedBox(width: 10),
-                            OutlinedButton.icon(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.trending_up,
-                                size: 16,
-                                color: Colors.white70,
-                              ),
-                              label: const Text(
-                                'Earn more',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              style: OutlinedButton.styleFrom(
-                                side: const BorderSide(color: Colors.white38),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: const [
+                                Text(
+                                  '1555',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
+                                SizedBox(width: 2),
+                                Text(
+                                  'pts',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
@@ -358,313 +164,398 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
 
-            // --- SEARCH BAR SECTION ---
+            // ၂။ Search Bar နှင့် Category Tabs
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE5E1D8),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: Colors.black12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 4,
-                ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search shops...',
-                    hintStyle: TextStyle(color: Colors.black38),
-                    border: InputBorder.none,
-                    icon: Icon(Icons.search, color: Colors.black45),
-                  ),
-                ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
               ),
-            ),
-            const SizedBox(height: 24),
-
-            // --- CATEGORIES LABELS ---
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'Categories',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: darkBrownColor,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 45, // Slightly increased height for better tap targets
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: _categories.length,
-                itemBuilder: (context, index) {
-                  final item = _categories[index];
-                  bool isSelected = _selectedCategory == item['name'];
-
-                  return GestureDetector(
-                    behavior: HitTestBehavior
-                        .opaque, // Makes the entire padding zone clickable
-                    onTap: () {
-                      setState(() {
-                        _selectedCategory = item['name'];
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            item['name'],
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? darkBrownColor
-                                  : Colors.black45,
-                            ),
-                          ),
-                          if (isSelected) ...[
-                            const SizedBox(height: 4),
-                            Container(
-                              width: 16,
-                              height: 2,
-                              decoration: BoxDecoration(
-                                color: darkBrownColor,
-                                borderRadius: BorderRadius.circular(1),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // --- HORIZONTAL COFFEE CARDS FEED ---
-            SizedBox(
-              height: 230,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return Container(
-                    width: 160,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 4,
-                    ),
+              child: Column(
+                children: [
+                  Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E1410),
-                      borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 6,
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              height: 110,
-                              width: double.infinity,
-                              color: Colors.black26,
-                              child: const Center(
-                                child: Icon(
-                                  Icons.coffee_rounded,
-                                  size: 40,
-                                  color: Colors.white54,
-                                ),
-                              ),
-                            ),
+                    child: SizedBox(
+                      height: 46,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search_',
+                          hintStyle: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF9CA3AF),
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            color: Color(0xFF9CA3AF),
+                            size: 20,
+                          ),
+                          suffixIcon: const Icon(
+                            Icons.close,
+                            color: Color(0xFF9CA3AF),
+                            size: 20,
+                          ),
+                          filled: true,
+                          fillColor: const Color(
+                            0xFFF3F4F6,
+                          ), // အဖြူရောင်ပေါ်မှာ ထင်ရှားအောင် မီးခိုးနုလေး သုံးထားပါတယ်
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 0,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Cappuccino',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              const Text(
-                                'With creamy milk',
-                                style: TextStyle(
-                                  color: Colors.white54,
-                                  fontSize: 11,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: const [
-                                      Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                        size: 14,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        '4.2',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFC77C4C),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // --- VERTICAL COFFEE PRODUCT LIST ITEMS ---
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
+                  ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
                     child: Row(
-                      children: [
-                        Container(
-                          width: 90,
-                          height: 90,
-                          decoration: BoxDecoration(
-                            color: darkBrownColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.coffee_maker_outlined,
-                              color: Colors.white,
-                              size: 36,
+                      children: List.generate(categories.length, (index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedCategoryIndex = index;
+                              });
+                            },
+                            child: CategoryTab(
+                              title: categories[index],
+                              isSelected: _selectedCategoryIndex == index,
+                              activeColor: customTealColor,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                product['title'],
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: darkBrownColor,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  Row(
-                                    children: List.generate(
-                                      product['rating'],
-                                      (index) => const Icon(
-                                        Icons.star,
-                                        color: Colors.orangeAccent,
-                                        size: 14,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    product['reviews'],
-                                    style: const TextStyle(
-                                      color: Colors.black38,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                product['price'],
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: darkBrownColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.favorite_border,
-                            color: Colors.black54,
-                          ),
-                          onPressed: () {},
-                        ),
-                      ],
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 5),
+
+            // ၃။ Horizontal Cards (Teal အရောင် ဖောင်းကြွကတ်များ)
+            SizedBox(
+              height: 150,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemCount: horizontalIceCreams.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      right: 14.0,
+                      bottom: 12.0,
+                      top: 4,
+                    ),
+                    child: _buildGridItem(
+                      horizontalIceCreams[index]['name']!,
+                      horizontalIceCreams[index]['price']!,
+                      Icons.icecream_outlined,
+                      customTealColor,
                     ),
                   );
                 },
               ),
             ),
-            const SizedBox(height: 24),
+
+            // ၄။ Vertical Cards (Teal အရောင် ဖောင်းကြွကတ်များ)
+            Expanded(
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  bottom: 110.0,
+                ),
+                itemCount: verticalIceCreams.length,
+                itemBuilder: (context, index) {
+                  final item = verticalIceCreams[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 14.0),
+                    child: _buildListItem(
+                      item['name']!,
+                      item['price']!,
+                      Icons.icecream_rounded,
+                      customTealColor,
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
+
+      // Floating Action Button (QR Scan - အဖြူရောင် ပေါ်လွင်စေရန် ပြင်ဆင်ထားသည်)
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Transform.translate(
+        offset: const Offset(0, 12),
+        child: Container(
+          height: 58,
+          width: 58,
+          decoration: BoxDecoration(
+            color: Colors
+                .white, // အောက်ခြေ Teal ထဲမှာ ပေါ်လွင်အောင် အဖြူရောင် ပြောင်းထားပါတယ်
+            shape: BoxShape.circle,
+            border: Border.all(color: customTealColor, width: 3),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            onPressed: () {},
+            child: const Icon(
+              Icons.qr_code_scanner,
+              color: customTealColor,
+              size: 24,
+            ),
+          ),
+        ),
+      ),
+
+      // Bottom Navigation Bar (Teal အရောင် ဖောင်းကြွဒီဇိုင်း)
+      bottomNavigationBar: Container(
+        height: 68,
+        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        decoration: BoxDecoration(
+          color:
+              customTealColor, // Good morning နောက်ခံအတိုင်း ပြောင်းလဲပေးထားပါတယ်
+          borderRadius: BorderRadius.circular(32),
+          boxShadow: [
+            BoxShadow(
+              color: customTealColor.withOpacity(
+                0.4,
+              ), // ထင်းနေသော ဖောင်းကြွ Shadow
+              blurRadius: 15,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildBottomNavItem(Icons.home_rounded, 'ပင်မ', true),
+            _buildBottomNavItem(Icons.assignment_rounded, 'အော်ဒါများ', false),
+            const SizedBox(width: 40), // QR နေရာလွတ်
+            _buildBottomNavItem(
+              Icons.account_balance_wallet_rounded,
+              'ပိုက်ဆံအိတ်',
+              false,
+            ),
+            _buildBottomNavItem(Icons.person_rounded, 'ကိုယ်ရေး', false),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavItem(IconData icon, String label, bool isActive) {
+    final color = isActive
+        ? Colors.white
+        : Colors.white60; // စာလုံးနှင့် အိုင်ကွန်များကို အဖြူရောင်သန်းထားပါတယ်
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(icon, color: color, size: 22),
+        const SizedBox(height: 3),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 10,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGridItem(
+    String name,
+    String price,
+    IconData icon,
+    Color themeColor,
+  ) {
+    return Container(
+      width: 135,
+      decoration: BoxDecoration(
+        color: themeColor, // ကတ်နောက်ခံကို Teal အရောင်ပြောင်းထားပါတယ်
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: themeColor.withOpacity(
+              0.4,
+            ), // ပိုမိုထင်ရှားသော ဖောင်းကြွရိပ်
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 65,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(
+                0.15,
+              ), // ကတ်ထဲက အိုင်ကွန်ကွက်ကို အဖြူလင်းလင်းလေး ထားထားပါတယ်
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, size: 28, color: Colors.white),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            price,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.bold,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListItem(
+    String name,
+    String price,
+    IconData icon,
+    Color themeColor,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeColor, // ကတ်နောက်ခံကို Teal အရောင်ပြောင်းထားပါတယ်
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: themeColor.withOpacity(
+              0.35,
+            ), // ပိုမိုထင်ရှားသော ဖောင်းကြွရိပ်
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          Container(
+            height: 50,
+            width: 70,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, size: 26, color: Colors.white),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  price,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryTab extends StatelessWidget {
+  final String title;
+  final bool isSelected;
+  final Color activeColor;
+
+  const CategoryTab({
+    super.key,
+    required this.title,
+    required this.isSelected,
+    required this.activeColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? activeColor : const Color(0xFF9CA3AF),
+          ),
+        ),
+        SizedBox(
+          height: 5.0,
+          child: isSelected
+              ? Container(
+                  margin: const EdgeInsets.only(top: 4.0),
+                  height: 3.0,
+                  width: 16,
+                  decoration: BoxDecoration(
+                    color: activeColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
     );
   }
 }
