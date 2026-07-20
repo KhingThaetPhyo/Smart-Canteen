@@ -247,29 +247,38 @@ class _LoginscreenState extends State<Loginscreen> {
                               width: double.infinity,
                               height: 55,
                               child: ElevatedButton(
-                                onPressed: () async {
+                              onPressed: () async {
+  print("Login button clicked");
+
   if (_formKey.currentState!.validate()) {
+    print("Form validation passed");
+
     try {
+      print("Calling loginUser API...");
+
       final result = await ApiService().loginUser(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      if (result != null && result.success == true) {
-        if (!mounted) return;
+      print("API Result: $result");
 
-        // Student and Teacher both go to HomeScreen
+      if (result != null && result.success == true) {
+        print("Login successful");
+        if (!mounted) return;
         context.go('/home');
       } else {
+        print("Login failed: ${result?.message}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              result?.message ?? 'Invalid email or password',
+              result?.message ?? "Invalid email or password",
             ),
           ),
         );
       }
     } catch (e) {
+      print("Login Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );

@@ -51,7 +51,7 @@ import 'package:smartcanteen/model/register_model.dart'; // Make sure this path 
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "http://192.168.1.15:8000/api";
+  static const String baseUrl = "http://192.168.1.18:8000/api";
 
   final Dio _dio = Dio(
     BaseOptions(
@@ -155,6 +155,8 @@ Future<LoginModel?> loginUser({
   required String password,
 }) async {
   try {
+    print("Sending login request...");
+
     final response = await _dio.post(
       '/login',
       data: {
@@ -163,19 +165,27 @@ Future<LoginModel?> loginUser({
       },
     );
 
+    print("Login Response: ${response.data}");
+
     if (response.statusCode == 200) {
       return LoginModel.fromJson(response.data);
-    } else {
-      return null;
     }
-  } on DioException catch (e) {
-    if (e.response != null) {
-      final data = e.response!.data;
-      throw data['message'] ?? 'Login failed.';
-    }
+    return null;
+  }  on DioException catch (e) {
+  print("========== LOGIN DIO ERROR ==========");
+  print("Type: ${e.type}");
+  print("Message: ${e.message}");
+  print("Status Code: ${e.response?.statusCode}");
+  print("Response: ${e.response?.data}");
+  print("=====================================");
 
-    throw 'Unable to connect to server.';
+  if (e.response != null) {
+    final data = e.response!.data;
+    throw data['message'] ?? 'Login failed.';
   }
+
+  throw 'Unable to connect to server.';
+}
 }
 }
 
