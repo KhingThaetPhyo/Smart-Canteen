@@ -8,7 +8,7 @@ import 'package:smartcanteen/view/student_info_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
 
 final router = GoRouter(
-  initialLocation: "/home",
+  initialLocation: "/login",
   routes: [
     GoRoute(
       path: "/login",

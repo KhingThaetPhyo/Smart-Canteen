@@ -408,6 +408,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/service/api_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class WalletInfoScreen extends StatefulWidget {
   final UserModel user;
@@ -571,6 +572,7 @@ void _showRegistrationFailedDialog(
   void _handleComplete() async {
 
   print("========== HANDLE COMPLETE ==========");
+  
   print("PIN: $_pin");
   print("Length: ${_pin.length}");
   print("Loading: $_isLoading");
@@ -588,30 +590,28 @@ void _showRegistrationFailedDialog(
   _isLoading = true;
 });
 try {
-  // final result = await ApiService().registerUser(
-  //   name: widget.user.userName,
-  //   email: widget.user.userEmail,
-  //   phone: widget.user.userPhone,
-  //   password: widget.user.userPassword ?? "",
-  //   role: widget.user.roleName,
-  //   studentId: widget.user.student!.studentId,
-  //   semester: widget.user.student!.semester,
-  //   academicYear: widget.user.student!.academicYear,
-  //   yearLevel: widget.user.student!.yearLevel,
-  //   walletPin: _pin,
-  // );
-  final result = await ApiService().registerUser(
-  name: widget.user.userName,
-  email: widget.user.userEmail,
-  phone: widget.user.userPhone,
-  password: widget.user.userPassword ?? "",
-  role: widget.user.roleName,
-  studentId: widget.user.student?.studentId,
-  semester: widget.user.student?.semester,
-  academicYear: widget.user.student?.academicYear,
-  yearLevel: widget.user.student?.yearLevel,
-  walletPin: _pin,
-);
+      // FCM token ယူခြင်း
+      String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+      // Console မှာ user device token print ထုတ်ခြင်း
+      print("====================================");
+      print("User Device FCM Token:");
+      print(fcmToken);
+      print("====================================");
+
+      final result = await ApiService().registerUser(
+        name: widget.user.userName,
+        email: widget.user.userEmail,
+        phone: widget.user.userPhone,
+        password: widget.user.userPassword ?? "",
+        role: widget.user.roleName,
+        studentId: widget.user.student?.studentId,
+        semester: widget.user.student?.semester,
+        academicYear: widget.user.student?.academicYear,
+        yearLevel: widget.user.student?.yearLevel,
+        walletPin: _pin,
+        fcmToken: fcmToken, // API ကို token ပို့ခြင်း
+      );
   setState(() {
     _isLoading = false;
   });

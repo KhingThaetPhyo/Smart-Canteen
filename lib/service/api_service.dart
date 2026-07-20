@@ -71,40 +71,44 @@ class ApiService {
   required String phone,
   required String password,
   required String role,
-   String? studentId,
-   String? semester,
-   String? academicYear,
-   String? yearLevel,
+  String? studentId,
+  String? semester,
+  String? academicYear,
+  String? yearLevel,
   required String walletPin,
+  String? fcmToken, // FCM Token ထည့်ရန်
 }) async {
-    try {
-      print({
-  'user_name': name,
-  'user_email': email,
-  'user_phone': phone,
-  'user_password': password,
-  'role_name': role,
-  'student_id': studentId,
-  'semester': semester,
-  'academic_year': academicYear,
-  'year_level': yearLevel,
-  'wallet_pin': walletPin,
-});
-      final response = await _dio.post(
-        "/register",
-        data: {
-  'user_name': name,
-  'user_phone': phone,
-  'user_email': email,
-  'user_password': password,
-  'role_name': role,
-  'student_id': studentId,
-  'semester': semester,
-  'academic_year': academicYear,
-  'year_level': yearLevel,
-  'wallet_pin': walletPin,
-},
-      );
+  try {
+    print({
+      'user_name': name,
+      'user_email': email,
+      'user_phone': phone,
+      'user_password': password,
+      'role_name': role,
+      'student_id': studentId,
+      'semester': semester,
+      'academic_year': academicYear,
+      'year_level': yearLevel,
+      'wallet_pin': walletPin,
+      'fcm_token': fcmToken,
+    });
+
+    final response = await _dio.post(
+      "/register",
+      data: {
+        'user_name': name,
+        'user_phone': phone,
+        'user_email': email,
+        'user_password': password,
+        'role_name': role,
+        'student_id': studentId,
+        'semester': semester,
+        'academic_year': academicYear,
+        'year_level': yearLevel,
+        'wallet_pin': walletPin,
+        'fcm_token': fcmToken, // API ကို token ပို့ခြင်း
+      },
+    );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Dio automatically parses JSON string responses into a Map/List,
