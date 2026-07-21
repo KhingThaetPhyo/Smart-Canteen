@@ -560,6 +560,7 @@
 //   }
 // }
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/view/profilescreen.dart';
 
 // ---------------------------------------------------------------------
@@ -644,7 +645,9 @@ class _MainNavigationScreenState extends State<Homescreen> {
           child: FloatingActionButton(
             elevation: 0,
             backgroundColor: Colors.transparent,
-            onPressed: () {},
+            onPressed: () {
+              context.go('/scan_qr');
+            },
             child: const Icon(
               Icons.qr_code_scanner,
               color: Colors.white,

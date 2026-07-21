@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+//permission for album image
+<uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <application
         android:label="smartcanteen"
         android:name="${applicationName}"

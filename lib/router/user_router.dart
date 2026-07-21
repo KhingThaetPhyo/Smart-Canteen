@@ -4,8 +4,10 @@ import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/view/homescreen.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
+import 'package:smartcanteen/view/qr_scanner_screen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
 import 'package:smartcanteen/view/student_info_screen.dart';
+import 'package:smartcanteen/view/user_qr_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
 
 final router = GoRouter(
@@ -73,6 +75,18 @@ final router = GoRouter(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
     ),
+    GoRoute(
+  path: '/user_qr',
+  builder: (context, state) {
+    final qrData = state.extra as String? ?? '';
+
+    return UserQrScreen(qrData: qrData);
+  },
+),
+GoRoute(
+  path: '/scan_qr',
+  builder: (context, state) => const QrScannerScreen(),
+),
   ],
 );
 

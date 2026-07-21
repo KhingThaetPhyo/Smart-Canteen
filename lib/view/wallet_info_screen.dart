@@ -402,6 +402,7 @@
 //     );
 //   }
 // }
+import 'dart:convert';
 import 'dart:ui';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -635,8 +636,27 @@ if (result != null && result.success) {
 
   if (!mounted) return;
 
-  // Go directly to HomeScreen
-  context.go('/home');
+//   // Create unique QR data for the user
+// final qrData = result.user?.userId != null
+//     ? 'SMARTCANTEEN_USER_${result.user!.userId}'
+//     : 'SMARTCANTEEN_USER';
+
+// // Navigate to QR screen
+// context.go(
+//   '/user_qr',
+//   extra: qrData,
+// );
+// Create QR data with username and student ID
+final qrData = jsonEncode({
+  'user_name': result.user?.userName ?? '',
+  'student_id': result.user?.student?.studentId ?? '',
+});
+
+// Navigate to QR screen
+context.go(
+  '/home',
+  extra: qrData,
+);
 }
   // Registration Failed
   else {
