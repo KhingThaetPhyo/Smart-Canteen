@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
+import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/view/homescreen.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
@@ -8,69 +9,69 @@ import 'package:smartcanteen/view/student_info_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
 
 final router = GoRouter(
-  initialLocation: "/login",
+  initialLocation: '/login',
+
+  // Check token when app opens
+  redirect: (context, state) async {
+    final token = await SecureStorageService.getToken();
+
+    final isLoggedIn = token != null && token.isNotEmpty;
+    final isAuthPage = state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register';
+
+    // If logged in, don't allow login/register page
+    if (isLoggedIn && isAuthPage) {
+      return '/home';
+    }
+
+    // If not logged in, don't allow home page
+    if (!isLoggedIn && state.matchedLocation == '/home') {
+      return '/login';
+    }
+
+    return null;
+  },
+
   routes: [
     GoRoute(
-      path: "/login",
+      path: '/login',
       builder: (context, state) => const Loginscreen(),
     ),
     GoRoute(
-      path: "/home",
+      path: '/home',
       builder: (context, state) => const Homescreen(),
     ),
-//     GoRoute(
-//   path: "/student_info",
-//   builder: (context, state) {
+    GoRoute(
+      path: '/student_info',
+      builder: (context, state) {
+        final user = state.extra as UserModel?;
 
-//     final user = state.extra as UserModel;
+        if (user == null) {
+          return const Scaffold(
+            body: Center(child: Text('User data not found')),
+          );
+        }
 
-//     return StudentInfoScreen(
-//       user: user,
-//     );
-//   },
-// ),
-//     GoRoute(
-//       path: "/wallet_info",
-//       builder: (context, state) {
+        return StudentInfoScreen(user: user);
+      },
+    ),
+    GoRoute(
+      path: '/wallet_info',
+      builder: (context, state) {
+        final user = state.extra as UserModel?;
 
-//     final user = state.extra as UserModel;
+        if (user == null) {
+          return const Scaffold(
+            body: Center(child: Text('User data not found')),
+          );
+        }
 
-//     return WalletInfoScreen(
-//       user: user,
-//     );
-//   },
-//     ),
-GoRoute(
-  path: "/student_info",
-  builder: (context, state) {
-    final user = state.extra as UserModel?;
-
-    if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("User data not found")),
-      );
-    }
-
-    return StudentInfoScreen(user: user);
-  },
-),
-
-GoRoute(
-  path: "/wallet_info",
-  builder: (context, state) {
-    final user = state.extra as UserModel?;
-
-    if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text("User data not found")),
-      );
-    }
-
-    return WalletInfoScreen(user: user);
-  },
-),
-    GoRoute(path: "/register",
-    builder: (context, state) => const RegisterScreen(),
+        return WalletInfoScreen(user: user);
+      },
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
     ),
   ],
 );
@@ -84,26 +85,9 @@ class UserRouter extends StatefulWidget {
 
 class _UserRouterState extends State<UserRouter> {
   @override
-  void initState() {
-    super.initState();
-    //checkLogin();
-  }
-
-  // void checkLogin() async {
-  //   final token = await SecureStore.getToken();
-  //   await Future.delayed(const Duration(seconds: 1));
-
-  //   if (!mounted) return;
-
-  //   if (token != null) {
-  //     context.go("/home");
-  //   } else {
-  //     context.go("/login");
-  //   }
-  // }
-
-  @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
+    );
   }
 }

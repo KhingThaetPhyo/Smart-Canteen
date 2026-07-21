@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/api_service.dart';
+import 'package:smartcanteen/service/secure_storage_service.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -262,12 +263,26 @@ class _LoginscreenState extends State<Loginscreen> {
       );
 
       print("API Result: $result");
+if (result != null && result.success == true) {
+  print("Login successful");
 
-      if (result != null && result.success == true) {
-        print("Login successful");
-        if (!mounted) return;
-        context.go('/home');
-      } else {
+  // Save auth token
+  if (result.token != null) {
+    await SecureStorageService.saveToken(result.token!);
+  }
+
+  // Save FCM token
+  if (result.user?.fcmToken != null) {
+    await SecureStorageService.saveFcmToken(
+      result.user!.fcmToken!,
+    );
+  }
+
+  if (!mounted) return;
+
+  // Go to HomeScreen
+  context.go('/home');
+} else {
         print("Login failed: ${result?.message}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

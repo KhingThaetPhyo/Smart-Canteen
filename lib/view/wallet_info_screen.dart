@@ -409,6 +409,7 @@ import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:smartcanteen/service/secure_storage_service.dart';
 
 class WalletInfoScreen extends StatefulWidget {
   final UserModel user;
@@ -617,17 +618,26 @@ try {
   });
 
   // Registration Success
-  if (result != null && result.success) {
-    setState(() {
-      _isSuccess = true;
-    });
+if (result != null && result.success) {
+  setState(() {
+    _isSuccess = true;
+  });
 
-    if (!mounted) return;
-
-    // Go directly to HomeScreen
-    context.go("/home"); // Change "/home" if your home route is different.
+  // Save auth token
+  if (result.token != null) {
+    await SecureStorageService.saveToken(result.token!);
   }
 
+  // Save FCM token
+  if (result.user?.fcmToken != null) {
+    await SecureStorageService.saveFcmToken(result.user!.fcmToken!);
+  }
+
+  if (!mounted) return;
+
+  // Go directly to HomeScreen
+  context.go('/home');
+}
   // Registration Failed
   else {
     if (!mounted) return;
