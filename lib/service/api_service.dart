@@ -6,7 +6,7 @@ import 'package:smartcanteen/model/register_model.dart'; // Make sure this path 
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "http://192.168.1.10:8000/api";
+  static const String baseUrl = "http://192.168.1.7:8000/api";
 
   final Dio _dio = Dio(
     BaseOptions(

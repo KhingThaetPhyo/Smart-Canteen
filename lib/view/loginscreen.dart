@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/api_service.dart';
@@ -264,12 +266,15 @@ class _LoginscreenState extends State<Loginscreen> {
 
       print("API Result: $result");
 if (result != null && result.success == true) {
+
   print("Login successful");
+
 
   // Save auth token
   if (result.token != null) {
     await SecureStorageService.saveToken(result.token!);
   }
+
 
   // Save FCM token
   if (result.user?.fcmToken != null) {
@@ -278,10 +283,29 @@ if (result != null && result.success == true) {
     );
   }
 
+
+  // Create QR data
+  final qrData = jsonEncode({
+    'user_name': result.user?.userName ?? '',
+    'student_id': result.user?.student?.studentId ?? '',
+  });
+
+
+  // Save QR permanently
+  await SecureStorageService.saveQrData(qrData);
+
+
+  print("LOGIN QR DATA:");
+  print(qrData);
+
+
   if (!mounted) return;
 
-  // Go to HomeScreen
-  context.go('/home');
+
+  context.go(
+    '/navigation',
+    extra: qrData,
+  );
 } else {
         print("Login failed: ${result?.message}");
         ScaffoldMessenger.of(context).showSnackBar(

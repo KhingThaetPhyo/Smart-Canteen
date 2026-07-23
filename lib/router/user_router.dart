@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
+import 'package:smartcanteen/navigation_bar.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
-import 'package:smartcanteen/view/homescreen.dart';
+import 'package:smartcanteen/view/home/homescreen.dart';
+// import 'package:smartcanteen/view/homescreen.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
+import 'package:smartcanteen/view/notification_screen.dart';
+import 'package:smartcanteen/view/orderscreen.dart';
+import 'package:smartcanteen/view/profilescreen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
+import 'package:smartcanteen/view/search_screen.dart';
 import 'package:smartcanteen/view/student_info_screen.dart';
 import 'package:smartcanteen/view/user_qr_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
+import 'package:smartcanteen/view/wallet_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/login',
@@ -23,11 +30,11 @@ final router = GoRouter(
 
     // If logged in, don't allow login/register page
     if (isLoggedIn && isAuthPage) {
-      return '/home';
+      return '/navigation';
     }
 
     // If not logged in, don't allow home page
-    if (!isLoggedIn && state.matchedLocation == '/home') {
+    if (!isLoggedIn && state.matchedLocation == '/navigation') {
       return '/login';
     }
 
@@ -87,6 +94,36 @@ GoRoute(
   path: '/scan_qr',
   builder: (context, state) => const QrScannerScreen(),
 ),
+GoRoute(
+  path: '/noti',
+  builder: (context, state) => const NotificationScreen(),
+),
+GoRoute(
+  path: '/search',
+  builder: (context, state) => const SearchScreen(),
+),
+GoRoute(
+  path: '/navigation',
+  builder: (context, state) {
+
+    final qrData = state.extra as String? ?? '';
+    return MainNavigation(
+      qrData: qrData,
+    );
+  },
+),
+    GoRoute(
+      path: '/order',
+      builder: (context, state) => const OrderScreen(),
+    ),
+    GoRoute(
+      path: '/wallet',
+      builder: (context, state) => const WalletScreen(),
+    ),
+    GoRoute(
+      path: '/profile',
+      builder: (context, state) => const ProfileScreen(),
+    ),
   ],
 );
 

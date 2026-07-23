@@ -647,14 +647,22 @@ if (result != null && result.success) {
 //   extra: qrData,
 // );
 // Create QR data with username and student ID
-final qrData = jsonEncode({
+var qrData = jsonEncode({
   'user_name': result.user?.userName ?? '',
   'student_id': result.user?.student?.studentId ?? '',
 });
+print("User QR Data -------  {$qrData}");
+await SecureStorageService.saveQrData(qrData);
+ final savedQr =
+        await SecureStorageService.getQrData();
 
+
+    print("========== QR STORAGE ==========");
+    print(savedQr);
+    print("================================");
 // Navigate to QR screen
 context.go(
-  '/home',
+  '/navigation',
   extra: qrData,
 );
 }

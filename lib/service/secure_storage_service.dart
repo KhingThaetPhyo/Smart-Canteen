@@ -31,4 +31,18 @@ class SecureStorageService {
     await _storage.delete(key: tokenKey);
     await _storage.delete(key: fcmTokenKey);
   }
+
+  static Future<void> saveQrData(String qrData) async {
+  await _storage.write(
+    key: "qr_data",
+    value: qrData,
+  );
+}
+
+
+static Future<String?> getQrData() async {
+  return await _storage.read(
+    key: "qr_data",
+  );
+}
 }
