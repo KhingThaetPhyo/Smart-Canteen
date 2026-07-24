@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../search/search_screen.dart';
-import '../../notification/notification_screen.dart';
 
-class HomeHeader extends StatelessWidget {
+import '../../notification/notification_screen.dart';
+import '../../scanner/scanner_screen.dart';
+import '../../search/search_screen.dart';
+import '../../wallet/wallet_screen.dart';
+import '../../wallet/transfer_screen.dart';
+
+class HomeHeader extends StatefulWidget {
   final String userName;
   final String major;
   final String studentId;
   final int points;
+  final Function(int tabIndex)? onSelectTab;
 
   const HomeHeader({
     super.key,
@@ -15,13 +20,34 @@ class HomeHeader extends StatelessWidget {
     required this.major,
     required this.studentId,
     required this.points,
+    this.onSelectTab,
   });
 
+  @override
+  State<HomeHeader> createState() => _HomeHeaderState();
+
   static const Color primaryColor = Color(0xff117992);
+}
+
+class _HomeHeaderState extends State<HomeHeader> {
+  late int _currentPoints;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPoints = widget.points;
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.points != widget.points) {
+      _currentPoints = widget.points;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Exact half-height of the Quick Action box
     const double halfCardHeight = 48;
 
     return Stack(
@@ -73,7 +99,7 @@ class HomeHeader extends StatelessWidget {
                     ),
                   ),
 
-                  /// HOME HEADER NOTIFICATION ICON - MODERN GLASS
+                  /// NOTIFICATION ICON
                   InkWell(
                     onTap: () {
                       Navigator.push(
@@ -104,8 +130,6 @@ class HomeHeader extends StatelessWidget {
                             color: Colors.white,
                             size: 24,
                           ),
-
-                          /// UNREAD BADGE
                           Positioned(
                             top: -2,
                             right: -2,
@@ -119,14 +143,10 @@ class HomeHeader extends StatelessWidget {
                                 minHeight: 18,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(
-                                  0xffFF5252,
-                                ), // Vibrant Accent
+                                color: const Color(0xffFF5252),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: const Color(
-                                    0xff117992,
-                                  ), // Matches Header BG for a clean cutout effect
+                                  color: const Color(0xff117992),
                                   width: 2,
                                 ),
                               ),
@@ -164,7 +184,7 @@ class HomeHeader extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  userName,
+                  widget.userName,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -178,14 +198,14 @@ class HomeHeader extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  "$major • $studentId",
+                  "${widget.major} • ${widget.studentId}",
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              /// POINTS CARD (Option 1: Glassmorphic Modern)
+              /// POINTS CARD
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -198,7 +218,6 @@ class HomeHeader extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    /// ICON BADGE
                     Container(
                       width: 48,
                       height: 48,
@@ -216,8 +235,6 @@ class HomeHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 16),
-
-                    /// POINTS TEXT
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +250,7 @@ class HomeHeader extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            "${NumberFormat('#,###').format(points)} pts",
+                            "${NumberFormat('#,###').format(_currentPoints)} pts",
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 26,
@@ -287,13 +304,12 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
 
-              /// GAP BETWEEN SEARCH BAR & QUICK ACTION CARD
               const SizedBox(height: 24),
             ],
           ),
         ),
 
-        /// FLOATING QUICK ACTIONS (Glassmorphic)
+        /// FLOATING QUICK ACTIONS
         Positioned(
           left: 20,
           right: 20,
@@ -315,38 +331,174 @@ class HomeHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _QuickAction(
                   icon: Icons.qr_code_scanner_rounded,
                   title: "Scan",
-                  iconColor: Color(0xff117992),
-                  bgColor: Color(0xffEAF7F9),
+                  iconColor: const Color(0xff117992),
+                  bgColor: const Color(0xffEAF7F9),
+                  onTap: () {
+                    if (widget.onSelectTab != null) {
+                      widget.onSelectTab!(2);
+                    }
+                  },
                 ),
                 _QuickAction(
-                  icon: Icons.receipt_long_rounded,
-                  title: "Orders",
-                  iconColor: Color(0xff117992),
-                  bgColor: Color(0xffEAF7F9),
+                  icon: Icons.qr_code_2_rounded,
+                  title: "Receive",
+                  iconColor: const Color(0xff117992),
+                  bgColor: const Color(0xffEAF7F9),
+                  onTap: () => _showReceiveQRModal(context),
                 ),
                 _QuickAction(
                   icon: Icons.send_rounded,
                   title: "Transfer",
-                  iconColor: Color(0xff117992),
-                  bgColor: Color(0xffEAF7F9),
+                  iconColor: const Color(0xff117992),
+                  bgColor: const Color(0xffEAF7F9),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TransferScreen(
+                          currentBalance: _currentPoints,
+                          onTransferCompleted: (amount, recipient) {
+                            setState(() {
+                              _currentPoints -= amount;
+                            });
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 _QuickAction(
                   icon: Icons.account_balance_wallet_rounded,
-                  title: "wallet",
-                  iconColor: Color(0xff117992),
-                  bgColor: Color(0xffEAF7F9),
+                  title: "Wallet",
+                  iconColor: const Color(0xff117992),
+                  bgColor: const Color(0xffEAF7F9),
+                  onTap: () {
+                    if (widget.onSelectTab != null) {
+                      widget.onSelectTab!(3);
+                    }
+                  },
                 ),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  /// MODAL BOTTOM SHEET TO SHOW RECEIVE QR CODE
+  void _showReceiveQRModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle Bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            const Text(
+              "Receive Points",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xff1E293B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Show this QR code to the sender to receive points",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+
+            // QR Code Container
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xffF8FAFC),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xffE2E8F0)),
+              ),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.qr_code_2_rounded,
+                    size: 200,
+                    color: Color(0xff117992),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    widget.userName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "ID: ${widget.studentId}",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Close Button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff117992),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  "Done",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
     );
   }
 
@@ -363,45 +515,51 @@ class _QuickAction extends StatelessWidget {
   final String title;
   final Color iconColor;
   final Color bgColor;
+  final VoidCallback onTap;
 
   const _QuickAction({
     required this.icon,
     required this.title,
     required this.iconColor,
     required this.bgColor,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 72,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(16),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: 72,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(icon, color: iconColor, size: 26),
             ),
-            child: Icon(icon, color: iconColor, size: 26),
-          ),
-          const SizedBox(height: 6),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              title,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Color(0xff334155),
+            const SizedBox(height: 6),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff334155),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

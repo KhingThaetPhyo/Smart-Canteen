@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'widgets/notification_card.dart';
 import 'widgets/notification_tab_bar.dart';
+import '../orders/widgets/pickup_qr_dialog.dart';
 
 class NotificationModel {
   final String id;
   final NotificationType type;
+  final String? pickupCode;
   final String title;
   final String message;
   final String time;
@@ -13,6 +15,7 @@ class NotificationModel {
 
   NotificationModel({
     required this.id,
+    this.pickupCode,
     required this.type,
     required this.title,
     required this.message,
@@ -36,6 +39,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   final List<NotificationModel> notifications = [
     NotificationModel(
       id: "1",
+      pickupCode: "MBK-1003",
       type: NotificationType.order,
       title: "Order Ready",
       message: "Your Milk Tea is ready for pickup at Coffee Corner.",
@@ -233,6 +237,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             setState(() {
                               item.isRead = true;
                             });
+
+                            if (item.pickupCode != null) {
+                              showPickUpCodeDialog(context, item.pickupCode!);
+                            }
                           },
                         );
                       },

@@ -8,7 +8,9 @@ import 'widgets/recent_order_card.dart';
 import 'shop_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(int tabIndex)? onSelectTab;
+
+  const HomeScreen({super.key, this.onSelectTab});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -22,18 +24,18 @@ class _HomeScreenState extends State<HomeScreen> {
       "orderDate": "Today, 10:15 AM",
       "totalPrice": "4,500 pts",
       "items": [
-        const OrderItem(name: "Milk Tea", quantity: 2),
-        const OrderItem(name: "Iced Americano", quantity: 1),
+        const OrderItem(name: "Milk Tea", quantity: 2, unitPoints: 1500),
+        const OrderItem(name: "Iced Americano", quantity: 1, unitPoints: 1500),
       ],
     },
     {
       "shopName": "Aunt May Noodles",
-      "orderDate": "Yesterday",
+      "orderDate": "Yesterday, 12:45 PM",
       "totalPrice": "5,000 pts",
       "items": [
-        const OrderItem(name: "Shan Noodle", quantity: 1),
-        const OrderItem(name: "Fried Tofu", quantity: 1),
-        const OrderItem(name: "Green Tea", quantity: 1),
+        const OrderItem(name: "Shan Noodle", quantity: 1, unitPoints: 2000),
+        const OrderItem(name: "Fried Tofu", quantity: 1, unitPoints: 2000),
+        const OrderItem(name: "Green Tea", quantity: 1, unitPoints: 1000),
       ],
     },
   ];
@@ -58,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 major: "Fifth Year",
                 studentId: "UCSTT(22-23)-000",
                 points: 5700,
+                onSelectTab: widget.onSelectTab,
               ),
             ),
 
@@ -151,7 +154,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // TODO: Navigate to full OrdersScreen / Orders tab
+                        if (widget.onSelectTab != null) {
+                          widget.onSelectTab!(1);
+                        }
                       },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,

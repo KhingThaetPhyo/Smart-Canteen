@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:smartcanteen/view/home/home_screen.dart';
 import 'package:smartcanteen/view/orders/orders_screen.dart';
 import 'package:smartcanteen/view/scanner/scanner_screen.dart';
-import 'package:smartcanteen/view/wallet/wallet_screen.dart'; // Updated import
+import 'package:smartcanteen/view/wallet/wallet_screen.dart';
 import 'package:smartcanteen/view/profilescreen.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -18,18 +18,19 @@ class _MainNavigationState extends State<MainNavigation> {
 
   static const Color primaryColor = Color(0xFF117992);
 
-  // Index mapping:
-  // 0: Home
-  // 1: Orders
-  // 2: Scanner (Center Button)
-  // 3: Wallet
-  // 4: Profile
-  final List<Widget> screens = const [
-    HomeScreen(), // Index 0
-    OrdersScreen(), // Index 1
-    ScannerScreen(), // Index 2
-    WalletScreen(), // Index 3
-    ProfileScreen(), // Index 4
+  // REPLACE 'final List<Widget> screens = const [...]' WITH THIS GETTER:
+  List<Widget> get screens => [
+    HomeScreen(
+      onSelectTab: (index) {
+        setState(() {
+          currentIndex = index; // Switches active tab on HomeHeader tap
+        });
+      },
+    ), // Index 0
+    const OrdersScreen(), // Index 1
+    const ScannerScreen(), // Index 2
+    const WalletScreen(), // Index 3
+    const ProfileScreen(), // Index 4
   ];
 
   @override

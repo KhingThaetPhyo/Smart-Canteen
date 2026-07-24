@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'popular_menu_card.dart';
+import '../shop_detail_screen.dart'; // Import ShopDetailScreen
 
 class MenuSection extends StatelessWidget {
   const MenuSection({super.key});
@@ -53,28 +54,45 @@ class MenuSection extends StatelessWidget {
                 shopName: "Coffee Corner",
                 price: 1500,
                 rating: 4.8,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const ShopDetailScreen(shopName: "Coffee Corner"),
+                    ),
+                  );
+                },
               ),
               PopularMenuCard(
                 menuName: "Shan Noodle",
                 shopName: "Aunt May Noodles",
                 price: 3000,
                 rating: 4.9,
-                onTap: () {},
-              ),
-              PopularMenuCard(
-                menuName: "Fried Rice",
-                shopName: "Snack House",
-                price: 2500,
-                rating: 4.7,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const ShopDetailScreen(shopName: "Aunt May Noodles"),
+                    ),
+                  );
+                },
               ),
               PopularMenuCard(
                 menuName: "Thai Milk Tea",
                 shopName: "Coffee Corner",
                 price: 1800,
                 rating: 4.8,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const ShopDetailScreen(shopName: "Coffee Corner"),
+                    ),
+                  );
+                },
               ),
             ],
           ),

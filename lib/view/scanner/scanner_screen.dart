@@ -7,24 +7,131 @@ class ScannerScreen extends StatefulWidget {
   State<ScannerScreen> createState() => _ScannerScreenState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> {
+class _ScannerScreenState extends State<ScannerScreen>
+    with SingleTickerProviderStateMixin {
   static const Color primaryColor = Color(0xff117992);
   bool isFlashOn = false;
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  // Simulated scan success handler
+  void _simulateSuccessfulScan() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xff10B981).withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.check_rounded,
+                color: Color(0xff10B981),
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              "QR Code Detected",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xff1E293B),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              "Coffee Corner Canteen • ID: CC-8921",
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close sheet
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  "Proceed to Pay",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xff0F172A),
       body: Stack(
         children: [
           /// SIMULATED CAMERA VIEWFINDER BACKDROP
-          Container(
-            color: const Color(0xff0F172A),
-            child: Center(
-              child: Icon(
-                Icons.camera_alt_outlined,
-                size: 80,
-                color: Colors.white.withOpacity(0.08),
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xff090D16), Color(0xff0F172A)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.camera_alt_outlined,
+                  size: 90,
+                  color: Colors.white.withOpacity(0.04),
+                ),
               ),
             ),
           ),
@@ -34,49 +141,113 @@ class _ScannerScreenState extends State<ScannerScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    /// TARGET SCAN AREA
-                    Container(
-                      width: 250,
-                      height: 250,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: primaryColor.withOpacity(0.6),
-                          width: 2,
+                GestureDetector(
+                  onTap: _simulateSuccessfulScan, // Tap frame to test scan
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      /// TARGET SCAN AREA BACKGROUND
+                      Container(
+                        width: 260,
+                        height: 260,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.03),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: primaryColor.withOpacity(0.4),
+                            width: 1.5,
+                          ),
                         ),
                       ),
-                    ),
 
-                    /// CORNER RETICLE ACCENTS
-                    SizedBox(
-                      width: 260,
-                      height: 260,
-                      child: CustomPaint(
-                        painter: ScannerCornerPainter(color: primaryColor),
+                      /// ANIMATED SCANNING LINE
+                      AnimatedBuilder(
+                        animation: _animationController,
+                        builder: (context, child) {
+                          return SizedBox(
+                            width: 240,
+                            height: 240,
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 240 * _animationController.value,
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    height: 2,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.transparent,
+                                          primaryColor,
+                                          Colors.transparent,
+                                        ],
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryColor.withOpacity(0.8),
+                                          blurRadius: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    ),
-                  ],
+
+                      /// CORNER RETICLE ACCENTS
+                      SizedBox(
+                        width: 272,
+                        height: 272,
+                        child: CustomPaint(
+                          painter: ScannerCornerPainter(color: primaryColor),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-
-                const SizedBox(height: 24),
-
-                Text(
-                  "Align QR code within the frame to pay",
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                const SizedBox(height: 28),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: Color(0xff10B981),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Align QR code within the frame to pay",
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.85),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
 
-          /// TOP BAR WITH CONTROLS
+          /// TOP BAR WITH CONTROLS (Back button removed)
           Positioned(
             top: 50,
             left: 20,
@@ -88,12 +259,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 14,
-                    vertical: 8,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border: Border.all(color: Colors.white.withOpacity(0.15)),
                   ),
                   child: const Row(
                     children: [
@@ -127,33 +298,42 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         ? Icons.flash_on_rounded
                         : Icons.flash_off_rounded,
                     color: isFlashOn ? Colors.amber : Colors.white,
+                    size: 20,
                   ),
                   style: IconButton.styleFrom(
                     backgroundColor: Colors.black.withOpacity(0.4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
 
-          /// BOTTOM GALLERY PICKER ACTION
+          /// BOTTOM GALLERY PICKER ACTION (Added extra bottom padding to clear the navigation bar)
           Positioned(
-            bottom: 100,
+            bottom: 110,
             left: 0,
             right: 0,
             child: Center(
               child: GestureDetector(
                 onTap: () {
-                  // Action for picking QR image from gallery
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Opening photo gallery..."),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 10,
+                    vertical: 12,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: Colors.white.withOpacity(0.25)),
                   ),
                   child: const Row(
@@ -199,7 +379,7 @@ class ScannerCornerPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    const cornerLength = 24.0;
+    const cornerLength = 28.0;
 
     // Top Left
     canvas.drawPath(
