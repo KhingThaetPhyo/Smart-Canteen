@@ -13,7 +13,6 @@ class RecentOrderCard extends StatelessWidget {
   final String orderDate;
   final String totalPrice;
   final List<OrderItem> items;
-  final VoidCallback? onReorder;
 
   const RecentOrderCard({
     super.key,
@@ -21,7 +20,6 @@ class RecentOrderCard extends StatelessWidget {
     required this.orderDate,
     required this.totalPrice,
     required this.items,
-    this.onReorder,
   });
 
   static const Color primaryColor = Color(0xff117992);
@@ -51,18 +49,23 @@ class RecentOrderCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.storefront_rounded,
-                      size: 18,
-                      color: primaryColor,
-                    ),
-                  ),
+                  /// SHOP LOGO
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Image.asset(
+                "assets/image/chef.jpg",
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
                   const SizedBox(width: 8),
                   Text(
                     shopName,
@@ -169,26 +172,31 @@ class RecentOrderCard extends StatelessWidget {
               ),
 
               /// REORDER BUTTON
-              SizedBox(
-                height: 36,
-                child: ElevatedButton.icon(
-                  onPressed: onReorder,
-                  icon: const Icon(Icons.refresh_rounded, size: 15),
-                  label: const Text(
-                    "Reorder All",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
+ElevatedButton(
+  onPressed: () {
+    
+  },
+
+  child: const Text(
+    "View Detail",
+    style: TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+    ),
+  ),
+
+  style: ElevatedButton.styleFrom(
+    backgroundColor: primaryColor,
+    foregroundColor: Colors.white,
+    elevation: 0,
+    padding: const EdgeInsets.symmetric(
+      horizontal: 14,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+),
             ],
           ),
         ],

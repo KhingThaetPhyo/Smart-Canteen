@@ -696,7 +696,7 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:smartcanteen/view/home/home_header.dart';
-import 'package:smartcanteen/view/home/menu.dart';
+import 'package:smartcanteen/view/home/menu_section.dart';
 import 'package:smartcanteen/view/home/recent_order.dart';
 import 'package:smartcanteen/view/home/shop.dart';
 import 'package:smartcanteen/view/shop_detail_screen.dart';
@@ -719,22 +719,21 @@ class _HomescreenState extends State<Homescreen> {
   // Mock grouped order history data
   final List<Map<String, dynamic>> recentOrdersData = [
     {
-      "shopName": "Coffee Corner",
+      "shopName": "Tun",
       "orderDate": "Today, 10:15 AM",
       "totalPrice": "4,500 pts",
       "items": [
-        const OrderItem(name: "Milk Tea", quantity: 2),
-        const OrderItem(name: "Iced Americano", quantity: 1),
+        const OrderItem(name: "ထမင်း", quantity: 2),
+        const OrderItem(name: "ကြက်ဟင်းခါးသီးကြော်", quantity: 2),
       ],
     },
     {
-      "shopName": "Aunt May Noodles",
-      "orderDate": "Yesterday",
-      "totalPrice": "5,000 pts",
+      "shopName": "Tun",
+      "orderDate": "Today, 10:15 AM",
+      "totalPrice": "4,500 pts",
       "items": [
-        const OrderItem(name: "Shan Noodle", quantity: 1),
-        const OrderItem(name: "Fried Tofu", quantity: 1),
-        const OrderItem(name: "Green Tea", quantity: 1),
+        const OrderItem(name: "ထမင်း", quantity: 2),
+        const OrderItem(name: "ကြက်ဟင်းခါးသီးကြော်", quantity: 2),
       ],
     },
   ];
@@ -755,9 +754,9 @@ class _HomescreenState extends State<Homescreen> {
             /// HEADER
             SliverToBoxAdapter(
               child: HomeHeader(
-                userName: "Wa Thon",
+                userName: "Min Khit",
                 major: "Fifth Year",
-                studentId: "UCSTT(22-23)-000",
+                studentId: "UCSTT(22-23)-025",
                 points: 5700,
               ),
             ),
@@ -782,9 +781,8 @@ class _HomescreenState extends State<Homescreen> {
             SliverList(
               delegate: SliverChildListDelegate([
                 ShopCard(
-                  shopName: "Coffee Corner",
-                  category: "Coffee & Drinks",
-                  rating: 4.8,
+                  shopName: "Aunty Mon",
+                  category: "Daw Mon",
                   estimatedTime: "5 - 10 min",
                   isOpen: true,
                   onTap: () {
@@ -792,16 +790,15 @@ class _HomescreenState extends State<Homescreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            const ShopDetailScreen(shopName: "Coffee Corner"),
+                            const ShopDetailScreen(shopName: "Aunty Mon"),
                       ),
                     );
                   },
                 ),
 
                 ShopCard(
-                  shopName: "Aunt May Noodles",
-                  category: "Noodles",
-                  rating: 4.9,
+                  shopName: "Tun",
+                  category: "U Tun",
                   estimatedTime: "10 - 15 min",
                   isOpen: true,
                   onTap: () {
@@ -809,7 +806,7 @@ class _HomescreenState extends State<Homescreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => const ShopDetailScreen(
-                          shopName: "Aunt May Noodles",
+                          shopName: "Tun",
                         ),
                       ),
                     );
@@ -817,9 +814,8 @@ class _HomescreenState extends State<Homescreen> {
                 ),
 
                 ShopCard(
-                  shopName: "Snack House",
-                  category: "Snacks",
-                  rating: 4.7,
+                  shopName: "A Lin Yaung",
+                  category: "Daw Sandar",
                   estimatedTime: "5 - 8 min",
                   isOpen: false,
                   onTap: () {
@@ -827,7 +823,7 @@ class _HomescreenState extends State<Homescreen> {
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            const ShopDetailScreen(shopName: "Snack House"),
+                            const ShopDetailScreen(shopName: "A Lin Yaung"),
                       ),
                     );
                   },
@@ -883,9 +879,6 @@ class _HomescreenState extends State<Homescreen> {
                   orderDate: order["orderDate"],
                   totalPrice: order["totalPrice"],
                   items: order["items"],
-                  onReorder: () {
-                    // Reorder all items logic
-                  },
                 );
               }, childCount: limitedOrders.length),
             ),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class ShopCard extends StatelessWidget {
   final String shopName;
   final String category;
-  final double rating;
   final bool isOpen;
   final String estimatedTime;
   final VoidCallback? onTap;
@@ -12,7 +11,6 @@ class ShopCard extends StatelessWidget {
     super.key,
     required this.shopName,
     required this.category,
-    required this.rating,
     required this.isOpen,
     required this.estimatedTime,
     this.onTap,
@@ -38,122 +36,142 @@ class ShopCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            // Prevent navigation when the shop is closed
-            onTap: isOpen ? onTap : null,
-            borderRadius: BorderRadius.circular(20),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  /// SHOP LOGO
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: isOpen
-                          ? primaryColor.withOpacity(0.08)
-                          : Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      Icons.storefront_rounded,
-                      size: 38,
-                      color: isOpen ? primaryColor : Colors.grey.shade400,
-                    ),
-                  ),
+        child: Padding(
+  padding: const EdgeInsets.all(12),
+  child: Column(
+    children: [
 
-                  const SizedBox(width: 14),
+      /// TOP SHOP INFO
+      Row(
+        children: [
 
-                  /// CONTENT
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                shopName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: isOpen
-                                      ? const Color(0xff1E293B)
-                                      : Colors.grey.shade600,
-                                ),
-                              ),
-                            ),
-
-                            /// OPEN / CLOSED BADGE
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isOpen
-                                    ? const Color(0xff10B981).withOpacity(0.1)
-                                    : const Color(0xffEF4444).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                isOpen ? "Open" : "Closed",
-                                style: TextStyle(
-                                  color: isOpen
-                                      ? const Color(0xff059669)
-                                      : const Color(0xffDC2626),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        Text(
-                          category,
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 12,
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        /// RATING & TIME
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Colors.amber,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              rating.toString(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+          /// SHOP LOGO
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Image.asset(
+                "assets/image/chef.jpg",
+                fit: BoxFit.cover,
               ),
             ),
           ),
-        ),
+
+          const SizedBox(width: 14),
+
+          /// CONTENT
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                Row(
+                  children: [
+
+                    Expanded(
+                      child: Text(
+                        shopName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isOpen
+                              ? const Color(0xff1E293B)
+                              : Colors.grey.shade600,
+                        ),
+                      ),
+                    ),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isOpen
+                            ? const Color(0xff10B981).withOpacity(0.1)
+                            : const Color(0xffEF4444).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        isOpen ? "Open" : "Closed",
+                        style: TextStyle(
+                          color: isOpen
+                              ? const Color(0xff059669)
+                              : const Color(0xffDC2626),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  category,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+        ],
+      ),
+
+
+      const SizedBox(height: 12),
+
+
+      /// BOTTOM BUTTON
+      SizedBox(
+        width: double.infinity,
+        height: 38,
+        child: ElevatedButton(
+  onPressed: isOpen ? onTap : null,
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.white,
+    disabledBackgroundColor: Colors.grey.shade300,
+
+    side: BorderSide(
+      color: isOpen 
+          ? const Color(0xff117992) 
+          : Colors.grey.shade400,
+      width: 1.5,
+    ),
+
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(14),
+    ),
+
+    elevation: 0,
+  ),
+  child: Text(
+    isOpen ? "View Menu" : "Shop Closed",
+    style: TextStyle(
+      color: isOpen
+          ? const Color(0xff117992)
+          : Colors.grey.shade600,
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    ),
+  ),
+),
+      ),
+
+    ],
+  ),
+),
       ),
     );
   }

@@ -263,11 +263,8 @@ Future<void> _loadQrData() async {
       setState(() {
         qrData = savedQr;
       });
-
     }
-
   }
-
 }
   static const Color primaryColor = Color(0xFF117992);
 
