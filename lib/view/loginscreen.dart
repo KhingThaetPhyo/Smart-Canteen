@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/model/login_model.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 
@@ -269,7 +270,9 @@ if (result != null && result.success == true) {
 
   print("Login successful");
 
-
+await SecureStorageService.saveUser(
+  jsonEncode(result.user!.toJson()),
+);
   // Save auth token
   if (result.token != null) {
     await SecureStorageService.saveToken(result.token!);
@@ -298,14 +301,24 @@ if (result != null && result.success == true) {
   print("LOGIN QR DATA:");
   print(qrData);
 
+if (!mounted) return;
 
-  if (!mounted) return;
-
-
-  context.go(
-    '/navigation',
-    extra: qrData,
+if (result.user == null) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("User data not found"),
+    ),
   );
+  return;
+}
+
+context.go(
+  '/navigation',
+  extra: {
+    'user': result.user!,
+    'qrData': qrData,
+  },
+);
 } else {
         print("Login failed: ${result?.message}");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -404,7 +417,7 @@ if (result != null && result.success == true) {
                         ],
                       ),
 
-                      SizedBox(height: height * .02),
+                      // SizedBox(height: height * .02),
                     ],
                   ),
                 ),

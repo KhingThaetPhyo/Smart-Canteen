@@ -19,6 +19,9 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
   student: json['student_academic'] == null
       ? null
       : StudentModel.fromJson(json['student_academic'] as Map<String, dynamic>),
+  wallet: json['wallet'] == null
+      ? null
+      : WalletModel.fromJson(json['wallet'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -32,4 +35,5 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
   'updated_at': instance.updatedAt,
   'created_at': instance.createdAt,
   'student_academic': instance.student?.toJson(),
+  'wallet': instance.wallet?.toJson(),
 };

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:smartcanteen/model/wallet_model.dart';
 import 'student_model.dart'; // Assuming this exists
 
 part 'user_model.g.dart';
@@ -17,6 +18,8 @@ class UserModel {
   //final StudentModel? student;
   @JsonKey(name: 'student_academic')
 final StudentModel? student;
+@JsonKey(name: 'wallet')
+final WalletModel? wallet;
 
   UserModel({
     this.userId,
@@ -29,6 +32,7 @@ final StudentModel? student;
     required this.updatedAt,
     required this.createdAt,
     this.student,
+    this.wallet,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

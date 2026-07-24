@@ -45,4 +45,19 @@ static Future<String?> getQrData() async {
     key: "qr_data",
   );
 }
+
+static const String userKey = "user";
+static Future<void> saveUser(String user) async {
+  await _storage.write(
+    key: userKey,
+    value: user,
+  );
+}
+
+
+static Future<String?> getUser() async {
+  return await _storage.read(
+    key: userKey,
+  );
+}
 }

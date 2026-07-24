@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:smartcanteen/model/user_model.dart';
+import 'package:smartcanteen/model/wallet_model.dart';
 
 part 'login_model.g.dart';
 
@@ -9,12 +10,14 @@ class LoginModel {
   final String message;
   final String? token;
   final UserModel? user;
+  final WalletModel? wallet;
 
   LoginModel({
     required this.success,
     required this.message,
     this.token,
     this.user,
+    this.wallet,
   });
 
   // Fixed the lowercase 'm' to uppercase 'M' here:

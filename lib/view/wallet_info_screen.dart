@@ -407,6 +407,7 @@ import 'dart:ui';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/model/login_model.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -430,7 +431,7 @@ class _WalletInfoScreenState extends State<WalletInfoScreen> {
 
   bool _isLoading = false;
   bool _isSuccess = false;
-
+late final LoginModel user;
 
   void _pressKey(String num) {
 
@@ -663,7 +664,10 @@ await SecureStorageService.saveQrData(qrData);
 // Navigate to QR screen
 context.go(
   '/navigation',
-  extra: qrData,
+  extra: {
+    'user': user,
+    'qrData': qrData,
+  },
 );
 }
   // Registration Failed

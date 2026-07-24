@@ -14,6 +14,9 @@ RegisterModel _$RegisterModelFromJson(Map<String, dynamic> json) =>
       user: json['user'] == null
           ? null
           : UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      wallet: json['wallet'] == null
+          ? null
+          : WalletModel.fromJson(json['wallet'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RegisterModelToJson(RegisterModel instance) =>
@@ -22,4 +25,5 @@ Map<String, dynamic> _$RegisterModelToJson(RegisterModel instance) =>
       'message': instance.message,
       'token': instance.token,
       'user': instance.user?.toJson(),
+      'wallet': instance.wallet?.toJson(),
     };

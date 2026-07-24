@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:smartcanteen/router/user_router.dart';
 
 void main() async {
@@ -11,6 +12,10 @@ void main() async {
 
   // Notification permission တောင်းခြင်း (optional)
   await FirebaseMessaging.instance.requestPermission();
+    // Hide status bar and navigation bar
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.immersiveSticky,
+  );
 
   runApp(const MyApp());
 }
@@ -25,7 +30,7 @@ class MyApp extends StatelessWidget {
 
       theme: ThemeData(
         useMaterial3: true,
-
+           fontFamily: 'Roboto',
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF4CAF50),
           brightness: Brightness.light,
@@ -56,3 +61,34 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+// import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
+// import 'package:smartcanteen/view/splash_screen.dart';
+
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   // Hide status bar and navigation bar
+//   SystemChrome.setEnabledSystemUIMode(
+//     SystemUiMode.immersiveSticky,
+//   );
+
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//     fontFamily: 'Roboto',
+//   ),
+//       title: 'Material App',
+      
+//       home: const SplashScreen(),
+//     );
+//   }
+// }
