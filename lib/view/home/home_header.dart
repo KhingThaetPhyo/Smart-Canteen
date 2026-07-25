@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends StatelessWidget implements PreferredSizeWidget {
   final String userName;
   final String major;
   final String studentId;
@@ -17,21 +16,26 @@ class HomeHeader extends StatelessWidget {
     required this.points,
   });
 
+  // 1. INCREASE PREFERRED HEIGHT TO ACCOUNT FOR LOWER FLOATING CARD
+  @override
+  Size get preferredSize => const Size.fromHeight(330); // 👈 Increased from 310 to 330
+
   @override
   Widget build(BuildContext context) {
     const double halfCardHeight = 48;
-   final hasNotification=true;
-    
+    final bool hasNotification = true;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        /// HEADER BACKGROUND
+        /// HEADER BACKGROUND (APPBAR CONTAINER)
         Container(
-          padding: EdgeInsets.fromLTRB(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(
             20,
-            MediaQuery.of(context).padding.top + 16,
+            60,
             20,
-            halfCardHeight,
+            halfCardHeight + 24,
           ),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -50,17 +54,14 @@ class HomeHeader extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              /// TOP HEADER: AVATAR + GREETING + NOTIFICATION
+              /// TOP ROW: AVATAR + GREETING + NOTIFICATION
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Profile Avatar
                   Container(
                     width: 54,
                     height: 54,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
                     child: ClipOval(
                       child: Image.asset(
                         "assets/image/user_logo.jpg",
@@ -69,14 +70,12 @@ class HomeHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // Greeting & Name
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "WELCOME BACK",
+                        const Text(
+                          "ကြိုဆိုပါ၏",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -96,70 +95,62 @@ class HomeHeader extends StatelessWidget {
                       ],
                     ),
                   ),
-
-                  // Notification Icon Button
-                 InkWell(
-  onTap: () {
-    context.go('/noti');
-  },
-  borderRadius: BorderRadius.circular(20),
-  child: Container(
-    width: 44,
-    height: 44,
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.12),
-      shape: BoxShape.circle,
-    ),
-    child: Stack(
-      children: [
-        // NOTIFICATION ICON
-        const Center(
-          child: Icon(
-            Icons.notifications_outlined,
-            color: Colors.white,
-            size: 22,
-          ),
-        ),
-
-        // DYNAMIC RED DOT BADGE
-        if (hasNotification)
-          Positioned(
-            top: 10,
-            right: 10,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: const Color(0xffEF4444), // Red spot
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xff117992), // Matches header background
-                  width: 1.5,
-                ),
-              ),
-            ),
-          ),
-      ],
-    ),
-  ),
-)
+                  InkWell(
+                    onTap: () => context.go('/noti'),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Stack(
+                        children: [
+                          const Center(
+                            child: Icon(
+                              Icons.notifications_outlined,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                          if (hasNotification)
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xffEF4444),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: const Color(0xff117992),
+                                    width: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              /// SECOND ROW: STUDENT DETAILS + COMPACT POINTS BADGE
+              /// SECOND ROW: STUDENT DETAILS + POINTS BADGE
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Student Major & ID Details
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         major,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -168,90 +159,63 @@ class HomeHeader extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         studentId,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
                         ),
                       ),
                     ],
                   ),
-
-                  // Compact Points Pill Card
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.15),
-                      ),
+                      border: Border.all(color: Colors.white.withOpacity(0.15)),
                     ),
                     child: Row(
-  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-  crossAxisAlignment: CrossAxisAlignment.center,
-  children: [
-    // Points Icon
-    const Icon(
-      Icons.stars_rounded,
-      color: Colors.white,
-      size: 16,
-    ),
-    SizedBox(width: 5,),
-    Text(
-      NumberFormat('#,###').format(points),
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 15,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    SizedBox(width: 3,),
-    Text(
-      "Pts",
-      style: TextStyle(
-        color: Colors.white.withOpacity(0.6),
-        fontSize: 10,
-      ),
-    ),
-    
-  ],
-)
+                      children: [
+                        const Icon(Icons.stars_rounded, color: Colors.white, size: 16),
+                        const SizedBox(width: 5),
+                        Text(
+                          NumberFormat('#,###').format(points),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          "ပွိုင့်",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.6),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
 
               const SizedBox(height: 24),
 
-              /// SEARCH BAR (UNCHANGED)
+              /// SEARCH BAR
               GestureDetector(
-                onTap: () {
-                  context.go('/search');
-                },
+                onTap: () => context.go('/search'),
                 child: Container(
                   height: 50,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(32),
                   ),
                   child: const Row(
                     children: [
-                      Icon(
-                        Icons.search_rounded,
-                        color: Colors.grey,
-                      ),
+                      Icon(Icons.search_rounded, color: Colors.grey),
                       SizedBox(width: 12),
-                      Text(
-                        "Search shops, foods...",
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
+                      Text("ရှာဖွေပါ...", style: TextStyle(color: Colors.grey)),
                     ],
                   ),
                 ),
@@ -259,52 +223,36 @@ class HomeHeader extends StatelessWidget {
             ],
           ),
         ),
-// end header background
 
-        /// QUICK ACTION CARD (UNCHANGED)
+        /// FLOATING QUICK ACTION CARD (MOVED DOWN)
         Positioned(
-  left: 20,
-  right: 20,
-  bottom: -halfCardHeight, // Make sure to recalculate halfCardHeight if needed!
-  child: Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: 12,
-      vertical: 8, // 👈 Reduced from 14 to 6
-    ),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(24),
-      boxShadow: const [
-        BoxShadow(
-          color: Colors.black12,
-          blurRadius: 20,
-          offset: Offset(0, 8),
-        ),
-      ],
-    ),
-    child: const Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _QuickAction(
-          icon: Icons.qr_code_scanner_rounded,
-          title: "Scan",
-        ),
-        _QuickAction(
-          icon: Icons.send_rounded,
-          title: "Transfer",
-        ),
-        _QuickAction(
-          icon: Icons.history,
-          title: "History",
-        ),
-        _QuickAction(
-          icon: Icons.qr_code,
-          title: "My QR",
-        ),
-      ],
-    ),
-  ),
-)
+          left: 20,
+          right: 20,
+          bottom: -28, // 👈 Lowered down (change this value if you want more/less offset)
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _QuickAction(icon: Icons.qr_code_scanner_rounded, title: "Scan ဖတ်ပါ"),
+                _QuickAction(icon: Icons.send_rounded, title: "ပွိုင့်လွှဲ"),
+                _QuickAction(icon: Icons.history, title: "မှတ်တမ်း"),
+                _QuickAction(icon: Icons.qr_code, title: "ကျွန်ုပ်၏ QR"),
+              ],
+            ),
+          ),
+        )
       ],
     );
   }

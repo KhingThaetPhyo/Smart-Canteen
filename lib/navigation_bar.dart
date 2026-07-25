@@ -339,17 +339,17 @@ Future<void> _loadQrData() async {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildBottomNavItem(Icons.home_rounded, "Home", 0),
-              _buildBottomNavItem(Icons.receipt_long_rounded, "Orders", 1),
+              _buildBottomNavItem(Icons.home_rounded, "ပင်မ", 0),
+              _buildBottomNavItem(Icons.receipt_long_rounded, "အမှာစာ", 1),
 
               const SizedBox(width: 48), // Gap for middle Scanner button
 
               _buildBottomNavItem(
                 Icons.account_balance_wallet_rounded,
-                "Wallet",
+                "ပိုက်ဆံအိတ်",
                 3,
               ),
-              _buildBottomNavItem(Icons.person_rounded, "Profile", 4),
+              _buildBottomNavItem(Icons.person_rounded, "ပရိုဖိုင်", 4),
             ],
           ),
         ),

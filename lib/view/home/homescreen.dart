@@ -5,7 +5,6 @@ import 'package:smartcanteen/view/home/menu_section.dart';
 import 'package:smartcanteen/view/home/recent_order.dart';
 import 'package:smartcanteen/view/home/shop.dart';
 import 'package:smartcanteen/view/shop_detail_screen.dart';
-
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -14,7 +13,6 @@ class Homescreen extends StatefulWidget {
 }
 
 class _HomescreenState extends State<Homescreen> {
-  // Mock grouped order history data
   final List<Map<String, dynamic>> recentOrdersData = [
     {
       "shopName": "Tun",
@@ -38,28 +36,30 @@ class _HomescreenState extends State<Homescreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Restrict list to only the 5 most recent items
     final limitedOrders = recentOrdersData.take(5).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xffF6F8FC),
-
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
-
           slivers: [
-            /// HEADER
-            SliverToBoxAdapter(
-              child: HomeHeader(
-                userName: "Min Khit",
-                major: "Fifth Year",
-                studentId: "UCSTT(22-23)-025",
-                points: 5700,
+            /// 1. STICKY HEADER (PINNED AT TOP)
+            SliverPersistentHeader(
+              pinned: true, // 👈 Keeps the header fixed at the top when scrolling
+              delegate: _StickyHeaderDelegate(
+                height: 330, // 👈 Match HomeHeader's preferredSize height
+                child: const HomeHeader(
+                  userName: "Min Khit",
+                  major: "Fifth Year",
+                  studentId: "UCSTT(22-23)-025",
+                  points: 5700,
+                ),
               ),
             ),
 
-            SliverToBoxAdapter(child: SizedBox(height: 50)),
+            /// 2. SPACING UNDER FLOATING CARD
+            const SliverToBoxAdapter(child: SizedBox(height: 35)),
 
             /// POPULAR MENU
             const SliverToBoxAdapter(child: MenuSection()),
@@ -69,13 +69,13 @@ class _HomescreenState extends State<Homescreen> {
               child: Padding(
                 padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
                 child: Text(
-                  "Shops",
+                  "ဆိုင်များ",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
 
-            /// SHOPS
+            /// SHOPS LIST
             SliverList(
               delegate: SliverChildListDelegate([
                 ShopCard(
@@ -93,7 +93,6 @@ class _HomescreenState extends State<Homescreen> {
                     );
                   },
                 ),
-
                 ShopCard(
                   shopName: "Tun",
                   category: "U Tun",
@@ -110,7 +109,6 @@ class _HomescreenState extends State<Homescreen> {
                     );
                   },
                 ),
-
                 ShopCard(
                   shopName: "A Lin Yaung",
                   category: "Daw Sandar",
@@ -137,7 +135,7 @@ class _HomescreenState extends State<Homescreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      "Recent Orders",
+                      "အမှာစာများ",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -145,17 +143,14 @@ class _HomescreenState extends State<Homescreen> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        // TODO: Navigate to full OrdersScreen / Orders tab
-                        
-                      },
+                      onPressed: () {},
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(50, 30),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: const Text(
-                        "See All",
+                        "အားလုံးကြည့်ရန်",
                         style: TextStyle(
                           color: Color(0xff117992),
                           fontWeight: FontWeight.bold,
@@ -168,7 +163,7 @@ class _HomescreenState extends State<Homescreen> {
               ),
             ),
 
-            /// RECENT ORDERS (MAX 5 ORDER BLOCKS)
+            /// RECENT ORDERS LIST
             SliverList(
               delegate: SliverChildBuilderDelegate((context, index) {
                 final order = limitedOrders[index];
@@ -187,5 +182,31 @@ class _HomescreenState extends State<Homescreen> {
         ),
       ),
     );
+  }
+}
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+  final double height;
+
+  _StickyHeaderDelegate({
+    required this.child,
+    required this.height,
+  });
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox.expand(child: child);
+  }
+
+  @override
+  double get maxExtent => height;
+
+  @override
+  double get minExtent => height;
+
+  @override
+  bool shouldRebuild(covariant _StickyHeaderDelegate oldDelegate) {
+    return oldDelegate.height != height || oldDelegate.child != child;
   }
 }

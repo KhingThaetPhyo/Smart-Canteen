@@ -40,7 +40,6 @@ class MenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Sample items list matching your design
     final List<Map<String, dynamic>> menuItems = [
       {
         "image": "assets/image/ကြက်ဟင်းခါးသီးကြော်.jpg",
@@ -73,12 +72,12 @@ class MenuSection extends StatelessWidget {
       children: [
         /// CATEGORIES HEADER
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20,),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Categories",
+                "အမျိုးအစားများ",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -88,7 +87,7 @@ class MenuSection extends StatelessWidget {
               TextButton(
                 onPressed: () {},
                 child: const Text(
-                  "View All",
+                  "အားလုံးကြည့်ရန်",
                   style: TextStyle(
                     color: primaryColor,
                     fontWeight: FontWeight.w600,
@@ -99,40 +98,39 @@ class MenuSection extends StatelessWidget {
           ),
         ),
 
-        /// CATEGORY PILLS HORIZONTAL SCROLL
-        SizedBox(
-          height: 35,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+        /// CATEGORY PILLS HORIZONTAL SCROLL (Optimized gesture handling)
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
             children: [
-              _buildCategoryButton("lunch", true),
+              _buildCategoryButton("နေ့လယ်စာ", true),
               const SizedBox(width: 10),
-              _buildCategoryButton("Breakfast", false),
+              _buildCategoryButton("မနက်စာ", false),
               const SizedBox(width: 10),
-              _buildCategoryButton("Noodles", false),
+              _buildCategoryButton("မုန့်များ", false),
               const SizedBox(width: 10),
-              _buildCategoryButton("Drinks", false),
+              _buildCategoryButton("အချိုရည်", false),
               const SizedBox(width: 10),
-              _buildCategoryButton("Desserts", false),
+              _buildCategoryButton("အချိုပွဲ", false),
             ],
           ),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
 
-        /// MENU GRID SECTION (2 COLUMNS)
+        /// MENU GRID SECTION (Fixed non-scrollable configuration)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: GridView.builder(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(), // 👈 Disables inner vertical scrolling completely
             itemCount: menuItems.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 14,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.85, // Adjust aspect ratio as needed
+              childAspectRatio: 0.85, 
             ),
             itemBuilder: (context, index) {
               final item = menuItems[index];
@@ -171,7 +169,6 @@ class _PopularMenuCardState extends State<_PopularMenuCard> {
   bool isFavorite = false;
 
   static const Color primaryColor = Color(0xff117992);
-  static const Color accentBgColor = Color(0xffB5EAE1);
 
   @override
   Widget build(BuildContext context) {
@@ -189,9 +186,9 @@ class _PopularMenuCardState extends State<_PopularMenuCard> {
       ),
       child: Column(
         children: [
-          /// 1. IMAGE SECTION (Takes exactly 2/3 of card)
+          /// 1. IMAGE SECTION
           Expanded(
-            flex: 2, // 👈 2/3 of space
+            flex: 2,
             child: Stack(
               children: [
                 ClipRRect(
@@ -223,8 +220,7 @@ class _PopularMenuCardState extends State<_PopularMenuCard> {
                       child: Icon(
                         isFavorite ? Icons.favorite : Icons.favorite_border,
                         color: isFavorite ? Colors.red : Colors.grey.shade600,
-                       
-                        size: 20,
+                        size: 18,
                       ),
                     ),
                   ),
@@ -233,92 +229,83 @@ class _PopularMenuCardState extends State<_PopularMenuCard> {
             ),
           ),
 
-          /// 2. TEXT/CONTENT SECTION (Takes exactly 1/3 of card)
+          /// 2. TEXT/CONTENT SECTION
           Expanded(
-  flex: 1, // 👈 1/3 of card space
-  child: Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        /// LEFT SIDE: Title, Shop Name, and Price
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 1. Menu Name
-              Text(
-                widget.menuName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-
-              // 2. Shop Name with Icon
-              Row(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.storefront_outlined,
-                    size: 11,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 2),
                   Expanded(
-                    child: Text(
-                      widget.shopName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 10,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.menuName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.storefront_outlined,
+                              size: 11,
+                              color: Colors.grey.shade600,
+                            ),
+                            const SizedBox(width: 2),
+                            Expanded(
+                              child: Text(
+                                widget.shopName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          "${NumberFormat('#,###').format(widget.price)} ပွိုင့်",
+                          style: const TextStyle(
+                            color: primaryColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  InkWell(
+                    onTap: () {},
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      width: 25,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 16,
                       ),
                     ),
                   ),
                 ],
               ),
-
-              // 3. Price
-              Text(
-                "${NumberFormat('#,###').format(widget.price)} pts",
-                style: const TextStyle(
-                  color: primaryColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-
-        const SizedBox(width: 6),
-
-        /// RIGHT SIDE: Add (+) Button
-       InkWell(
-  onTap: () {},
-  borderRadius: BorderRadius.circular(6),
-  child: Container(
-    width: 25,
-    height: 25,
-    decoration: BoxDecoration(
-      color: primaryColor,
-      borderRadius: BorderRadius.circular(6), // Square with slightly rounded corners
-    ),
-    child: const Icon(
-      Icons.arrow_forward_rounded,
-      color: Colors.white,
-      size: 18,
-    ),
-  ),
-)
-      ],
-    ),
-  ),
-)
         ],
       ),
     );
