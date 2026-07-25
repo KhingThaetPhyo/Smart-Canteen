@@ -340,13 +340,13 @@ Future<void> _loadQrData() async {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildBottomNavItem(Icons.home_rounded, "ပင်မ", 0),
-              _buildBottomNavItem(Icons.receipt_long_rounded, "အမှာစာ", 1),
+              _buildBottomNavItem(Icons.receipt_long_rounded, "အော်ဒါ", 1),
 
               const SizedBox(width: 48), // Gap for middle Scanner button
 
               _buildBottomNavItem(
-                Icons.account_balance_wallet_rounded,
-                "ပိုက်ဆံအိတ်",
+                Icons.favorite_border_sharp,
+                "နှစ်သက်သော",
                 3,
               ),
               _buildBottomNavItem(Icons.person_rounded, "ပရိုဖိုင်", 4),

@@ -31,7 +31,7 @@ class MenuSection extends StatelessWidget {
           style: TextStyle(
             color: isSelected ? Colors.white : Colors.black87,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            fontSize: 14,
+            fontSize: 12,
           ),
         ),
       ),
@@ -296,7 +296,7 @@ class _PopularMenuCardState extends State<_PopularMenuCard> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Icon(
-                        Icons.arrow_forward_rounded,
+                        Icons.arrow_forward_ios,
                         color: Colors.white,
                         size: 16,
                       ),
