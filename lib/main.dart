@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:smartcanteen/router/user_router.dart';
 
 void main() async {
@@ -25,7 +26,9 @@ class MyApp extends StatelessWidget {
 
       theme: ThemeData(
         useMaterial3: true,
-
+        textTheme: GoogleFonts.latoTextTheme(
+Theme.of(context).textTheme,
+),
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF4CAF50),
           brightness: Brightness.light,
