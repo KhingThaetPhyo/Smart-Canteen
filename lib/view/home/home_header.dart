@@ -1,494 +1,4 @@
-// import 'package:flutter/material.dart';
-// import 'package:go_router/go_router.dart';
-// import 'package:intl/intl.dart';
 
-// class HomeHeader extends StatelessWidget {
-//   final String userName;
-//   final String major;
-//   final String studentId;
-//   final int points;
-
-//   const HomeHeader({
-//     super.key,
-//     required this.userName,
-//     required this.major,
-//     required this.studentId,
-//     required this.points,
-//   });
-
-//   static const Color primaryColor = Color(0xff117992);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     // Exact half-height of the Quick Action box
-//     const double halfCardHeight = 48;
-
-//     return Stack(
-//       clipBehavior: Clip.none,
-//       children: [
-//         /// COLORED HEADER BACKGROUND
-//         Container(
-//           padding: const EdgeInsets.fromLTRB(20, 16, 20, halfCardHeight),
-//           decoration: const BoxDecoration(
-//             gradient: LinearGradient(
-//               colors: [Color(0xff0D6B80), Color(0xff117992)],
-//               begin: Alignment.topLeft,
-//               end: Alignment.bottomRight,
-//             ),
-//             borderRadius: BorderRadius.only(
-//               bottomLeft: Radius.circular(34),
-//               bottomRight: Radius.circular(34),
-//             ),
-//           ),
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               /// TOP BAR
-//               Row(
-//                 children: [
-//                   Container(
-//                     width: 54,
-//                     height: 54,
-//                     decoration: BoxDecoration(
-//                       borderRadius: BorderRadius.circular(18),
-//                       color: Colors.white.withOpacity(.12),
-//                       border: Border.all(color: Colors.white24),
-//                     ),
-//                     child: const Icon(
-//                       Icons.restaurant_menu_rounded,
-//                       color: Colors.white,
-//                       size: 28,
-//                     ),
-//                   ),
-//                   const SizedBox(width: 14),
-//                   const Expanded(
-//                     child: Text(
-//                       "Smart Canteen",
-//                       style: TextStyle(
-//                         color: Colors.white,
-//                         fontSize: 20,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                   ),
-
-//                   /// HOME HEADER NOTIFICATION ICON - MODERN GLASS
-//                   // InkWell(
-//                   //   onTap: () {
-//                   //     // Navigator.push(
-//                   //     //   context,
-//                   //     //   MaterialPageRoute(
-//                   //     //     builder: (_) => const NotificationScreen(),
-//                   //     //   ),
-//                   //     // );
-//                   //     context.go('/noti');
-//                   //   },
-//                   //   borderRadius: BorderRadius.circular(18),
-//                   //   child: Container(
-//                   //     width: 48,
-//                   //     height: 48,
-//                   //     decoration: BoxDecoration(
-//                   //       color: Colors.white.withOpacity(0.15),
-//                   //       borderRadius: BorderRadius.circular(18),
-//                   //       border: Border.all(
-//                   //         color: Colors.white.withOpacity(0.25),
-//                   //         width: 1,
-//                   //       ),
-//                   //     ),
-//                   //     child: Stack(
-//                   //       alignment: Alignment.center,
-//                   //       clipBehavior: Clip.none,
-//                   //       children: [
-//                   //         const Icon(
-//                   //           Icons.notifications_none_rounded,
-//                   //           color: Colors.white,
-//                   //           size: 24,
-//                   //         ),
-
-//                   //         /// UNREAD BADGE
-//                   //         Positioned(
-//                   //           top: -2,
-//                   //           right: -2,
-//                   //           child: Container(
-//                   //             padding: const EdgeInsets.symmetric(
-//                   //               horizontal: 6,
-//                   //               vertical: 2,
-//                   //             ),
-//                   //             constraints: const BoxConstraints(
-//                   //               minWidth: 18,
-//                   //               minHeight: 18,
-//                   //             ),
-//                   //             decoration: BoxDecoration(
-//                   //               color: const Color(
-//                   //                 0xffFF5252,
-//                   //               ), // Vibrant Accent
-//                   //               borderRadius: BorderRadius.circular(10),
-//                   //               border: Border.all(
-//                   //                 color: const Color(
-//                   //                   0xff117992,
-//                   //                 ), // Matches Header BG for a clean cutout effect
-//                   //                 width: 2,
-//                   //               ),
-//                   //             ),
-//                   //             child: const Center(
-//                   //               child: Text(
-//                   //                 "3",
-//                   //                 style: TextStyle(
-//                   //                   color: Colors.white,
-//                   //                   fontSize: 10,
-//                   //                   fontWeight: FontWeight.bold,
-//                   //                   height: 1,
-//                   //                 ),
-//                   //               ),
-//                   //             ),
-//                   //           ),
-//                   //         ),
-//                   //       ],
-//                   //     ),
-//                   //   ),
-//                   // ),
-//                   InkWell(
-//   onTap: () {
-//     context.go('/noti');
-//   },
-
-//   borderRadius: BorderRadius.circular(30),
-
-//   child: Stack(
-//     clipBehavior: Clip.none,
-//     alignment: Alignment.center,
-
-//     children: [
-
-//       const Icon(
-//         Icons.notifications_none_rounded,
-//         color: Colors.white,
-//         size: 28,
-//       ),
-
-
-//       /// UNREAD BADGE
-//       Positioned(
-//         top: -6,
-//         right: -8,
-
-//         child: Container(
-
-//           padding: const EdgeInsets.symmetric(
-//             horizontal: 5,
-//             vertical: 2,
-//           ),
-
-//           constraints: const BoxConstraints(
-//             minWidth: 16,
-//             minHeight: 16,
-//           ),
-
-
-//           decoration: BoxDecoration(
-
-//             color: const Color(0xffFF5252),
-
-//             borderRadius:
-//             BorderRadius.circular(10),
-
-//             border: Border.all(
-//               color: Colors.white,
-//               width: 1.5,
-//             ),
-
-//           ),
-
-
-//           child: const Center(
-
-//             child: Text(
-//               "3",
-
-//               style: TextStyle(
-
-//                 color: Colors.white,
-
-//                 fontSize: 9,
-
-//                 fontWeight:
-//                 FontWeight.bold,
-
-//                 height: 1,
-
-//               ),
-
-//             ),
-
-//           ),
-
-//         ),
-
-//       ),
-
-//     ],
-//   ),
-// )
-//                 ],
-//               ),
-
-//               const SizedBox(height: 20),
-
-//               /// GREETING
-//               Align(
-//                 alignment: Alignment.centerLeft,
-//                 child: Text(
-//                   _greeting(),
-//                   style: const TextStyle(color: Colors.white70, fontSize: 16),
-//                 ),
-//               ),
-
-//               Align(
-//                 alignment: Alignment.centerLeft,
-//                 child: Text(
-//                   userName,
-//                   style: const TextStyle(
-//                     color: Colors.white,
-//                     fontSize: 24,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//               ),
-
-//               const SizedBox(height: 4),
-
-//               Align(
-//                 alignment: Alignment.centerLeft,
-//                 child: Text(
-//                   "$major • $studentId",
-//                   style: const TextStyle(color: Colors.white70, fontSize: 14),
-//                 ),
-//               ),
-
-//               const SizedBox(height: 16),
-
-//               /// POINTS CARD (Option 1: Glassmorphic Modern)
-//               Container(
-//                 padding: const EdgeInsets.symmetric(
-//                   horizontal: 20,
-//                   vertical: 16,
-//                 ),
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(24),
-//                   color: Colors.white.withOpacity(.12),
-//                   border: Border.all(color: Colors.white.withOpacity(.2)),
-//                 ),
-//                 child: Row(
-//                   children: [
-//                     /// ICON BADGE
-//                     Container(
-//                       width: 48,
-//                       height: 48,
-//                       decoration: BoxDecoration(
-//                         color: const Color(0xffF59E0B).withOpacity(.2),
-//                         borderRadius: BorderRadius.circular(16),
-//                         border: Border.all(
-//                           color: const Color(0xffF59E0B).withOpacity(.3),
-//                         ),
-//                       ),
-//                       child: const Icon(
-//                         Icons.stars_rounded,
-//                         color: Color(0xffFBBF24),
-//                         size: 26,
-//                       ),
-//                     ),
-//                     const SizedBox(width: 16),
-
-//                     /// POINTS TEXT
-//                     Expanded(
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           Text(
-//                             "Available Points",
-//                             style: TextStyle(
-//                               color: Colors.white.withOpacity(.8),
-//                               fontSize: 12,
-//                               fontWeight: FontWeight.w500,
-//                               letterSpacing: 0.3,
-//                             ),
-//                           ),
-//                           const SizedBox(height: 2),
-//                           Text(
-//                             "${NumberFormat('#,###').format(points)} pts",
-//                             style: const TextStyle(
-//                               color: Colors.white,
-//                               fontSize: 26,
-//                               fontWeight: FontWeight.bold,
-//                               letterSpacing: -0.5,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-
-//               const SizedBox(height: 14),
-
-//               /// SEARCH BAR
-//               GestureDetector(
-//                 onTap: () {
-//                   // Navigator.push(
-//                   //   context,
-//                   //   MaterialPageRoute(builder: (_) => const SearchScreen()),
-//                   // );
-//                   context.go('/search');
-//                 },
-//                 child: Container(
-//                   height: 50,
-//                   padding: const EdgeInsets.symmetric(horizontal: 18),
-//                   decoration: BoxDecoration(
-//                     color: Colors.white,
-//                     borderRadius: BorderRadius.circular(32),
-//                     boxShadow: [
-//                       BoxShadow(
-//                         color: Colors.black.withOpacity(.05),
-//                         blurRadius: 10,
-//                         offset: const Offset(0, 4),
-//                       ),
-//                     ],
-//                   ),
-//                   child: const Row(
-//                     children: [
-//                       Icon(Icons.search_rounded, color: Colors.grey, size: 24),
-//                       SizedBox(width: 12),
-//                       Expanded(
-//                         child: Text(
-//                           "Search shops, foods...",
-//                           style: TextStyle(color: Colors.grey, fontSize: 15),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-
-//               /// GAP BETWEEN SEARCH BAR & QUICK ACTION CARD
-//               const SizedBox(height: 24),
-//             ],
-//           ),
-//         ),
-
-//         /// FLOATING QUICK ACTIONS (Glassmorphic)
-//         Positioned(
-//           left: 20,
-//           right: 20,
-//           bottom: -halfCardHeight,
-//           child: Container(
-//             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-//             decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(24),
-//               border: Border.all(
-//                 color: const Color(0xff117992).withOpacity(0.12),
-//                 width: 1.5,
-//               ),
-//               boxShadow: [
-//                 BoxShadow(
-//                   color: const Color(0xff0D6B80).withOpacity(0.12),
-//                   blurRadius: 20,
-//                   offset: const Offset(0, 8),
-//                 ),
-//               ],
-//             ),
-//             child: const Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceAround,
-//               children: [
-//                 _QuickAction(
-//                   icon: Icons.qr_code_scanner_rounded,
-//                   title: "Scan",
-//                   iconColor: Color(0xff117992),
-//                   bgColor: Color(0xffEAF7F9),
-//                 ),
-//                 _QuickAction(
-//                   icon: Icons.receipt_long_rounded,
-//                   title: "Orders",
-//                   iconColor: Color(0xff117992),
-//                   bgColor: Color(0xffEAF7F9),
-//                 ),
-//                 _QuickAction(
-//                   icon: Icons.send_rounded,
-//                   title: "Transfer",
-//                   iconColor: Color(0xff117992),
-//                   bgColor: Color(0xffEAF7F9),
-//                 ),
-//                 _QuickAction(
-//                   icon: Icons.account_balance_wallet_rounded,
-//                   title: "wallet",
-//                   iconColor: Color(0xff117992),
-//                   bgColor: Color(0xffEAF7F9),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-
-//   String _greeting() {
-//     final hour = DateTime.now().hour;
-//     if (hour < 12) return "Good morning,";
-//     if (hour < 17) return "Good afternoon,";
-//     return "Good evening,";
-//   }
-// }
-
-// class _QuickAction extends StatelessWidget {
-//   final IconData icon;
-//   final String title;
-//   final Color iconColor;
-//   final Color bgColor;
-
-//   const _QuickAction({
-//     required this.icon,
-//     required this.title,
-//     required this.iconColor,
-//     required this.bgColor,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//       width: 72,
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Container(
-//             width: 50,
-//             height: 50,
-//             decoration: BoxDecoration(
-//               color: bgColor,
-//               borderRadius: BorderRadius.circular(16),
-//             ),
-//             child: Icon(icon, color: iconColor, size: 26),
-//           ),
-//           const SizedBox(height: 6),
-//           FittedBox(
-//             fit: BoxFit.scaleDown,
-//             child: Text(
-//               title,
-//               textAlign: TextAlign.center,
-//               maxLines: 1,
-//               style: const TextStyle(
-//                 fontSize: 12,
-//                 fontWeight: FontWeight.w600,
-//                 color: Color(0xff334155),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -507,636 +17,338 @@ class HomeHeader extends StatelessWidget {
     required this.points,
   });
 
-
   @override
   Widget build(BuildContext context) {
-
     const double halfCardHeight = 48;
-
-
+   final hasNotification=true;
+    
     return Stack(
-
       clipBehavior: Clip.none,
-
-
       children: [
-
-
         /// HEADER BACKGROUND
         Container(
-
           padding: EdgeInsets.fromLTRB(
-
             20,
-
             MediaQuery.of(context).padding.top + 16,
-
             20,
-
             halfCardHeight,
-
           ),
-
-
-
           decoration: const BoxDecoration(
-
             gradient: LinearGradient(
-
               colors: [
-
                 Color(0xff0D6B80),
-
                 Color(0xff117992),
-
               ],
-
-              begin: Alignment.topLeft,
-
-              end: Alignment.bottomRight,
-
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-
-
             borderRadius: BorderRadius.only(
-
               bottomLeft: Radius.circular(34),
-
               bottomRight: Radius.circular(34),
-
             ),
-
           ),
-
-
-
-
           child: Column(
-
             mainAxisSize: MainAxisSize.min,
-
-
             children: [
+              /// TOP HEADER: AVATAR + GREETING + NOTIFICATION
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Profile Avatar
+                  Container(
+                    width: 54,
+                    height: 54,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        "assets/image/user_logo.jpg",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
 
+                  // Greeting & Name
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "WELCOME BACK",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          userName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
+                  // Notification Icon Button
+                 InkWell(
+  onTap: () {
+    context.go('/noti');
+  },
+  borderRadius: BorderRadius.circular(20),
+  child: Container(
+    width: 44,
+    height: 44,
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.12),
+      shape: BoxShape.circle,
+    ),
+    child: Stack(
+      children: [
+        // NOTIFICATION ICON
+        const Center(
+          child: Icon(
+            Icons.notifications_outlined,
+            color: Colors.white,
+            size: 22,
+          ),
+        ),
 
-              /// TOP HEADER
-              /// LOGO + GREETING + NOTIFICATION
-Row(
+        // DYNAMIC RED DOT BADGE
+        if (hasNotification)
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: const Color(0xffEF4444), // Red spot
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xff117992), // Matches header background
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+      ],
+    ),
+  ),
+)
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              /// SECOND ROW: STUDENT DETAILS + COMPACT POINTS BADGE
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Student Major & ID Details
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        major,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        studentId,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Compact Points Pill Card
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.15),
+                      ),
+                    ),
+                    child: Row(
+  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
   crossAxisAlignment: CrossAxisAlignment.center,
   children: [
-   Container(
-  width: 60,
-  height: 60,
-  decoration: BoxDecoration(
-    color: Colors.white.withOpacity(0.15),
-    borderRadius: BorderRadius.circular(18),
-  ),
-  child: ClipRRect(
-    borderRadius: BorderRadius.circular(18),
-    child: Image.asset(
-      "assets/image/user_logo.jpg",
-      fit: BoxFit.cover,
+    // Points Icon
+    const Icon(
+      Icons.stars_rounded,
+      color: Colors.white,
+      size: 16,
     ),
-  ),
-),
-    const SizedBox(width: 16),
-
-    /// GREETING
-    Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            _greeting(),
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 15,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            userName,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "$major • $studentId",
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
-          ),
-        ],
+    SizedBox(width: 5,),
+    Text(
+      NumberFormat('#,###').format(points),
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 15,
+        fontWeight: FontWeight.bold,
       ),
     ),
-
-    /// NOTIFICATION
-    InkWell(
-      onTap: () {
-        context.go('/noti');
-      },
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Icon(
-            Icons.notifications_none_rounded,
-            color: Colors.white,
-            size: 30,
-          ),
-
-          Positioned(
-            top: -5,
-            right: -6,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 5,
-                vertical: 2,
-              ),
-              decoration: BoxDecoration(
-                color: const Color(0xffFF5252),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Text(
-                "3",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
+    SizedBox(width: 3,),
+    Text(
+      "Pts",
+      style: TextStyle(
+        color: Colors.white.withOpacity(0.6),
+        fontSize: 10,
       ),
     ),
+    
   ],
-),
-              const SizedBox(height:20),
+)
+                  ),
+                ],
+              ),
 
-              /// SEARCH BAR
+              const SizedBox(height: 24),
+
+              /// SEARCH BAR (UNCHANGED)
               GestureDetector(
-
-                onTap:(){
-
+                onTap: () {
                   context.go('/search');
-
                 },
-
-
-                child:Container(
-
-                  height:50,
-
-
-                  padding:
-                  const EdgeInsets.symmetric(
-
-                    horizontal:18,
-
+                child: Container(
+                  height: 50,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
                   ),
-
-
-                  decoration:BoxDecoration(
-
-                    color:Colors.white,
-
-
-                    borderRadius:
-                    BorderRadius.circular(32),
-
-
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(32),
                   ),
-
-
-
-                  child:const Row(
-
-                    children:[
-
-
+                  child: const Row(
+                    children: [
                       Icon(
-
                         Icons.search_rounded,
-
-                        color:Colors.grey,
-
+                        color: Colors.grey,
                       ),
-
-
-
-                      SizedBox(width:12),
-
-
-
+                      SizedBox(width: 12),
                       Text(
-
                         "Search shops, foods...",
-
-                        style:TextStyle(
-
-                          color:Colors.grey,
-
+                        style: TextStyle(
+                          color: Colors.grey,
                         ),
-
-                      )
-
+                      ),
                     ],
-
                   ),
-
                 ),
-
               ),
-
-              const SizedBox(height:20),
-              /// POINT CARD
-              Container(
-
-                padding:
-                const EdgeInsets.symmetric(
-
-                  horizontal:20,
-
-                  vertical:16,
-
-                ),
-
-
-                decoration:BoxDecoration(
-
-                  borderRadius:
-                  BorderRadius.circular(24),
-
-
-                  color:
-                  Colors.white.withOpacity(.12),
-
-
-                  border:Border.all(
-
-                    color:
-                    Colors.white.withOpacity(.2),
-
-                  ),
-
-                ),
-
-
-
-
-                child:Row(
-
-
-                  children:[
-
-
-                    Container(
-
-                      width:48,
-
-                      height:48,
-
-
-                      decoration:BoxDecoration(
-
-                        color:
-                        const Color(0xffF59E0B)
-                            .withOpacity(.2),
-
-
-                        borderRadius:
-                        BorderRadius.circular(16),
-
-
-                      ),
-
-
-
-                      child:const Icon(
-
-                        Icons.money_off_rounded,
-
-                        color:
-                        Color(0xffFBBF24),
-
-                        size:26,
-
-                      ),
-
-                    ),
-
-
-
-
-                    const SizedBox(width:16),
-
-
-
-
-                    Expanded(
-
-                      child:Column(
-
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-
-                        children:[
-                          Text(
-
-                            "Balance",
-                            style:TextStyle(
-
-                              color:
-                              Colors.white.withOpacity(.8),
-
-                              fontSize:12,
-
-                            ),
-
-                          ),
-
-
-
-
-                          Text(
-
-                            "${NumberFormat('#,###').format(points)} pts",
-
-
-                            style:const TextStyle(
-
-                              color:Colors.white,
-
-                              fontSize:26,
-
-                              fontWeight:
-                              FontWeight.bold,
-
-                            ),
-
-                          ),
-
-
-
-                        ],
-
-                      ),
-
-                    )
-
-                  ],
-
-                ),
-
-              ),
-
-              const SizedBox(height:15),
-
-
-
             ],
-
           ),
-
         ),
+// end header background
 
-
-
-
-
-        /// QUICK ACTION CARD
+        /// QUICK ACTION CARD (UNCHANGED)
         Positioned(
-
-          left:20,
-
-          right:20,
-
-
-          bottom:-halfCardHeight,
-
-
-          child:Container(
-
-            padding:
-            const EdgeInsets.symmetric(
-
-              horizontal:12,
-
-              vertical:14,
-
-            ),
-
-
-
-            decoration:BoxDecoration(
-
-              color:Colors.white,
-
-              borderRadius:
-              BorderRadius.circular(24),
-
-              boxShadow:[
-
-                BoxShadow(
-
-                  color:
-                  Colors.black12,
-
-                  blurRadius:20,
-
-                  offset:
-                  Offset(0,8),
-
-                )
-
-              ],
-
-            ),
-
-
-
-            child:const Row(
-
-              mainAxisAlignment:
-              MainAxisAlignment.spaceAround,
-
-
-              children:[
-
-
-                _QuickAction(
-                  icon:Icons.qr_code_scanner_rounded,
-                  title:"Scan",
-                ),
-
-                
-                _QuickAction(
-                  icon:Icons.send_rounded,
-                  title:"Transfer",
-                ),
-
-                _QuickAction(
-                  icon:Icons.history,
-                  title:"History",
-                ),
-
-                _QuickAction(
-                  icon:Icons.qr_code,
-                  title:"My QR",
-                ),
-
-
-              ],
-
-            ),
-
-          ),
-
+  left: 20,
+  right: 20,
+  bottom: -halfCardHeight, // Make sure to recalculate halfCardHeight if needed!
+  child: Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: 12,
+      vertical: 8, // 👈 Reduced from 14 to 6
+    ),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(24),
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 20,
+          offset: Offset(0, 8),
         ),
-
-
       ],
-
+    ),
+    child: const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _QuickAction(
+          icon: Icons.qr_code_scanner_rounded,
+          title: "Scan",
+        ),
+        _QuickAction(
+          icon: Icons.send_rounded,
+          title: "Transfer",
+        ),
+        _QuickAction(
+          icon: Icons.history,
+          title: "History",
+        ),
+        _QuickAction(
+          icon: Icons.qr_code,
+          title: "My QR",
+        ),
+      ],
+    ),
+  ),
+)
+      ],
     );
-
   }
-
-
-
-
-
-
-  String _greeting(){
-
-    final hour = DateTime.now().hour;
-
-
-    if(hour < 12){
-      return "Good morning,";
-    }
-
-    if(hour < 17){
-      return "Good afternoon,";
-    }
-
-
-    return "Good evening,";
-
-  }
-
 }
 
-
-
-
-
-
 class _QuickAction extends StatelessWidget {
-
-
   final IconData icon;
-
   final String title;
 
-
-
   const _QuickAction({
-
     required this.icon,
-
     required this.title,
-
   });
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return SizedBox(
-
-      width:72,
-
-
-      child:Column(
-
-        children:[
-
-
+      width: 72,
+      child: Column(
+        children: [
           Container(
-
-            width:50,
-
-            height:50,
-
-
-            decoration:BoxDecoration(
-
-              color:
-              const Color(0xffEAF7F9),
-
-
-              borderRadius:
-              BorderRadius.circular(16),
-
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: const Color(0xffEAF7F9),
+              borderRadius: BorderRadius.circular(16),
             ),
-
-
-
-            child:Icon(
-
+            child: Icon(
               icon,
-
-              color:
-              const Color(0xff117992),
-
-              size:26,
-
+              color: const Color(0xff117992),
+              size: 26,
             ),
-
           ),
-
-
-
-
-          const SizedBox(height:6),
-
-
-
-
+          const SizedBox(height: 6),
           Text(
-
             title,
-
-
-            style:const TextStyle(
-
-              fontSize:12,
-
-              fontWeight:
-              FontWeight.w600,
-
-              color:
-              Color(0xff334155),
-
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff334155),
             ),
-
-          )
-
-
+          ),
         ],
-
       ),
-
     );
-
   }
-
 }

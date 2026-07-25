@@ -128,10 +128,7 @@ class ShopCard extends StatelessWidget {
           ),
         ],
       ),
-
-
       const SizedBox(height: 12),
-
 
       /// BOTTOM BUTTON
       SizedBox(

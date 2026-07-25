@@ -266,7 +266,7 @@ Future<void> _loadQrData() async {
     }
   }
 }
-  static const Color primaryColor = Color(0xFF117992);
+  static const Color primaryColor = Color(0xff117992);
 
   // Index mapping:
   // 0: Home
@@ -286,7 +286,7 @@ Future<void> _loadQrData() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color(0xff117992),
       extendBody: true,
       body: Stack(
         children: [
@@ -322,7 +322,7 @@ Future<void> _loadQrData() async {
         child: Container(
           height: 66,
           decoration: BoxDecoration(
-            color: const Color(0xFF0C5470).withOpacity(0.75),
+            color: const Color(0xFF0C5470),
             borderRadius: BorderRadius.circular(30),
             border: Border.all(
               color: Colors.white.withOpacity(0.2),
