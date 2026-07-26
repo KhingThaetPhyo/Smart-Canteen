@@ -1,12 +1,16 @@
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:http/http.dart' as _dio;
+import 'package:smartcanteen/model/category_model.dart';
 import 'package:smartcanteen/model/login_model.dart';
-import 'package:smartcanteen/model/register_model.dart'; // Make sure this path is correct for your project
+import 'package:smartcanteen/model/register_model.dart';
+import 'package:smartcanteen/model/shop_model.dart';
+import 'package:smartcanteen/model/view_menu_model.dart'; // Make sure this path is correct for your project
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "http://192.168.1.4:8000/api";
+  static const String baseUrl = "http://192.168.1.5:8000/api";
 
   final Dio _dio = Dio(
     BaseOptions(
@@ -146,5 +150,73 @@ Future<LoginModel?> loginUser({
   throw 'Unable to connect to server.';
 }
 }
+
+/// Fetch Shops along with their Menu Items using ViewMenuModel
+  Future<ViewMenuModel?> getShopsWithMenus() async {
+    try {
+      final response = await _dio.get("/shops-with-menus");
+
+      if (response.statusCode == 200) {
+        return ViewMenuModel.fromJson(response.data);
+      }
+      return null;
+    } on DioException catch (e) {
+      print("========== FETCH MENUS DIO ERROR ==========");
+      print("Type: ${e.type}");
+      print("Message: ${e.message}");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+      print("===========================================");
+
+      if (e.response != null) {
+        final data = e.response!.data;
+        throw data['message'] ?? 'Failed to load shops and menus.';
+      }
+
+      throw 'Unable to connect to server.';
+    }
+  }
+
+ Future<List<ShopModel>> getShops() async {
+  try {
+    final response = await _dio.get("/shops");
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      final List list = response.data['data'] ?? [];
+      return list.map((json) => ShopModel.fromJson(json)).toList();
+    }
+    return [];
+  } on DioException catch (e) {
+    // PRINT THIS TO YOUR FLUTTER CONSOLE TO SEE THE EXACT ISSUE:
+    print("LOG ERROR: ${e.type} -> ${e.message}");
+    print("RESPONSE: ${e.response?.data}");
+    
+    throw e.response?.data['message'] ?? 'Failed to load shops.';
+  }
 }
 
+/// Fetch Categories List
+  Future<List<CategoryModel>> getCategories() async {
+    try {
+      final response = await _dio.get("/shops/all-categories");
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final List list = response.data['data'] ?? [];
+        return list.map((json) => CategoryModel.fromJson(json)).toList();
+      }
+      return [];
+    } on DioException catch (e) {
+      print("========== FETCH CATEGORIES DIO ERROR ==========");
+      print("Type: ${e.type}");
+      print("Message: ${e.message}");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response Data: ${e.response?.data}");
+      print("================================================");
+
+      if (e.response != null && e.response?.data != null) {
+        throw e.response?.data['message'] ?? 'Failed to load categories.';
+      }
+      throw 'Unable to connect to server. Please check your connection.';
+    }
+  }
+}

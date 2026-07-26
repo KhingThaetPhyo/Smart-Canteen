@@ -207,6 +207,7 @@
 // }
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 // import 'package:smartcanteen/view/home/home_screen.dart';
@@ -241,6 +242,7 @@ String? qrData;
 @override
 void initState() {
   super.initState();
+  _hideStatusBar();
 
   qrData = widget.qrData;
 
@@ -248,7 +250,12 @@ void initState() {
 
   _loadQrData();
 }
-
+void _hideStatusBar() {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.bottom], // Hides the top status bar
+    );
+  }
 Future<void> _loadQrData() async {
 
   if (qrData == null || qrData!.isEmpty) {
@@ -286,6 +293,7 @@ Future<void> _loadQrData() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, // <-- PREVENTS NAV BAR FROM RISING WITH KEYBOARD
       backgroundColor: Color(0xff117992),
       extendBody: true,
       body: Stack(
@@ -345,7 +353,7 @@ Future<void> _loadQrData() async {
               const SizedBox(width: 48), // Gap for middle Scanner button
 
               _buildBottomNavItem(
-                Icons.favorite_border_sharp,
+                Icons.favorite_outline_rounded,
                 "နှစ်သက်သော",
                 3,
               ),
@@ -367,7 +375,7 @@ Future<void> _loadQrData() async {
  if(qrData != null){
 
  context.go(
-   '/user_qr',
+   '/scan_qr',
    extra: qrData,
  );
 

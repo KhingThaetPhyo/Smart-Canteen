@@ -31,7 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () {
-            context.go('/home'); // Home Screen ကို ပြန်သွားမယ့် လမ်းကြောင်း
+            context.go('/navigation'); // Home Screen ကို ပြန်သွားမယ့် လမ်းကြောင်း
           },
         ),
       ),

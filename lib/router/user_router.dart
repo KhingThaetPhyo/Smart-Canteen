@@ -12,13 +12,14 @@ import 'package:smartcanteen/view/profilescreen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
 import 'package:smartcanteen/view/search_screen.dart';
+import 'package:smartcanteen/view/splash_screen.dart';
 import 'package:smartcanteen/view/student_info_screen.dart';
 import 'package:smartcanteen/view/user_qr_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
 import 'package:smartcanteen/view/wallet_screen.dart';
 
 final router = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/splash',
 
   // Check token when app opens
   redirect: (context, state) async {
@@ -35,13 +36,17 @@ final router = GoRouter(
 
     // If not logged in, don't allow home page
     if (!isLoggedIn && state.matchedLocation == '/navigation') {
-      return '/login';
+      return '/navigation';
     }
 
     return null;
   },
 
   routes: [
+    GoRoute(
+  path: '/splash',
+  builder: (context, state) => const SplashScreen(),
+),
     GoRoute(
       path: '/login',
       builder: (context, state) => const Loginscreen(),

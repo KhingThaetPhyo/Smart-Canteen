@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
+import 'package:smartcanteen/service/shared_preferences_service.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -264,11 +265,19 @@ class _LoginscreenState extends State<Loginscreen> {
         password: _passwordController.text.trim(),
       );
 
+
       print("API Result: $result");
 if (result != null && result.success == true) {
 
+      
   print("Login successful");
+  // Save user object
+  await SharedPreferencesService.saveUser(result.user!);
 
+  // Save token if available
+  if (result.token != null) {
+    await SharedPreferencesService.saveToken(result.token!);
+  }
 
   // Save auth token
   if (result.token != null) {

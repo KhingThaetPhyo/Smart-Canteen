@@ -411,6 +411,7 @@ import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
+import 'package:smartcanteen/service/shared_preferences_service.dart';
 
 class WalletInfoScreen extends StatefulWidget {
   final UserModel user;
@@ -624,6 +625,15 @@ if (result != null && result.success) {
     _isSuccess = true;
   });
 
+// Save user object
+  if (result.user != null) {
+    await SharedPreferencesService.saveUser(result.user!);
+  }
+
+  // Save auth token
+  if (result.token != null) {
+    await SecureStorageService.saveToken(result.token!);
+  }
   // Save auth token
   if (result.token != null) {
     await SecureStorageService.saveToken(result.token!);

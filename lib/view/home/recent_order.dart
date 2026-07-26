@@ -157,7 +157,7 @@ class RecentOrderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Total",
+                    "စုစုပေါင်း",
                     style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                   ),
                   Text(
@@ -178,7 +178,7 @@ ElevatedButton(
   },
 
   child: const Text(
-    "View Detail",
+    "အသေးစိတ်",
     style: TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: 12,
