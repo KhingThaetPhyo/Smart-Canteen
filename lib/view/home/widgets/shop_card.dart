@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class ShopCard extends StatelessWidget {
   final String shopName;
   final String category;
-  final double rating;
   final bool isOpen;
   final String estimatedTime;
   final VoidCallback? onTap;
@@ -12,7 +11,6 @@ class ShopCard extends StatelessWidget {
     super.key,
     required this.shopName,
     required this.category,
-    required this.rating,
     required this.isOpen,
     required this.estimatedTime,
     this.onTap,
@@ -123,28 +121,6 @@ class ShopCard extends StatelessWidget {
                             color: Colors.grey.shade600,
                             fontSize: 12,
                           ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        /// RATING & TIME
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Colors.amber,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              rating.toString(),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
                         ),
                       ],
                     ),

@@ -9,10 +9,14 @@ class WalletScreen extends StatefulWidget {
   final String userName;
   final String studentId;
 
+  // Callback used to switch MainNavigation to Scanner tab
+  final VoidCallback? onOpenScanner;
+
   const WalletScreen({
     super.key,
     this.userName = "Wa Thon",
     this.studentId = "UCSTT(22-23)-000",
+    this.onOpenScanner,
   });
 
   @override
@@ -107,7 +111,7 @@ class _WalletScreenState extends State<WalletScreen> {
     final list = filteredTransactions;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF6F8FC),
+      backgroundColor: const Color(0xFFE3F2FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -308,10 +312,7 @@ class _WalletScreenState extends State<WalletScreen> {
             icon: Icons.qr_code_scanner_rounded,
             label: "Scanner",
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ScannerScreen()),
-              );
+              widget.onOpenScanner?.call();
             },
           ),
           _buildActionButton(

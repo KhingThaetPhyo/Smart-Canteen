@@ -23,7 +23,8 @@ class SmartCanteenApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
 
-        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+        // Updated background color
+        scaffoldBackgroundColor: const Color(0xFFE3F2FD),
 
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,

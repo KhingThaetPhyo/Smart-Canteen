@@ -53,7 +53,6 @@ class MenuSection extends StatelessWidget {
                 menuName: "Milk Tea",
                 shopName: "Coffee Corner",
                 price: 1500,
-                rating: 4.8,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -68,7 +67,6 @@ class MenuSection extends StatelessWidget {
                 menuName: "Shan Noodle",
                 shopName: "Aunt May Noodles",
                 price: 3000,
-                rating: 4.9,
                 onTap: () {
                   Navigator.push(
                     context,
@@ -83,7 +81,6 @@ class MenuSection extends StatelessWidget {
                 menuName: "Thai Milk Tea",
                 shopName: "Coffee Corner",
                 price: 1800,
-                rating: 4.8,
                 onTap: () {
                   Navigator.push(
                     context,

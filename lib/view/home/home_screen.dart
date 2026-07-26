@@ -46,8 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final limitedOrders = recentOrdersData.take(5).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xffF6F8FC),
-
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -86,7 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ShopCard(
                   shopName: "Coffee Corner",
                   category: "Coffee & Drinks",
-                  rating: 4.8,
                   estimatedTime: "5 - 10 min",
                   isOpen: true,
                   onTap: () {
@@ -103,7 +100,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ShopCard(
                   shopName: "Aunt May Noodles",
                   category: "Noodles",
-                  rating: 4.9,
                   estimatedTime: "10 - 15 min",
                   isOpen: true,
                   onTap: () {
@@ -121,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ShopCard(
                   shopName: "Snack House",
                   category: "Snacks",
-                  rating: 4.7,
                   estimatedTime: "5 - 8 min",
                   isOpen: false,
                   onTap: () {

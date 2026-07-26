@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // GoRouter သုံးဖို့အတွက် import ထည့်ထားပါတယ်
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -9,74 +8,262 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _notificationsOn = false;
+  bool _notificationsOn = true;
   bool _darkModeOn = false;
   String _selectedLanguage = 'EN';
 
+  // Editable Profile State Variables
+  String _name = 'Wa Thon';
+  String _email = 'wathon.dev@email.mm';
+  String _phone = '+95 9 778 123 456';
+
+  static const Color primaryColor = Color(0xff117992);
+
+  // Method to open Edit Profile Bottom Sheet or Dialog
+  void _showEditProfileBottomSheet() {
+    final nameController = TextEditingController(text: _name);
+    final emailController = TextEditingController(text: _email);
+    final phoneController = TextEditingController(text: _phone);
+    final formKey = GlobalKey<FormState>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Edit Profile",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: "Full Name",
+                      prefixIcon: const Icon(Icons.person_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? "Name cannot be empty"
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator: (value) => value == null || !value.contains("@")
+                        ? "Enter a valid email"
+                        : null,
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: phoneController,
+                    decoration: InputDecoration(
+                      labelText: "Phone Number",
+                      prefixIcon: const Icon(Icons.phone_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator: (value) => value == null || value.isEmpty
+                        ? "Enter a phone number"
+                        : null,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          setState(() {
+                            _name = nameController.text.trim();
+                            _email = emailController.text.trim();
+                            _phone = phoneController.text.trim();
+                          });
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Profile updated successfully!"),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        "Save Changes",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Custom colors from the UI image
-    const primaryTeal = Color(0xFF006D60);
-    const goldColor = Color(0xFFB48346);
-
     return Scaffold(
-      // Background Color ကို မိုးပြာရောင် (Light Blue) ပြောင်းလဲထားပါတယ်
-      backgroundColor: Colors.lightBlue.shade50,
-
-      // Home Screen ပြန်သွားဖို့အတွက် AppBar နှင့် Back Arrow ထည့်သွင်းထားပါတယ်
-      appBar: AppBar(
-        backgroundColor: Colors
-            .transparent, // background နဲ့ တစ်သားတည်းဖြစ်အောင် transparent လုပ်ထားပါတယ်
-        elevation: 0, // အောက်ခြေလိုင်း ပျောက်အောင်ပါ
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () {
-            context.go('/home'); // Home Screen ကို ပြန်သွားမယ့် လမ်းကြောင်း
-          },
-        ),
-      ),
+      backgroundColor: const Color(0xFFE3F2FD),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // --- PROFILE HEADER ---
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.grey.shade400,
-                child: const Icon(Icons.person, size: 60, color: Colors.white),
-              ),
-              const SizedBox(height: 12),
+              /// TOP APP BAR / TITLE
               const Text(
-                'Wa Thon',
+                "Profile",
                 style: TextStyle(
-                  fontSize: 22,
+                  color: Color(0xff1E293B),
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
                 ),
-              ),
-              const Text(
-                'wathon.dev@email.mm',
-                style: TextStyle(color: Colors.grey, fontSize: 13),
-              ),
-              const Text(
-                '+95 9 778 123 456',
-                style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
               const SizedBox(height: 24),
 
-              // --- ACCOUNT SETTINGS ---
-              _buildSectionHeader('ACCOUNT SETTINGS', goldColor),
+              /// FLOATING PROFILE CARD WITH PRIMARY COLOR BACKGROUND
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xff0D6B80), Color(0xff117992)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryColor.withOpacity(0.3),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.2),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.4),
+                          width: 2,
+                        ),
+                      ),
+                      child: const CircleAvatar(
+                        radius: 36,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.person_rounded,
+                          size: 40,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _email,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _phone,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              /// --- ACCOUNT SETTINGS SECTION ---
+              _buildSectionHeader('ACCOUNT SETTINGS'),
+              const SizedBox(height: 10),
               _buildSectionCard([
                 _buildListTile(
-                  Icons.person_outline,
+                  Icons.person_outline_rounded,
                   'Edit Profile',
-                  onTap: () {},
+                  onTap: _showEditProfileBottomSheet,
                 ),
                 _buildDivider(),
                 _buildSwitchTile(
-                  Icons.notifications_none_outlined,
+                  Icons.notifications_none_rounded,
                   'Notifications',
                   _notificationsOn,
                   (val) {
@@ -84,7 +271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
                 _buildDivider(),
-                _buildLanguageTile(Icons.language_outlined, 'Language'),
+                _buildLanguageTile(Icons.language_rounded, 'Language'),
                 _buildDivider(),
                 _buildSwitchTile(
                   Icons.dark_mode_outlined,
@@ -96,7 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 _buildDivider(),
                 _buildListTile(
-                  Icons.help_outline_outlined,
+                  Icons.help_outline_rounded,
                   'Help Center',
                   onTap: () {},
                 ),
@@ -107,41 +294,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {},
                 ),
               ]),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
-              // --- LOG OUT BUTTON ---
+              /// --- LOG OUT BUTTON ---
               SizedBox(
                 width: double.infinity,
-                height: 54,
+                height: 52,
                 child: ElevatedButton(
                   onPressed: () {
                     // Log out action
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryTeal,
+                    backgroundColor: const Color(0xffFF5252),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(27),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.logout, color: Colors.white, size: 20),
-                      const SizedBox(width: 8),
+                      Icon(Icons.logout_rounded, color: Colors.white, size: 18),
+                      SizedBox(width: 8),
                       Text(
                         'Log Out',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 15,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -149,35 +335,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Section Label Layout
-  Widget _buildSectionHeader(String title, Color color) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(top: 16, bottom: 8, left: 4),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: color,
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
+  Widget _buildSectionHeader(String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 4),
+        child: Text(
+          title,
+          style: const TextStyle(
+            color: primaryColor,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.8,
+          ),
         ),
       ),
     );
   }
 
-  // White Card Wrap holding items
   Widget _buildSectionCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.black.withOpacity(0.04), width: 1.2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -185,29 +371,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Navigation Rows
   Widget _buildListTile(
     IconData icon,
     String title, {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF006D60), size: 24),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xffEAF7F9),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: primaryColor, size: 20),
+      ),
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-          color: Colors.black87,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Color(0xff1E293B),
         ),
       ),
-      dense: false,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      trailing: Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 14,
+        color: Colors.grey.shade400,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       onTap: onTap,
     );
   }
 
-  // Toggle rows
   Widget _buildSwitchTile(
     IconData icon,
     String title,
@@ -215,45 +410,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ValueChanged<bool> onChanged,
   ) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF006D60), size: 24),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xffEAF7F9),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: primaryColor, size: 20),
+      ),
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-          color: Colors.black87,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Color(0xff1E293B),
         ),
       ),
-      trailing: Switch(
+      trailing: Switch.adaptive(
         value: value,
         onChanged: onChanged,
         activeColor: Colors.white,
-        activeTrackColor: const Color(0xFF006D60),
-        inactiveTrackColor: Colors.grey.shade300,
-        inactiveThumbColor: Colors.white,
-        trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+        activeTrackColor: primaryColor,
+        inactiveTrackColor: Colors.grey.shade200,
       ),
-      dense: false,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
     );
   }
 
-  // Custom Selector segment row for Languages
   Widget _buildLanguageTile(IconData icon, String title) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFF006D60), size: 24),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xffEAF7F9),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: primaryColor, size: 20),
+      ),
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-          color: Colors.black87,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Color(0xff1E293B),
         ),
       ),
       trailing: Container(
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(20),
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(12),
         ),
         padding: const EdgeInsets.all(2),
         child: Row(
@@ -261,8 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [_buildLangOption('EN'), _buildLangOption('MY')],
         ),
       ),
-      dense: false,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
     );
   }
 
@@ -271,15 +475,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedLanguage = lang),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF006D60) : Colors.transparent,
-          borderRadius: BorderRadius.circular(18),
+          color: isSelected ? primaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           lang,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: FontWeight.bold,
             color: isSelected ? Colors.white : Colors.grey.shade600,
           ),
@@ -291,8 +495,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildDivider() {
     return Divider(
       height: 1,
-      thickness: 0.8,
-      color: Colors.grey.withOpacity(0.15),
+      thickness: 1,
+      color: Colors.grey.shade100,
       indent: 16,
       endIndent: 16,
     );

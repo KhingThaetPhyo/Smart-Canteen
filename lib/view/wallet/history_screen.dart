@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import '../../model/transaction_model.dart';
 
 class TransactionHistoryScreen extends StatefulWidget {
@@ -15,21 +17,136 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   static const Color primaryColor = Color(0xff117992);
   int _selectedTab = 0; // 0: All, 1: Received, 2: Spent
   String _searchQuery = "";
+  DateTimeRange? _selectedDateRange;
+
+  DateTime? _parseTransactionDate(String time) {
+    final now = DateTime.now();
+    final normalizedTime = time.trim();
+
+    // Handles: "Today • 11:15 AM"
+    if (normalizedTime.startsWith("Today")) {
+      return DateTime(now.year, now.month, now.day);
+    }
+
+    // Handles: "Yesterday"
+    if (normalizedTime.startsWith("Yesterday")) {
+      final yesterday = now.subtract(const Duration(days: 1));
+
+      return DateTime(yesterday.year, yesterday.month, yesterday.day);
+    }
+
+    // Handles newly created transaction: "Just now"
+    if (normalizedTime.startsWith("Just now")) {
+      return DateTime(now.year, now.month, now.day);
+    }
+
+    // Handles: "18 Jul 2026"
+    try {
+      return DateFormat("dd MMM yyyy").parseStrict(normalizedTime);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool _isTransactionInsideDateRange(String transactionTime) {
+    if (_selectedDateRange == null) {
+      return true;
+    }
+
+    final transactionDate = _parseTransactionDate(transactionTime);
+
+    // Hide unrecognized dates while a date filter is active
+    if (transactionDate == null) {
+      return false;
+    }
+
+    final normalizedTransactionDate = DateTime(
+      transactionDate.year,
+      transactionDate.month,
+      transactionDate.day,
+    );
+
+    final startDate = DateTime(
+      _selectedDateRange!.start.year,
+      _selectedDateRange!.start.month,
+      _selectedDateRange!.start.day,
+    );
+
+    final endDate = DateTime(
+      _selectedDateRange!.end.year,
+      _selectedDateRange!.end.month,
+      _selectedDateRange!.end.day,
+      23,
+      59,
+      59,
+    );
+
+    return !normalizedTransactionDate.isBefore(startDate) &&
+        !normalizedTransactionDate.isAfter(endDate);
+  }
 
   List<TransactionModel> get _filteredTransactions {
-    return widget.transactions.where((t) {
+    return widget.transactions.where((transaction) {
+      // 1. Filter by All / Received / Spent
       final matchesTab =
           _selectedTab == 0 ||
-          (_selectedTab == 1 && t.type == TransactionType.received) ||
-          (_selectedTab == 2 && t.type == TransactionType.spent);
+          (_selectedTab == 1 && transaction.type == TransactionType.received) ||
+          (_selectedTab == 2 && transaction.type == TransactionType.spent);
+
+      // 2. Filter by search text
+      final query = _searchQuery.trim().toLowerCase();
 
       final matchesSearch =
-          _searchQuery.isEmpty ||
-          t.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          t.subtitle.toLowerCase().contains(_searchQuery.toLowerCase());
+          query.isEmpty ||
+          transaction.title.toLowerCase().contains(query) ||
+          transaction.subtitle.toLowerCase().contains(query) ||
+          transaction.amount.toLowerCase().contains(query);
 
-      return matchesTab && matchesSearch;
+      // 3. Filter by selected date range
+      final matchesDate = _isTransactionInsideDateRange(transaction.time);
+
+      // Transaction must match all active filters
+      return matchesTab && matchesSearch && matchesDate;
     }).toList();
+  }
+
+  Future<void> _selectDateRange() async {
+    final now = DateTime.now();
+
+    final selectedRange = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(now.year + 5),
+      initialDateRange: _selectedDateRange,
+      helpText: "Select transaction dates",
+      saveText: "Apply",
+      cancelText: "Cancel",
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: primaryColor,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Color(0xff1E293B),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (selectedRange != null) {
+      setState(() {
+        _selectedDateRange = selectedRange;
+      });
+    }
+  }
+
+  void _clearDateFilter() {
+    setState(() {
+      _selectedDateRange = null;
+    });
   }
 
   @override
@@ -94,7 +211,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    /// SEARCH BAR
+                    /// SEARCH BAR WITH DATE FILTER
                     TextField(
                       onChanged: (value) {
                         setState(() {
@@ -107,25 +224,68 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                           color: Colors.grey.shade400,
                           fontSize: 14,
                         ),
+
+                        // Search icon on the left
                         prefixIcon: const Icon(
                           Icons.search_rounded,
                           color: primaryColor,
                           size: 20,
                         ),
+
+                        // Calendar filter button on the right
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: Material(
+                            color: _selectedDateRange != null
+                                ? primaryColor
+                                : const Color(0xffEAF7F9),
+                            borderRadius: BorderRadius.circular(12),
+                            child: InkWell(
+                              onTap: () {
+                                if (_selectedDateRange != null) {
+                                  // Clear the selected date filter
+                                  _clearDateFilter();
+                                } else {
+                                  // Open the date picker
+                                  _selectDateRange();
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Icon(
+                                _selectedDateRange != null
+                                    ? Icons.close_rounded
+                                    : Icons.calendar_month_rounded,
+                                color: _selectedDateRange != null
+                                    ? Colors.white
+                                    : primaryColor,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 16,
                         ),
+
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(color: Colors.grey.shade200),
                         ),
+
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.grey.shade200),
+                          borderSide: BorderSide(
+                            color: _selectedDateRange != null
+                                ? primaryColor
+                                : Colors.grey.shade200,
+                            width: _selectedDateRange != null ? 1.5 : 1,
+                          ),
                         ),
+
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(

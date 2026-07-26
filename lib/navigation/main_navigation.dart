@@ -6,14 +6,36 @@ import 'package:smartcanteen/view/scanner/scanner_screen.dart';
 import 'package:smartcanteen/view/wallet/wallet_screen.dart';
 import 'package:smartcanteen/view/profilescreen.dart';
 
+// Inside main_navigation.dart
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
+  // Global controller to switch tabs from anywhere
+  static final ValueNotifier<int> navigationNotifier = ValueNotifier<int>(0);
+
   @override
-  State<MainNavigation> createState() => _MainNavigationState();
+  State<MainNavigation> createState() => _$MainNavigationState();
 }
 
-class _MainNavigationState extends State<MainNavigation> {
+class _$MainNavigationState extends State<MainNavigation> {
+  @override
+  void initState() {
+    super.initState();
+    MainNavigation.navigationNotifier.addListener(_onTabChanged);
+  }
+
+  @override
+  void dispose() {
+    MainNavigation.navigationNotifier.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    setState(() {
+      currentIndex = MainNavigation.navigationNotifier.value;
+    });
+  }
+
   int currentIndex = 0;
 
   static const Color primaryColor = Color(0xFF117992);
@@ -29,7 +51,13 @@ class _MainNavigationState extends State<MainNavigation> {
     ), // Index 0
     const OrdersScreen(), // Index 1
     const ScannerScreen(), // Index 2
-    const WalletScreen(), // Index 3
+    WalletScreen(
+      onOpenScanner: () {
+        setState(() {
+          currentIndex = 2;
+        });
+      },
+    ), // Index 3
     const ProfileScreen(), // Index 4
   ];
 

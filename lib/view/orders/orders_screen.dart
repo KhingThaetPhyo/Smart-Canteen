@@ -215,7 +215,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xffF8FAFC),
+      backgroundColor: const Color(0xFFE3F2FD),
       body: Column(
         children: [
           /// FLOATING CARD HEADER

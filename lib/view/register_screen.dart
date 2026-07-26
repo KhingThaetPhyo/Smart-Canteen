@@ -165,7 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final height = size.height;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEFF7FF),
+      backgroundColor: const Color(0xFFE3F2FD),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(

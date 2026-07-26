@@ -16,6 +16,10 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   String selectedMealType = "All";
   String selectedCategory = "All";
 
+  // Search state and controller
+  String searchQuery = "";
+  final TextEditingController searchController = TextEditingController();
+
   // Seat Reservation State
   String? selectedSeatId;
   bool isSeatSectionExpanded = true;
@@ -35,7 +39,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   // ===========================================================================
   String seatLayoutType = "grid"; // Options: "grid" or "canvas"
 
-  // UPDATED: Set crossAxisCount to 4 for 4x4 layout
   int gridCrossAxisCount = 4;
 
   // Canvas Configuration
@@ -256,6 +259,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     },
   ];
 
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
   void _addToCart(Map<String, dynamic> item) {
     setState(() {
       final bool isCountable = item["isCountable"] ?? false;
@@ -286,10 +295,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   void _resetOrder() {
     setState(() {
-      // 1. Reset seat selection
       selectedSeatId = null;
-
-      // 2. Reset cart quantity for all items
       for (var item in menuItems) {
         item["cartQuantity"] = 0;
       }
@@ -305,12 +311,20 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Filter items based on meal type, category, and search query
     final filteredItems = menuItems.where((item) {
       final matchesMeal =
           selectedMealType == "All" || item["mealType"] == selectedMealType;
       final matchesCategory =
           selectedCategory == "All" || item["category"] == selectedCategory;
-      return matchesMeal && matchesCategory;
+
+      final query = searchQuery.toLowerCase();
+      final itemName = item["name"].toString().toLowerCase();
+      final itemDesc = item["description"].toString().toLowerCase();
+      final matchesSearch =
+          query.isEmpty || itemName.contains(query) || itemDesc.contains(query);
+
+      return matchesMeal && matchesCategory && matchesSearch;
     }).toList();
 
     return Scaffold(
@@ -320,7 +334,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       floatingActionButton: (totalCartCount > 0 || selectedSeatId != null)
           ? FloatingActionButton.extended(
               onPressed: () {
-                // SHOW THE CART RECEIPT SHEET
                 showModalBottomSheet(
                   context: context,
                   isScrollControlled: true,
@@ -383,19 +396,13 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          /// APP BAR
+          /// REDESIGNED APP BAR HEADER
           SliverAppBar(
-            expandedHeight: 180,
+            expandedHeight: 160,
             pinned: true,
             backgroundColor: primaryColor,
             elevation: 0,
-            leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
+            automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(
@@ -407,68 +414,59 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 30, 20, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
                             Container(
-                              width: 52,
-                              height: 52,
+                              width: 38,
+                              height: 38,
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(14),
+                                shape: BoxShape.circle,
                               ),
-                              child: const Icon(
-                                Icons.storefront_rounded,
-                                color: Colors.white,
-                                size: 30,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                onPressed: () => Navigator.pop(context),
                               ),
                             ),
-                            const SizedBox(width: 14),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     widget.shopName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 22,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  const Row(
+                                  const SizedBox(height: 2),
+                                  Row(
                                     children: [
-                                      Icon(
-                                        Icons.star_rounded,
-                                        color: Colors.amber,
-                                        size: 16,
-                                      ),
-                                      SizedBox(width: 3),
-                                      Text(
-                                        "4.8",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      SizedBox(width: 12),
-                                      Icon(
+                                      const Icon(
                                         Icons.circle,
                                         color: Color(0xff34D399),
-                                        size: 8,
+                                        size: 7,
                                       ),
-                                      SizedBox(width: 4),
-                                      Text(
+                                      const SizedBox(width: 5),
+                                      const Text(
                                         "Open Now",
                                         style: TextStyle(
                                           color: Color(0xff34D399),
-                                          fontSize: 12,
+                                          fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -479,6 +477,89 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 14),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.12),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.access_time_rounded,
+                                color: Colors.white70,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "BREAKFAST",
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white60,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 1),
+                                  const Text(
+                                    "6AM - 10AM",
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              Container(
+                                width: 1,
+                                height: 24,
+                                color: Colors.white.withOpacity(0.2),
+                              ),
+                              const Spacer(),
+                              const Icon(
+                                Icons.lunch_dining_rounded,
+                                color: Colors.white70,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "LUNCH",
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white60,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 1),
+                                  const Text(
+                                    "11AM - 2PM",
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -487,53 +568,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ),
           ),
 
-          /// MEAL SCHEDULE NOTICE
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.access_time_filled_rounded,
-                    color: primaryColor,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "Breakfast: 6AM-10AM",
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(width: 1, height: 12, color: Colors.grey.shade300),
-                  const Spacer(),
-                  const Icon(
-                    Icons.lunch_dining_rounded,
-                    color: Colors.orange,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "Lunch: 11AM-2PM",
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
           /// SEAT RESERVATION CARD
           SliverToBoxAdapter(
@@ -552,7 +587,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               ),
               child: Column(
                 children: [
-                  /// SECTION HEADER
                   InkWell(
                     onTap: () {
                       setState(() {
@@ -627,7 +661,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
-                          /// COUNTER INDICATOR
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -660,7 +693,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             ),
                           ),
 
-                          /// LAYOUT RENDERER
                           if (seats.isEmpty)
                             const Padding(
                               padding: EdgeInsets.symmetric(vertical: 20),
@@ -676,7 +708,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
                           const SizedBox(height: 16),
 
-                          /// LEGEND ROW
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -707,10 +738,92 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ),
           ),
 
+          /// REDESIGNED SEARCH BAR WIDGET (Matching History Screen Style)[cite: 8, 9]
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+              child: TextField(
+                controller: searchController,
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: "Search menu items...",
+                  hintStyle: TextStyle(
+                    color: Colors.grey.shade400,
+                    fontSize: 14,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.search_rounded,
+                    color: primaryColor,
+                    size: 20,
+                  ),
+                  suffixIcon: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Material(
+                      color: searchQuery.isNotEmpty
+                          ? primaryColor
+                          : const Color(0xffEAF7F9),
+                      borderRadius: BorderRadius.circular(12),
+                      child: InkWell(
+                        onTap: () {
+                          if (searchQuery.isNotEmpty) {
+                            setState(() {
+                              searchController.clear();
+                              searchQuery = "";
+                            });
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Icon(
+                          searchQuery.isNotEmpty
+                              ? Icons.close_rounded
+                              : Icons.tune_rounded, // or filter icon
+                          color: searchQuery.isNotEmpty
+                              ? Colors.white
+                              : primaryColor,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 16,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(
+                      color: searchQuery.isNotEmpty
+                          ? primaryColor
+                          : Colors.grey.shade200,
+                      width: searchQuery.isNotEmpty ? 1.5 : 1,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: primaryColor,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           /// MEAL TYPE SEGMENT FILTER
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -855,259 +968,299 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-          /// MENU ITEM LIST
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              final item = filteredItems[index];
-              final bool isCountable = item["isCountable"] ?? false;
-              final int stockCount = item["stockCount"] ?? 0;
-              final int cartQuantity = item["cartQuantity"] ?? 0;
-              final String? mealType = item["mealType"];
-
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
+          /// MENU ITEM LIST OR EMPTY STATE
+          filteredItems.isEmpty
+              ? SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.search_off_rounded,
+                            size: 48,
+                            color: Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            "No items found",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    /// ITEM IMAGE
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: Container(
-                        width: 82,
-                        height: 82,
-                        color: Colors.grey.shade100,
-                        child: item["imageUrl"] != null
-                            ? Image.network(
-                                item["imageUrl"],
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Center(
+                  ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final item = filteredItems[index];
+                    final bool isCountable = item["isCountable"] ?? false;
+                    final int stockCount = item["stockCount"] ?? 0;
+                    final int cartQuantity = item["cartQuantity"] ?? 0;
+                    final String? mealType = item["mealType"];
+
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 6,
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// ITEM IMAGE
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              width: 82,
+                              height: 82,
+                              color: Colors.grey.shade100,
+                              child: item["imageUrl"] != null
+                                  ? Image.network(
+                                      item["imageUrl"],
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Center(
+                                                child: Icon(
+                                                  Icons.fastfood_rounded,
+                                                  color: Colors.grey.shade400,
+                                                  size: 30,
+                                                ),
+                                              ),
+                                    )
+                                  : Center(
                                       child: Icon(
                                         Icons.fastfood_rounded,
                                         color: Colors.grey.shade400,
                                         size: 30,
                                       ),
                                     ),
-                              )
-                            : Center(
-                                child: Icon(
-                                  Icons.fastfood_rounded,
-                                  color: Colors.grey.shade400,
-                                  size: 30,
-                                ),
-                              ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 14),
-
-                    /// ITEM DETAILS
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item["name"],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: Color(0xff1E293B),
                             ),
                           ),
 
-                          if (isCountable) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              stockCount > 0
-                                  ? "Stock left: $stockCount"
-                                  : "Out of stock",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: stockCount > 3
-                                    ? Colors.grey.shade600
-                                    : (stockCount > 0
-                                          ? Colors.orange.shade800
-                                          : Colors.red.shade400),
-                              ),
-                            ),
-                          ],
+                          const SizedBox(width: 14),
 
-                          const SizedBox(height: 4),
-
-                          Text(
-                            item["description"],
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.grey.shade500,
-                              fontSize: 11,
-                              height: 1.3,
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          /// PRICE & BADGE
-                          Row(
-                            children: [
-                              Text(
-                                item["price"],
-                                style: const TextStyle(
-                                  color: primaryColor,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14,
+                          /// ITEM DETAILS
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item["name"],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Color(0xff1E293B),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              if (mealType != null)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 7,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: mealType == "Breakfast"
-                                        ? const Color(0xffFEF3C7)
-                                        : const Color(0xffFFEDD5),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    mealType,
+
+                                if (isCountable) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    stockCount > 0
+                                        ? "Stock left: $stockCount"
+                                        : "Out of stock",
                                     style: TextStyle(
-                                      color: mealType == "Breakfast"
-                                          ? const Color(0xffD97706)
-                                          : const Color(0xffEA580C),
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 10,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: stockCount > 3
+                                          ? Colors.grey.shade600
+                                          : (stockCount > 0
+                                                ? Colors.orange.shade800
+                                                : Colors.red.shade400),
                                     ),
                                   ),
+                                ],
+
+                                const SizedBox(height: 4),
+
+                                Text(
+                                  item["description"],
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.grey.shade500,
+                                    fontSize: 11,
+                                    height: 1.3,
+                                  ),
                                 ),
-                            ],
+
+                                const SizedBox(height: 10),
+
+                                /// PRICE & BADGE
+                                Row(
+                                  children: [
+                                    Text(
+                                      item["price"],
+                                      style: const TextStyle(
+                                        color: primaryColor,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    if (mealType != null)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 7,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: mealType == "Breakfast"
+                                              ? const Color(0xffFEF3C7)
+                                              : const Color(0xffFFEDD5),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          mealType,
+                                          style: TextStyle(
+                                            color: mealType == "Breakfast"
+                                                ? const Color(0xffD97706)
+                                                : const Color(0xffEA580C),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(width: 8),
+
+                          /// ACTION BUTTON CONTROLS
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child:
+                                isCountable &&
+                                    stockCount == 0 &&
+                                    cartQuantity == 0
+                                ? Container(
+                                    height: 36,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Sold Out",
+                                        style: TextStyle(
+                                          color: Colors.grey.shade400,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : cartQuantity == 0
+                                ? SizedBox(
+                                    height: 36,
+                                    child: ElevatedButton(
+                                      onPressed: () => _addToCart(item),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: primaryColor,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        "+ Add",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: primaryColor.withOpacity(0.08),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: primaryColor),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(
+                                            minWidth: 32,
+                                          ),
+                                          icon: const Icon(
+                                            Icons.remove,
+                                            size: 16,
+                                            color: primaryColor,
+                                          ),
+                                          onPressed: () =>
+                                              _removeFromCart(item),
+                                        ),
+                                        Text(
+                                          '$cartQuantity',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                            color: primaryColor,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(
+                                            minWidth: 32,
+                                          ),
+                                          icon: Icon(
+                                            Icons.add,
+                                            size: 16,
+                                            color:
+                                                (!isCountable || stockCount > 0)
+                                                ? primaryColor
+                                                : Colors.grey,
+                                          ),
+                                          onPressed:
+                                              (!isCountable || stockCount > 0)
+                                              ? () => _addToCart(item)
+                                              : null,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
-                    ),
-
-                    const SizedBox(width: 8),
-
-                    /// ACTION BUTTON CONTROLS
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: isCountable && stockCount == 0 && cartQuantity == 0
-                          ? Container(
-                              height: 36,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Sold Out",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade400,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : cartQuantity == 0
-                          ? SizedBox(
-                              height: 36,
-                              child: ElevatedButton(
-                                onPressed: () => _addToCart(item),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                  ),
-                                ),
-                                child: const Text(
-                                  "+ Add",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Container(
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: primaryColor.withOpacity(0.08),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: primaryColor),
-                              ),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(
-                                      minWidth: 32,
-                                    ),
-                                    icon: const Icon(
-                                      Icons.remove,
-                                      size: 16,
-                                      color: primaryColor,
-                                    ),
-                                    onPressed: () => _removeFromCart(item),
-                                  ),
-                                  Text(
-                                    '$cartQuantity',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                      color: primaryColor,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(
-                                      minWidth: 32,
-                                    ),
-                                    icon: Icon(
-                                      Icons.add,
-                                      size: 16,
-                                      color: (!isCountable || stockCount > 0)
-                                          ? primaryColor
-                                          : Colors.grey,
-                                    ),
-                                    onPressed: (!isCountable || stockCount > 0)
-                                        ? () => _addToCart(item)
-                                        : null,
-                                  ),
-                                ],
-                              ),
-                            ),
-                    ),
-                  ],
+                    );
+                  }, childCount: filteredItems.length),
                 ),
-              );
-            }, childCount: filteredItems.length),
-          ),
 
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
@@ -1119,7 +1272,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   // SEAT LAYOUT BUILDERS
   // ===========================================================================
 
-  /// BUILDER 1: Flexible Grid
   Widget _buildFlexibleGridLayout() {
     return GridView.builder(
       shrinkWrap: true,
@@ -1155,7 +1307,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     );
   }
 
-  /// BUILDER 2: Canvas Floor Plan
   Widget _buildCanvasLayout() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -1203,7 +1354,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     );
   }
 
-  /// HELPER WIDGET FOR SEAT CARD
   Widget _buildSeatCard({
     required String seatId,
     required String displayLabel,
@@ -1299,7 +1449,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     );
   }
 
-  /// HELPER WIDGET FOR LEGEND ITEM
   Widget _buildLegendItem({required Color color, required String label}) {
     return Row(
       children: [

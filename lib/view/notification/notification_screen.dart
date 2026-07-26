@@ -98,12 +98,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
     });
   }
 
+  /// Delete single notification by ID
+  void _deleteNotification(String id) {
+    setState(() {
+      notifications.removeWhere((n) => n.id == id);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final displayedList = filteredNotifications;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF6F8FC),
+      backgroundColor: const Color(0xFFE3F2FD),
       body: SafeArea(
         child: Column(
           children: [
@@ -159,45 +166,61 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                   ),
 
-                  /// UNREAD BADGE / MARK READ BUTTON
+                  /// READ ALL BUTTON
+                  if (unreadCount > 0) ...[
+                    TextButton(
+                      onPressed: _markAllAsRead,
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: const Text(
+                        "Read All",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+
+                  /// UNREAD BADGE
                   if (unreadCount > 0)
-                    GestureDetector(
-                      onTap: _markAllAsRead,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.25),
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.25),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Color(0xff34D399),
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: const BoxDecoration(
-                                color: Color(
-                                  0xff34D399,
-                                ), // Soft green indicator
-                                shape: BoxShape.circle,
-                              ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "$unreadCount New",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              "$unreadCount New",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                 ],
@@ -227,21 +250,42 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       itemCount: displayedList.length,
                       itemBuilder: (context, index) {
                         final item = displayedList[index];
-                        return NotificationCard(
-                          type: item.type,
-                          title: item.title,
-                          message: item.message,
-                          time: item.time,
-                          isRead: item.isRead,
-                          onTap: () {
-                            setState(() {
-                              item.isRead = true;
-                            });
-
-                            if (item.pickupCode != null) {
-                              showPickUpCodeDialog(context, item.pickupCode!);
-                            }
+                        return Dismissible(
+                          key: Key(item.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade400,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          onDismissed: (direction) {
+                            _deleteNotification(item.id);
                           },
+                          child: NotificationCard(
+                            type: item.type,
+                            title: item.title,
+                            message: item.message,
+                            time: item.time,
+                            isRead: item.isRead,
+                            onTap: () {
+                              setState(() {
+                                item.isRead = true;
+                              });
+
+                              if (item.pickupCode != null) {
+                                showPickUpCodeDialog(context, item.pickupCode!);
+                              }
+                            },
+                          ),
                         );
                       },
                     ),
