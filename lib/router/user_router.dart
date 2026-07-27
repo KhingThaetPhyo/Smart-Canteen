@@ -7,11 +7,13 @@ import 'package:smartcanteen/view/home/homescreen.dart';
 // import 'package:smartcanteen/view/homescreen.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/notification_screen.dart';
+import 'package:smartcanteen/view/order_menu_screen.dart';
 import 'package:smartcanteen/view/orderscreen.dart';
 import 'package:smartcanteen/view/profilescreen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
 import 'package:smartcanteen/view/search_screen.dart';
+import 'package:smartcanteen/view/shop_detail_screen.dart';
 import 'package:smartcanteen/view/splash_screen.dart';
 import 'package:smartcanteen/view/student_info_screen.dart';
 import 'package:smartcanteen/view/user_qr_screen.dart';
@@ -19,7 +21,7 @@ import 'package:smartcanteen/view/wallet_info_screen.dart';
 import 'package:smartcanteen/view/wallet_screen.dart';
 
 final router = GoRouter(
-  initialLocation: '/splash',
+  initialLocation: '/order_menu',
 
   // Check token when app opens
   redirect: (context, state) async {
@@ -43,6 +45,10 @@ final router = GoRouter(
   },
 
   routes: [
+     GoRoute(
+  path: '/order_menu',
+  builder: (context, state) => const ShopDetailScreen(shopName: 'Mon',),
+),
     GoRoute(
   path: '/splash',
   builder: (context, state) => const SplashScreen(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'order_menu_screen.dart'; // Adjust path if needed based on your folder structure
 
 class ShopDetailScreen extends StatefulWidget {
   final String shopName;
@@ -12,13 +13,20 @@ class ShopDetailScreen extends StatefulWidget {
 class _ShopDetailScreenState extends State<ShopDetailScreen> {
   static const Color primaryColor = Color(0xff117992);
 
-  // Meal Segment: (All, Breakfast, Lunch)
-  String selectedMealType = "All";
-  String selectedCategory = "All";
+  // Search controller & query state
+  final TextEditingController _searchController = TextEditingController();
+  String searchQuery = "";
 
-  final List<String> mealTypes = ["All", "Breakfast", "Lunch"];
+  // Seat selection ID (if applicable, null for takeaway)
+  String? selectedSeatId;
+
+  // Meal Segment: (All, Breakfast, Lunch)
+  String selectedMealType = "အားလုံး";
+  String selectedCategory = "အားလုံး";
+
+  final List<String> mealTypes = ["အားလုံး", "မနက်စာ", "နေ့လည်စာ"];
   final List<String> categories = [
-    "All",
+    "အားလုံး",
     "Main",
     "Appetizer",
     "Salad",
@@ -30,63 +38,181 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       "name": "Mohinga",
       "description":
           "Classic Burmese fish noodle soup served with crispy fritters and cooked egg",
-      "price": "250 pts",
-      "mealType": "Breakfast",
+      "price": "250 ပွိုင့်",
+      "mealType": "မနက်စာ",
       "category": "Main",
       "isAvailable": true,
+      "cartQuantity": 0,
       "imageUrl": "https://via.placeholder.com/150",
     },
     {
       "name": "Shan Noodle",
       "description":
           "Sticky rice noodles tossed with savory chicken tomato gravy",
-      "price": "300 pts",
-      "mealType": "Breakfast",
+      "price": "300 ပွိုင့်",
+      "mealType": "မနက်စာ",
       "category": "Main",
       "isAvailable": true,
+      "cartQuantity": 0,
       "imageUrl": "https://via.placeholder.com/150",
     },
     {
       "name": "Fried Rice & Egg",
       "description": "Yangon style fried rice served with sunny side up egg",
-      "price": "350 pts",
-      "mealType": "Lunch",
+      "price": "350 ပွိုင့်",
+      "mealType": "နေ့လည်စာ",
       "category": "Main",
       "isAvailable": true,
+      "cartQuantity": 0,
       "imageUrl": "https://via.placeholder.com/150",
     },
     {
       "name": "Iced Lemon Tea",
       "description": "Refreshing home-brewed iced lemon tea",
-      "price": "150 pts",
+      "price": "150 ပွိုင့်",
       "mealType": null, // No meal badge
       "category": "Drinks",
       "isAvailable": true,
+      "cartQuantity": 0,
       "imageUrl": "https://via.placeholder.com/150",
     },
     {
       "name": "Tea Leaf Salad",
       "description": "Fermented tea leaf salad mixed with crunchy roasted nuts",
-      "price": "200 pts",
-      "mealType": "Lunch",
+      "price": "200 ပွိုင့်",
+      "mealType": "နေ့လည်စာ",
       "category": "Salad",
       "isAvailable": false, // Sold Out
+      "cartQuantity": 0,
       "imageUrl": "https://via.placeholder.com/150",
     },
   ];
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _addToCart(Map<String, dynamic> item) {
+    setState(() {
+      final bool isCountable = item["isCountable"] ?? false;
+
+      if (isCountable) {
+        if ((item["stockCount"] ?? 0) > 0) {
+          item["stockCount"] -= 1;
+          item["cartQuantity"] = (item["cartQuantity"] ?? 0) + 1;
+        }
+      } else {
+        item["cartQuantity"] = (item["cartQuantity"] ?? 0) + 1;
+      }
+    });
+  }
+
+  void _removeFromCart(Map<String, dynamic> item) {
+    setState(() {
+      final bool isCountable = item["isCountable"] ?? false;
+
+      if ((item["cartQuantity"] ?? 0) > 0) {
+        if (isCountable) {
+          item["stockCount"] = (item["stockCount"] ?? 0) + 1;
+        }
+        item["cartQuantity"] -= 1;
+      }
+    });
+  }
+
+  void _resetOrder() {
+    setState(() {
+      for (var item in menuItems) {
+        item["cartQuantity"] = 0;
+      }
+    });
+  }
+
+  int get totalCartCount {
+    return menuItems.fold(
+      0,
+      (sum, item) => sum + ((item["cartQuantity"] as int?) ?? 0),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final filteredItems = menuItems.where((item) {
       final matchesMeal =
-          selectedMealType == "All" || item["mealType"] == selectedMealType;
+          selectedMealType == "အားလုံး" || item["mealType"] == selectedMealType;
       final matchesCategory =
-          selectedCategory == "All" || item["category"] == selectedCategory;
-      return matchesMeal && matchesCategory;
+          selectedCategory == "အားလုံး" || item["category"] == selectedCategory;
+      final matchesSearch = searchQuery.isEmpty ||
+          (item["name"] as String)
+              .toLowerCase()
+              .contains(searchQuery.toLowerCase());
+      return matchesMeal && matchesCategory && matchesSearch;
     }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xffF6F8FC),
+
+      /// BOTTOM RIGHT FLOATING CART BUTTON
+      floatingActionButton: (totalCartCount > 0)
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => CartReceiptSheet(
+                    shopName: widget.shopName,
+                    selectedSeatId: selectedSeatId,
+                    menuItems: menuItems,
+                    onAddToCart: _addToCart,
+                    onRemoveFromCart: _removeFromCart,
+                    onConfirmOrder: _resetOrder,
+                  ),
+                );
+              },
+              backgroundColor: primaryColor,
+              elevation: 4,
+              icon: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.shopping_bag_outlined, color: Colors.white),
+                  Positioned(
+                    right: -6,
+                    top: -6,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '$totalCartCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              label: const Text(
+                "ဈေးဝယ်ခြင်း",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : null,
 
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -207,14 +333,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.access_time_filled_rounded,
                     color: primaryColor,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    "Breakfast: 6AM-10AM",
+                    "မနက်စာ: 6AM-10AM",
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -224,14 +350,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   const Spacer(),
                   Container(width: 1, height: 12, color: Colors.grey.shade300),
                   const Spacer(),
-                  Icon(
+                  const Icon(
                     Icons.lunch_dining_rounded,
                     color: Colors.orange,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    "Lunch: 11AM-2PM",
+                    "နေ့လည်စာ: 11AM-2PM",
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -243,7 +369,56 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ),
           ),
 
-          /// MEAL TYPE SEGMENT FILTER: (All, Breakfast, Lunch)
+          /// SEARCH BAR SECTION
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                  style: const TextStyle(fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: "ရှာဖွေပါ...",
+                    hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                    prefixIcon: const Icon(Icons.search_rounded, color: Colors.grey),
+                    border: InputBorder.none,
+                    suffixIcon: searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, color: Colors.grey, size: 20),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                searchQuery = "";
+                              });
+                            },
+                          )
+                        : null,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          /// MEAL TYPE SEGMENT FILTER
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
@@ -300,7 +475,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             ),
           ),
 
-          /// REDESIGNED CATEGORY SECTION
+          /// CATEGORY SECTION
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,7 +486,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     vertical: 4,
                   ),
                   child: Text(
-                    "Categories",
+                    "အမျိုးအစားများ",
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -391,11 +566,11 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-          /// REDESIGNED MENU ITEM LIST
+          /// MENU ITEM LIST
           SliverList(
             delegate: SliverChildBuilderDelegate((context, index) {
               final item = filteredItems[index];
-              final bool isAvailable = item["isAvailable"];
+              final bool isAvailable = item["isAvailable"] ?? true;
               final String? mealType = item["mealType"];
 
               return Container(
@@ -452,7 +627,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// ITEM TITLE
                           Text(
                             item["name"],
                             maxLines: 1,
@@ -468,7 +642,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
                           const SizedBox(height: 4),
 
-                          /// DESCRIPTION
                           Text(
                             item["description"],
                             maxLines: 2,
@@ -482,7 +655,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
                           const SizedBox(height: 10),
 
-                          /// PRICE & MEAL BADGE ROW
                           Row(
                             children: [
                               Text(
@@ -498,7 +670,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
                               const SizedBox(width: 8),
 
-                              /// OPTIONAL MEAL BADGE (Breakfast / Lunch)
                               if (mealType != null)
                                 Container(
                                   padding: const EdgeInsets.symmetric(
@@ -506,7 +677,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: mealType == "Breakfast"
+                                    color: mealType == "မနက်စာ"
                                         ? const Color(0xffFEF3C7)
                                         : const Color(0xffFFEDD5),
                                     borderRadius: BorderRadius.circular(6),
@@ -514,7 +685,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                                   child: Text(
                                     mealType,
                                     style: TextStyle(
-                                      color: mealType == "Breakfast"
+                                      color: mealType == "မနက်စာ"
                                           ? const Color(0xffD97706)
                                           : const Color(0xffEA580C),
                                       fontWeight: FontWeight.bold,
@@ -536,7 +707,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       child: SizedBox(
                         height: 36,
                         child: ElevatedButton(
-                          onPressed: isAvailable ? () {} : null,
+                          onPressed: isAvailable ? () => _addToCart(item) : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isAvailable
                                 ? primaryColor
@@ -548,7 +719,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 14),
                           ),
                           child: Text(
-                            isAvailable ? "+ Add" : "Sold Out",
+                            isAvailable ? "+ ဝယ်ရန်" : "ကုန်သွားပြီ",
                             style: TextStyle(
                               color: isAvailable
                                   ? Colors.white

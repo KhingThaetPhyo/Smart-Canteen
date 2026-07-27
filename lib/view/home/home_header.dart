@@ -969,22 +969,22 @@ class _HomeHeaderState extends State<HomeHeader> {
 
               /// SEARCH BAR
               Container(
-  height: 50,
-  padding: const EdgeInsets.symmetric(horizontal: 6),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(32),
-  ),
-  child: const TextField(
-    decoration: InputDecoration(
-      hintText: "ရှာဖွေပါ...",
-      hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-      prefixIcon: Icon(Icons.search_rounded, color: Colors.grey),
-      border: InputBorder.none, // Removes the bottom underline
-      contentPadding: EdgeInsets.symmetric(vertical: 12),
-    ),
-  ),
-)
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: "ရှာဖွေပါ...",
+                    hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                    prefixIcon: Icon(Icons.search_rounded, color: Colors.grey),
+                    border: InputBorder.none, // Removes the bottom underline
+                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              )
             ],
           ),
         ),
