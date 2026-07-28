@@ -10,7 +10,7 @@ import 'package:smartcanteen/model/view_menu_model.dart'; // Make sure this path
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "http://192.168.1.4:8000/api";
+  static const String baseUrl = "http://192.168.1.10:8000/api";
 
   final Dio _dio = Dio(
     BaseOptions(
@@ -216,6 +216,32 @@ Future<LoginModel?> loginUser({
       if (e.response != null && e.response?.data != null) {
         throw e.response?.data['message'] ?? 'Failed to load categories.';
       }
+      throw 'Unable to connect to server. Please check your connection.';
+    }
+  }
+
+  /// Fetch all menus for a specific shop without using a custom model
+  Future<Map<String, dynamic>?> getShopAllMenus(int shopId) async {
+    try {
+      final response = await _dio.get("/shops/$shopId/all-menus");
+
+      if (response.statusCode == 200) {
+        // Dio automatically decodes JSON responses into a Map
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } on DioException catch (e) {
+      print("========== FETCH SHOP MENUS DIO ERROR ==========");
+      print("Type: ${e.type}");
+      print("Message: ${e.message}");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+      print("================================================");
+
+      if (e.response != null && e.response?.data != null) {
+        throw e.response?.data['message'] ?? 'Failed to load menu details.';
+      }
+
       throw 'Unable to connect to server. Please check your connection.';
     }
   }

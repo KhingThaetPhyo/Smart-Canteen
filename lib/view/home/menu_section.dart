@@ -1625,33 +1625,52 @@ class _MenuSectionState extends State<MenuSection> {
       if (currentUser == null) {
         context.go('/login');
       } else {
-        onAuthenticated();
+        context.go('/shop_detail');
       }
     }
   }
-
-  /// Fetches and flattens all menus from all shops into a display list
-  Future<List<_DisplayMenuItem>> _fetchDisplayItems() async {
+Future<List<_DisplayMenuItem>> _fetchDisplayItems() async {
+  try {
     final response = await _apiService.getShopsWithMenus();
     List<_DisplayMenuItem> displayItems = [];
 
+    // Debug 1: Check response state
+    print("DEBUG: API Response received. Success = ${response?.success}");
+
     if (response != null && response.success) {
+      print("DEBUG: Total shops found = ${response.data.length}");
+
       for (var shop in response.data) {
-        if (shop.menus != null) {
+        print("DEBUG: Processing Shop = '${shop.shopName}' | Menus count = ${shop.menus?.length}");
+
+        if (shop.menus != null && shop.menus!.isNotEmpty) {
           for (var menu in shop.menus!) {
+            // Debug individual menu values to catch null String field casts
+            print("DEBUG: Found menu '${menu.itemName}' (ID: ${menu.menuId}, CatID: ${menu.categoryId})");
+            
             displayItems.add(
               _DisplayMenuItem(
-                shopName: shop.shopName,
+                shopName: shop.shopName ?? 'Unknown Shop',
                 menu: menu,
               ),
             );
           }
+        } else {
+          print("DEBUG: Shop '${shop.shopName}' has no menus.");
         }
       }
+    } else {
+      print("DEBUG: API call failed or returned success = false");
     }
-    return displayItems;
-  }
 
+    return displayItems;
+  } catch (e, stackTrace) {
+    // Debug 2: Catch casting or parsing errors during model deserialization
+    print("DEBUG ERROR in _fetchDisplayItems: $e");
+    print("DEBUG STACKTRACE: $stackTrace");
+    rethrow;
+  }
+}
   Widget _buildCategoryButton({
     required String title,
     required bool isSelected,

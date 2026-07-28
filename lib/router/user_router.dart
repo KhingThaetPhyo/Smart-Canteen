@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/model/shop_model.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/navigation_bar.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/view/home/homescreen.dart';
-// import 'package:smartcanteen/view/homescreen.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/notification_screen.dart';
-import 'package:smartcanteen/view/order_menu_screen.dart';
 import 'package:smartcanteen/view/orderscreen.dart';
 import 'package:smartcanteen/view/profilescreen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
@@ -21,7 +20,7 @@ import 'package:smartcanteen/view/wallet_info_screen.dart';
 import 'package:smartcanteen/view/wallet_screen.dart';
 
 final router = GoRouter(
-  initialLocation: '/order_menu',
+  initialLocation: '/splash',
 
   // Check token when app opens
   redirect: (context, state) async {
@@ -45,10 +44,6 @@ final router = GoRouter(
   },
 
   routes: [
-     GoRoute(
-  path: '/order_menu',
-  builder: (context, state) => const ShopDetailScreen(shopName: 'Mon',),
-),
     GoRoute(
   path: '/splash',
   builder: (context, state) => const SplashScreen(),
@@ -56,6 +51,11 @@ final router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const Loginscreen(),
+    ),
+    
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
     ),
     GoRoute(
       path: '/home',
@@ -89,10 +89,28 @@ final router = GoRouter(
         return WalletInfoScreen(user: user);
       },
     ),
-    GoRoute(
-      path: '/register',
-      builder: (context, state) => const RegisterScreen(),
+//     GoRoute(
+//   path: '/shop_detail',
+//   builder: (context, state) => const ShopDetailScreen(shopName: 'Mon',),
+// ),
+GoRoute(
+      path: '/shop_detail/:id',
+      builder: (context, state) {
+        final shopModel = state.extra as ShopModel?;
+
+        if (shopModel == null) {
+          return const Scaffold(
+            body: Center(child: Text('Shop data not found')),
+          );
+        }
+
+        return ShopDetailScreen(shopName: shopModel.shopName,shopId: shopModel.shopId,);
+      },
     ),
+//   GoRoute(
+//   path: '/shop_detail',
+//   builder: (context, state) => const ShopDetailScreen(shopName: 'Mon',),
+// ),
     GoRoute(
   path: '/user_qr',
   builder: (context, state) {
