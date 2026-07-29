@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // intl package အား import လုပ်ပါ
 import '../orders/widgets/pickup_qr_dialog.dart';
 import 'orders_screen.dart'; // OrderStatus enum ကို သုံးနိုင်ရန် Import လုပ်ပေးပါ
 
@@ -12,69 +13,32 @@ class OrderDetailScreen extends StatelessWidget {
   static final Color lightTeal = Colors.teal.shade50;
   static final Color darkTeal = const Color(0xff117992);
 
-  // ရက်စွဲနှင့် အချိန် format အား အဓိပ္ပာယ်ရှိရှိ သဘာဝကျအောင် ပြောင်းလဲပေးသည့် Helper Function
-  String _formatMyanmarDateTime(String rawDate) {
-    if (rawDate.isEmpty) return rawDate;
+  // ရက်စွဲကို 5/12/2026 15:55:00 Format ဖြင့် ပြောင်းလဲပေးသည့် Helper Function
+  String _formatEnglishDateTime(dynamic dateInput) {
+    if (dateInput == null) return '';
 
-    String text = rawDate;
-
-    // AM/PM ကို မြန်မာလို အချိန်အပိုင်းအခြား ပြောင်းခြင်း
-    if (text.contains('AM') || text.contains('PM')) {
-      bool isPM = text.contains('PM');
-      text = text.replaceAll('AM', '').replaceAll('PM', '').trim();
-
-      // အချိန်နာရီကို ထုတ်ယူ၍ မနက်/နေ့လယ်/ညနေ/ည ခွဲခြားခြင်း
-      int hour = 0;
-      final timeParts = text.split(' ');
-      final timeDigits = (timeParts.isNotEmpty ? timeParts.last : text).split(
-        ':',
-      );
-      if (timeDigits.isNotEmpty) {
-        hour =
-            int.tryParse(timeDigits[0].replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    if (dateInput is DateTime) {
+      return DateFormat('d/M/yyyy HH:mm:ss').format(dateInput);
+    } else if (dateInput is String) {
+      final parsedDate = DateTime.tryParse(dateInput);
+      if (parsedDate != null) {
+        return DateFormat('d/M/yyyy HH:mm:ss').format(parsedDate);
       }
-
-      String period = '';
-      if (!isPM) {
-        period = 'မနက်';
-      } else {
-        if (hour == 12 || hour == 1 || hour == 2 || hour == 3) {
-          period = 'နေ့လယ်';
-        } else if (hour >= 4 && hour <= 6) {
-          period = 'ညနေ';
-        } else {
-          period = 'ည';
-        }
-      }
-
-      // "ယနေ့၊" သို့မဟုတ် "မနေ့က၊" ပါဝင်ပါက format ပြန်ညှိခြင်း
-      if (text.contains('ယနေ့') || text.contains('Today')) {
-        final timeOnly = text
-            .replaceAll('ယနေ့၊', '')
-            .replaceAll('Today,', '')
-            .trim();
-        return "ယနေ့ $period $timeOnly";
-      } else if (text.contains('မနေ့က') || text.contains('Yesterday')) {
-        final timeOnly = text
-            .replaceAll('မနေ့က၊', '')
-            .replaceAll('Yesterday,', '')
-            .trim();
-        return "မနေ့က $period $timeOnly";
-      } else {
-        return "$period $text";
-      }
+      return dateInput; // Parse လုပ်မရပါက မူရင်းအတိုင်း ပြသမည်
     }
-
-    return text;
+    return '';
   }
 
   @override
   Widget build(BuildContext context) {
     final String shopName = order['shopName'] ?? 'အန်တီမွန် စားသောက်ဆိုင်';
     final String customerName = order['customerName'] ?? 'Aung Aung';
-    final String orderDate = _formatMyanmarDateTime(
-      order['orderDate'] ?? 'ယနေ့ 12:15 PM',
+
+    // dateTime (သို့မဟုတ်) orderDate ကို English Date Format ပြောင်းလဲခြင်း
+    final String orderDate = _formatEnglishDateTime(
+      order['dateTime'] ?? order['orderDate'],
     );
+
     final String phone = order['phone'] ?? '09 790182418';
     final String code = order['pickupCode'] ?? 'MBK-1000';
     final List items = order['items'] ?? [];
@@ -374,7 +338,7 @@ class OrderDetailScreen extends StatelessWidget {
 
                     const SizedBox(height: 28),
 
-                    /// 4. SCAN PICK UP CODE BUTTON (အသင့်ဖြစ်ပြီ (OrderStatus.ready) ဖြစ်မှသာ ပြသမည်)
+                    /// 4. SCAN PICK UP CODE BUTTON
                     if (isReady)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 36),
@@ -439,9 +403,7 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                       )
                     else
-                      const SizedBox(
-                        height: 24,
-                      ), // Button မပါပါက ပြေစာအောက်ခြေ အကွာအဝေး ထိန်းရန်
+                      const SizedBox(height: 24),
                   ],
                 ),
               ),

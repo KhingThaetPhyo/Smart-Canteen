@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'order_detail.dart';
 
 enum OrderStatus { pending, preparing, ready, completed }
@@ -17,7 +18,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
   DateFilter _selectedDateFilter = DateFilter.today;
   static const Color primaryColor = Color(0xff117992);
 
-  // Status Filter များကို မြန်မာလို ပြောင်းလဲထားပါသည်
   final List<String> _filters = [
     'အားလုံး',
     'စောင့်ဆိုင်းဆဲ',
@@ -29,7 +29,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
   final List<Map<String, dynamic>> _canteenOrders = [
     {
       'shopName': 'အန်တီမွန်',
-      'orderDate': 'ယနေ့ ညနေ ၁၂:၁၅',
       'dateTime': DateTime.now(),
       'pickupCode': 'MBK-1003',
       'status': OrderStatus.ready,
@@ -46,7 +45,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     },
     {
       'shopName': 'ဘာဂါနှင့် ဂရီးလ် ထမင်းဆိုင်',
-      'orderDate': 'ယနေ့ ညနေ ၁၂:၄၀ ',
       'dateTime': DateTime.now(),
       'pickupCode': 'MBK-1004',
       'status': OrderStatus.preparing,
@@ -63,7 +61,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     },
     {
       'shopName': 'လတ်ဆတ် သစ်သီးဖျော်ရည်နှင့် အအေးဆိုင်',
-      'orderDate': 'မနေ့ ညနေ ၁၂:၁၅',
       'dateTime': DateTime.now().subtract(const Duration(days: 1)),
       'pickupCode': 'MBK-1001',
       'status': OrderStatus.pending,
@@ -76,7 +73,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     },
     {
       'shopName': 'ပါစတာနှင့် အီတလီ အစားအစာဆိုင်',
-      'orderDate': '၃ ရက်မတိုင်မီ၊ညနေ ၁:၁၀ ',
       'dateTime': DateTime.now().subtract(const Duration(days: 3)),
       'pickupCode': 'MBK-0998',
       'status': OrderStatus.completed,
@@ -370,6 +366,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
       totalPoints += unitPoints * qty;
     }
 
+    // DateTime ကို d/M/yyyy HH:mm:ss ပုံစံဖြင့် Convert လုပ်ခြင်း
+    final DateTime orderDateTime = order['dateTime'] as DateTime;
+    final String formattedDate = DateFormat(
+      'd/M/yyyy HH:mm:ss',
+    ).format(orderDateTime);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -423,7 +425,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              order['orderDate'],
+                              formattedDate, // ရက်စွဲကို 5/12/2026 15:55:00 ပုံစံဖြင့် ပြသပေးပါမည်
                               style: TextStyle(
                                 color: Colors.grey.shade500,
                                 fontSize: 11,
