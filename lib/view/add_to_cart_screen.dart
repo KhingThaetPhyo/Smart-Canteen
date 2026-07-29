@@ -1,487 +1,10 @@
 
-// import 'package:flutter/material.dart';
-// import 'package:smartcanteen/navigation_bar.dart';
-// import 'package:smartcanteen/view/choose_table_screen.dart';
-// import 'package:smartcanteen/view/transfer_point_screen.dart';
-
-// class AddToCartScreen extends StatefulWidget {
-//   final String shopName;
-//   final List<Map<String, dynamic>> menuItems;
-//   final Function(Map<String, dynamic>) onAddToCart;
-//   final Function(Map<String, dynamic>) onRemoveFromCart;
-//   final VoidCallback onConfirmOrder;
-
-//   const AddToCartScreen({
-//     super.key,
-//     required this.shopName,
-//     required this.menuItems,
-//     required this.onAddToCart,
-//     required this.onRemoveFromCart,
-//     required this.onConfirmOrder,
-//   });
-
-//   @override
-//   State<AddToCartScreen> createState() => _AddToCartScreenState();
-// }
-
-// class _AddToCartScreenState extends State<AddToCartScreen> {
-//   static const Color primaryColor = Color(0xff117992);
-
-//   // Default selected dining option
-//   String selectedOrderType = "ပါဆယ်ထုတ်မည်";
-
-//   // Options list with labels and icons
-//   final List<Map<String, dynamic>> orderTypeOptions = [
-//     {
-//       "value": "ဆိုင်ထိုင်စားမည်",
-//       "label": "ဆိုင်ထိုင်စားမည်",
-//       "icon": Icons.chair_alt_rounded,
-//     },
-//     {
-//       "value": "ပါဆယ်ထုတ်မည်",
-//       "label": "ပါဆယ်ထုတ်မည်",
-//       "icon": Icons.shopping_bag_outlined,
-//     },
-//   ];
-
-//   // Helper to extract numeric points from strings like "250 pts"
-//   int _parsePrice(String priceStr) {
-//     final numStr = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
-//     return int.tryParse(numStr) ?? 0;
-//   }
-
-//   int get totalPoints {
-//     int total = 0;
-//     for (var item in widget.menuItems) {
-//       final int qty = item["cartQuantity"] ?? 0;
-//       if (qty > 0) {
-//         total += _parsePrice(item["price"]) * qty;
-//       }
-//     }
-//     return total;
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final cartItems = widget.menuItems
-//         .where((item) => (item["cartQuantity"] as int? ?? 0) > 0)
-//         .toList();
-
-//     return Container(
-//       color: Colors.transparent,
-//       padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
-//       // Constrain height so that receipt content can scroll properly
-//       constraints: BoxConstraints(
-//         maxHeight: MediaQuery.of(context).size.height * 0.85,
-//       ),
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           /// RECEIPT PAPER BODY WITH ZIGZAG CLIPPER
-//           Expanded(
-//             child: ClipPath(
-//               clipper: ReceiptClipper(),
-//               child: Container(
-//                 color: Colors.white,
-//                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-//                 child: SingleChildScrollView(
-//                   physics: const BouncingScrollPhysics(),
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.center,
-//                     children: [
-//                       /// RECEIPT HEADER
-//                       Container(
-//                         width: 44,
-//                         height: 44,
-//                         decoration: BoxDecoration(
-//                           color: primaryColor.withOpacity(0.1),
-//                           shape: BoxShape.circle,
-//                         ),
-//                         child: const Icon(
-//                           Icons.receipt_long_rounded,
-//                           color: primaryColor,
-//                           size: 24,
-//                         ),
-//                       ),
-//                       const SizedBox(height: 10),
-//                       Text(
-//                         widget.shopName.toUpperCase(),
-//                         style: const TextStyle(
-//                           fontWeight: FontWeight.w900,
-//                           fontSize: 18,
-//                           letterSpacing: 1.5,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-
-//                       const SizedBox(height: 16),
-
-//                       /// SEAT / ORDER TYPE DROPDOWN BOX
-//                       PopupMenuButton<String>(
-//                         tooltip: "ရွေးချယ်ပါ",
-//                         offset: const Offset(0, 42), // Opens menu right below the box
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(12),
-//                         ),
-//                         onSelected: (String newValue) {
-//                           setState(() {
-//                             selectedOrderType = newValue;
-//                           });
-//                         },
-//                         itemBuilder: (BuildContext context) {
-//                           return orderTypeOptions.map((option) {
-//                             return PopupMenuItem<String>(
-//                               value: option["value"] as String,
-//                               child: Row(
-//                                 children: [
-//                                   Icon(
-//                                     option["icon"] as IconData,
-//                                     size: 18,
-//                                     color: primaryColor,
-//                                   ),
-//                                   const SizedBox(width: 8),
-//                                   Text(
-//                                     option["label"] as String,
-//                                     style: const TextStyle(
-//                                       fontSize: 13,
-//                                       fontWeight: FontWeight.w600,
-//                                     ),
-//                                   ),
-//                                 ],
-//                               ),
-//                             );
-//                           }).toList();
-//                         },
-//                         child: Container(
-//                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-//                           decoration: BoxDecoration(
-//                             color: Colors.grey.shade100,
-//                             borderRadius: BorderRadius.circular(10),
-//                             border: Border.all(color: Colors.grey.shade300),
-//                           ),
-//                           child: Row(
-//                             mainAxisSize: MainAxisSize.min,
-//                             children: [
-//                               // 1. Single Leading Icon based on current selection
-//                               Icon(
-//                                 orderTypeOptions.firstWhere(
-//                                   (e) => e["value"] == selectedOrderType,
-//                                 )["icon"] as IconData,
-//                                 size: 18,
-//                                 color: primaryColor,
-//                               ),
-//                               const SizedBox(width: 8),
-//                               // 2. Selected Text
-//                               Text(
-//                                 orderTypeOptions.firstWhere(
-//                                   (e) => e["value"] == selectedOrderType,
-//                                 )["label"] as String,
-//                                 style: const TextStyle(
-//                                   fontSize: 13,
-//                                   fontWeight: FontWeight.w600,
-//                                   color: Colors.black87,
-//                                 ),
-//                               ),
-//                               const SizedBox(width: 6),
-//                               // 3. Dropdown Indicator Arrow
-//                               Icon(
-//                                 Icons.arrow_drop_down_rounded,
-//                                 color: Colors.grey.shade600,
-//                                 size: 20,
-//                               ),
-//                             ],
-//                           ),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 20),
-//                       _buildDottedDivider(),
-//                       const SizedBox(height: 16),
-
-//                       /// CART ITEMS LIST
-//                       if (cartItems.isEmpty)
-//                         Padding(
-//                           padding: const EdgeInsets.symmetric(vertical: 30),
-//                           child: Column(
-//                             children: [
-//                               Icon(
-//                                 Icons.shopping_bag_outlined,
-//                                 size: 40,
-//                                 color: Colors.grey.shade300,
-//                               ),
-//                               const SizedBox(height: 8),
-//                               Text(
-//                                 "Your cart is empty",
-//                                 style: TextStyle(
-//                                   color: Colors.grey.shade500,
-//                                   fontWeight: FontWeight.w500,
-//                                 ),
-//                               ),
-//                             ],
-//                           ),
-//                         )
-//                       else
-//                         ListView.separated(
-//                           shrinkWrap: true,
-//                           physics: const NeverScrollableScrollPhysics(),
-//                           itemCount: cartItems.length,
-//                           separatorBuilder: (context, index) =>
-//                               const SizedBox(height: 12),
-//                           itemBuilder: (context, index) {
-//                             final item = cartItems[index];
-//                             final int qty = item["cartQuantity"];
-//                             final int unitPrice = _parsePrice(item["price"]);
-//                             final int itemTotalPts = unitPrice * qty;
-
-//                             return Row(
-//                               children: [
-//                                 /// ITEM DETAILS
-//                                 Expanded(
-//                                   child: Column(
-//                                     crossAxisAlignment: CrossAxisAlignment.start,
-//                                     children: [
-//                                       Text(
-//                                         item["name"],
-//                                         style: const TextStyle(
-//                                           fontWeight: FontWeight.bold,
-//                                           fontSize: 14,
-//                                           color: Color(0xff1E293B),
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 2),
-//                                       Text(
-//                                         "$unitPrice ပွိုင့်",
-//                                         style: TextStyle(
-//                                           fontSize: 11,
-//                                           color: Colors.grey.shade500,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ),
-
-//                                 /// QUANTITY MODIFIER BUTTONS
-//                                 Container(
-//                                   height: 32,
-//                                   decoration: BoxDecoration(
-//                                     color: Colors.grey.shade100,
-//                                     borderRadius: BorderRadius.circular(8),
-//                                     border: Border.all(color: Colors.grey.shade300),
-//                                   ),
-//                                   child: Row(
-//                                     children: [
-//                                       IconButton(
-//                                         padding: EdgeInsets.zero,
-//                                         constraints: const BoxConstraints(
-//                                           minWidth: 28,
-//                                         ),
-//                                         icon: const Icon(
-//                                           Icons.remove,
-//                                           size: 14,
-//                                           color: Colors.redAccent,
-//                                         ),
-//                                         onPressed: () {
-//                                           setState(() {
-//                                             widget.onRemoveFromCart(item);
-//                                           });
-//                                         },
-//                                       ),
-//                                       Text(
-//                                         '$qty',
-//                                         style: const TextStyle(
-//                                           fontWeight: FontWeight.bold,
-//                                           fontSize: 12,
-//                                         ),
-//                                       ),
-//                                       IconButton(
-//                                         padding: EdgeInsets.zero,
-//                                         constraints: const BoxConstraints(
-//                                           minWidth: 28,
-//                                         ),
-//                                         icon: const Icon(
-//                                           Icons.add,
-//                                           size: 14,
-//                                           color: primaryColor,
-//                                         ),
-//                                         onPressed: () {
-//                                           setState(() {
-//                                             widget.onAddToCart(item);
-//                                           });
-//                                         },
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ),
-
-//                                 const SizedBox(width: 14),
-
-//                                 /// TOTAL POINTS FOR ITEM
-//                                 SizedBox(
-//                                   width: 60,
-//                                   child: Text(
-//                                     "$itemTotalPts ပွိုင့်",
-//                                     textAlign: TextAlign.right,
-//                                     style: const TextStyle(
-//                                       fontWeight: FontWeight.w800,
-//                                       fontSize: 13,
-//                                       color: Color(0xff1E293B),
-//                                     ),
-//                                   ),
-//                                 ),
-//                               ],
-//                             );
-//                           },
-//                         ),
-
-//                       const SizedBox(height: 20),
-//                       _buildDottedDivider(),
-//                       const SizedBox(height: 16),
-
-//                       /// TOTAL POINTS DISPLAY
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//                           const Text(
-//                             "စုစုပေါင်း",
-//                             style: TextStyle(
-//                               fontWeight: FontWeight.w900,
-//                               fontSize: 15,
-//                               letterSpacing: 1.0,
-//                               color: Color(0xff1E293B),
-//                             ),
-//                           ),
-//                           Text(
-//                             "$totalPoints ပွိုင့်",
-//                             style: const TextStyle(
-//                               fontWeight: FontWeight.w900,
-//                               fontSize: 20,
-//                               color: primaryColor,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-
-//           const SizedBox(height: 16),
-// /// CONFIRM ORDER / PLACE ORDER BUTTON
-//           SizedBox(
-//             width: double.infinity,
-//             height: 52,
-//             child: ElevatedButton(
-//               onPressed: cartItems.isEmpty
-//                   ? null
-//                   : () {
-//                       Navigator.pop(context); // Close bottom sheet / modal first
-//                       widget.onConfirmOrder();
-
-//                       if (selectedOrderType == "ပါဆယ်ထုတ်မည်") {
-//                         // Navigate to Transfer Point Screen
-//                         //Navigator.pushNamed(context, '/transfer_point_screen');
-//                         // Or if you use direct class instantiation:
-//                         Navigator.push(
-//                           context,
-//                           MaterialPageRoute(
-//                             builder: (context) => TransferPointScreen(currentBalance: 0, onTransferCompleted: (int amount, String recipient) {  },),
-//                           ),
-//                         );
-                        
-//                       } else if (selectedOrderType == "ဆိုင်ထိုင်စားမည်") {
-//                         // Navigate to Choose Table Screen
-//                         //Navigator.pushNamed(context, '/choose_table_screen');
-//                         // Or if you use direct class instantiation:
-//                         Navigator.push(
-//                           context,
-//                           MaterialPageRoute(
-//                             builder: (context) =>  ChooseTableScreen(),
-//                           ),
-//                         );
-                        
-//                       }
-//                     },
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: primaryColor,
-//                 disabledBackgroundColor: Colors.grey.shade400,
-//                 elevation: 2,
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(16),
-//                 ),
-//               ),
-//               child: Text(
-//                 cartItems.isEmpty
-//                     ? "ရွေးချယ်ထားခြင်းမရှိပါ"
-//                     : "အော်ဒါတင်မည်",
-//                 style: const TextStyle(
-//                   color: Colors.white,
-//                   fontWeight: FontWeight.bold,
-//                   fontSize: 15,
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//   Widget _buildDottedDivider() {
-//     return LayoutBuilder(
-//       builder: (context, constraints) {
-//         final boxWidth = constraints.maxWidth;
-//         const dashWidth = 5.0;
-//         const dashHeight = 1.0;
-//         final dashCount = (boxWidth / (2 * dashWidth)).floor();
-//         return Flex(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           direction: Axis.horizontal,
-//           children: List.generate(dashCount, (_) {
-//             return SizedBox(
-//               width: dashWidth,
-//               height: dashHeight,
-//               child: DecoratedBox(
-//                 decoration: BoxDecoration(color: Colors.grey.shade300),
-//               ),
-//             );
-//           }),
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class ReceiptClipper extends CustomClipper<Path> {
-//   @override
-//   Path getClip(Size size) {
-//     Path path = Path();
-//     path.lineTo(0, size.height - 12);
-
-//     const double waveWidth = 8.0;
-//     const double waveHeight = 8.0;
-
-//     double x = 0;
-//     while (x < size.width) {
-//       x += waveWidth;
-//       path.lineTo(x - (waveWidth / 2), size.height - 12 + waveHeight);
-//       path.lineTo(x, size.height - 12);
-//     }
-
-//     path.lineTo(size.width, 0);
-//     path.close();
-//     return path;
-//   }
-
-//   @override
-//   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
-// }
-
-
 import 'package:flutter/material.dart';
 import 'package:smartcanteen/view/order_success_screen.dart';
 import 'package:smartcanteen/view/transfer_screen.dart';
 
 class AddToCartScreen extends StatefulWidget {
+  final int shopId;
   final String shopName;
   final List<Map<String, dynamic>> seats;
   final List<Map<String, dynamic>> menuItems;
@@ -497,7 +20,7 @@ class AddToCartScreen extends StatefulWidget {
     required this.onAddToCart,
     required this.onRemoveFromCart,
     required this.onConfirmOrder,
-    required this.currentBalance,
+    required this.currentBalance, required this.shopId,
   });
   @override
   State<AddToCartScreen> createState() => _AddToCartScreenState();
@@ -506,6 +29,7 @@ class AddToCartScreen extends StatefulWidget {
 class _AddToCartScreenState extends State<AddToCartScreen> {
   static const Color primaryColor = Color(0xff117992);
   // ORDER TYPE STATE: "dinein" (reserve table) or "takeaway"
+
   String orderType = "takeaway";
   String? selectedSeatId;
   String? selectedSeatLabel;
@@ -935,59 +459,80 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: !_isReadyToOrder
-                    ? null
-                    : () {
-                        final activeCartSnapshot =
-                            List<Map<String, dynamic>>.from(
-                              cartItems.map(
-                                (item) => Map<String, dynamic>.from(item),
-                              ),
-                            );
-                        final capturedTotal = totalPoints;
-                        final String orderNote = _noteController.text.trim();
-                        final String capturedOrderType = orderType;
-                        final String? capturedSeat =
-                            selectedSeatLabel ?? selectedSeatId;
-                        final navigator = Navigator.of(context);
+               onPressed: !_isReadyToOrder
+    ? null
+    : () {
+    //     // 1. Filter selected items and map to exact API key names
+    //     final selectedCartItems = widget.menuItems
+    // .where((item) => ((item["cartQuantity"] as int?) ?? 0) > 0)
+    // .map((item) {
+    //   // Safely extract ID checking both potential keys
+    //   final dynamic rawId = item["id"] ?? item["menu_item_id"] ?? item["menu_id"];
+    //   final int itemId = rawId != null ? int.parse(rawId.toString()) : 0;
 
-                        // Close the order-summary bottom sheet first.
-                        Navigator.pop(context);
+    //   // Safely extract Quantity
+    //   final dynamic rawQty = item["cartQuantity"] ?? item["quantity"];
+    //   final int qty = rawQty != null ? int.parse(rawQty.toString()) : 1;
 
-                        // Then open the locked transfer screen.
-                        Future.microtask(() {
-                          navigator.push(
-                            MaterialPageRoute(
-                              builder: (_) => TransferScreen(
-                                currentBalance: widget.currentBalance,
-                                initialRecipient: widget.shopName,
-                                initialAmount: capturedTotal,
-                                readOnlyTransfer: true,
-                                onTransferCompleted: (amount, recipient) {
-                                  widget.onConfirmOrder();
+    //   return {
+    //     "menu_item_id": itemId,
+    //     "quantity": qty,
+    //     "name": item["name"] ?? item["item_name"] ?? "",
+    //     "price": item["rawPrice"] ?? item["price"] ?? 0,
+    //   };
+    // })
+    // .toList();
+    final selectedCartItems = widget.menuItems
+    .where((item) => ((item["cartQuantity"] as int?) ?? 0) > 0)
+    .map((item) {
+      final dynamic rawId = item["id"] ?? item["menu_id"] ?? item["menu_item_id"];
+      final dynamic rawQty = item["cartQuantity"] ?? item["quantity"];
 
-                                  // TransferScreen closes itself after a successful
-                                  // transfer. Open the success page immediately after.
-                                  Future.microtask(() {
-                                    navigator.pushReplacement(
-                                      MaterialPageRoute(
-                                        builder: (_) => OrderSuccessScreen(
-                                          shopName: widget.shopName,
-                                          orderType: capturedOrderType,
-                                          selectedSeatId: capturedSeat,
-                                          cartItems: activeCartSnapshot,
-                                          totalPoints: capturedTotal,
-                                          note: orderNote,
-                                        ),
-                                      ),
-                                    );
-                                  });
-                                },
-                              ),
-                            ),
-                          );
-                        });
-                      },
+      return {
+        "menu_id": rawId,                       // Primary key expected by Laravel
+        "id": rawId,                            // Fallback key
+        "quantity": rawQty,                     // Primary quantity key
+        "cartQuantity": rawQty,                 // Fallback quantity key
+        "name": item["name"] ?? "",
+        "price": item["rawPrice"] ?? item["price"] ?? 0,
+      };
+    })
+    .toList();
+
+print("=== SELECTED ITEMS FROM ADD TO CART ===");
+print(selectedCartItems);
+        final capturedTotal = totalPoints;
+        final String orderNote = _noteController.text.trim();
+        final String capturedOrderType = orderType;
+        final String? capturedSeat = selectedSeatLabel ?? selectedSeatId;
+        final navigator = Navigator.of(context);
+
+        // 2. Dismiss AddToCart Bottom Sheet
+        Navigator.pop(context);
+
+        // 3. Open TransferScreen with cartItems passed
+        Future.microtask(() {
+          navigator.push(
+            MaterialPageRoute(
+              builder: (_) => TransferScreen(
+                shopId: widget.shopId,
+                currentBalance: widget.currentBalance,
+                initialRecipient: widget.shopName,
+                initialAmount: capturedTotal,
+                readOnlyTransfer: true,
+                // --- PASS CARRIED DATA HERE ---
+                cartItems: selectedCartItems,
+                orderType: capturedOrderType,
+                selectedSeatId: capturedSeat,
+                note: orderNote,
+                onTransferCompleted: (amount, recipient) {
+                  widget.onConfirmOrder();
+                },
+              ),
+            ),
+          );
+        });
+      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   disabledBackgroundColor: Colors.grey.shade400,

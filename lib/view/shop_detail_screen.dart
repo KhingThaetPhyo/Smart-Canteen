@@ -1007,7 +1007,7 @@ Future<void> _loadUserData() async {
                     menuItems: menuItems,
                     onAddToCart: _addToCart,
                     onRemoveFromCart: _removeFromCart,
-                    onConfirmOrder: _resetOrder, currentBalance:currentBalance ,
+                    onConfirmOrder: _resetOrder, currentBalance:currentBalance, shopId: widget.shopId ,
                   ),
                 );
               },
