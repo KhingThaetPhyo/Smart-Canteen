@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:smartcanteen/view/wallet/history_screen_detail.dart';
 import 'transfer_screen.dart';
 import '../../model/transaction_model.dart';
 import 'history_screen.dart';
-import '../scanner/scanner_screen.dart';
 
 class WalletScreen extends StatefulWidget {
   final String userName;
@@ -26,89 +26,85 @@ class WalletScreen extends StatefulWidget {
 class _WalletScreenState extends State<WalletScreen> {
   static const Color primaryColor = Color(0xff117992);
 
-  int selectedTab = 0; // 0: All, 1: Received, 2: Spent
   int currentBalance = 12450;
 
-  final List<TransactionModel> transactions = [
-    TransactionModel(
-      id: "0",
-      title: "Points Transferred",
-      subtitle: "To Myint Myat",
-      amount: "-1,000 pts",
-      time: "Today • 11:15 AM",
-      type: TransactionType.spent,
-    ),
-    TransactionModel(
-      id: "1",
-      title: "Points Received",
-      subtitle: "From Mg Mg",
-      amount: "+500 pts",
-      time: "Today • 10:30 AM",
-      type: TransactionType.received,
-    ),
-    TransactionModel(
-      id: "2",
-      title: "Coffee Corner",
-      subtitle: "Payment",
-      amount: "-1,500 pts",
-      time: "Today • 08:15 AM",
-      type: TransactionType.spent,
-    ),
-    TransactionModel(
-      id: "3",
-      title: "Shan Noodle Shop",
-      subtitle: "Payment",
-      amount: "-2,800 pts",
-      time: "Yesterday",
-      type: TransactionType.spent,
-    ),
-    TransactionModel(
-      id: "4",
-      title: "Points Received",
-      subtitle: "From student affairs",
-      amount: "+200 pts",
-      time: "18 Jul 2026",
-      type: TransactionType.received,
-    ),
-    TransactionModel(
-      id: "5",
-      title: "Snack Station",
-      subtitle: "Payment",
-      amount: "-600 pts",
-      time: "17 Jul 2026",
-      type: TransactionType.spent,
-    ),
-    TransactionModel(
-      id: "6",
-      title: "Points Received",
-      subtitle: "From student affairs",
-      amount: "+1,000 pts",
-      time: "15 Jul 2026",
-      type: TransactionType.received,
-    ),
-  ];
+  // Kpay style date formatter (e.g., 4/12/2026 15:36:12)
+  final DateFormat _kpayDateFormat = DateFormat('M/d/yyyy HH:mm:ss');
 
-  List<TransactionModel> get filteredTransactions {
-    List<TransactionModel> list;
-    if (selectedTab == 1) {
-      list = transactions
-          .where((t) => t.type == TransactionType.received)
-          .toList();
-    } else if (selectedTab == 2) {
-      list = transactions
-          .where((t) => t.type == TransactionType.spent)
-          .toList();
-    } else {
-      list = transactions;
-    }
+  late List<TransactionModel> transactions;
 
-    // Limit to only the 5 most recent transactions
-    return list.take(5).toList();
+  @override
+  void initState() {
+    super.initState();
+    // Kpay Style ရက်စွဲ စာသားများဖြင့် Initial Transactions တည်ဆောက်ထားခြင်း[cite: 1]
+    transactions = [
+      TransactionModel(
+        id: "0",
+        title: "ငွေလွှဲမည် သို့",
+        subtitle: "Myint Myat",
+        amount: "-1,000 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "1",
+        title: "ပေးပို့သူ",
+        subtitle: "Mg Mg",
+        amount: "+500 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
+        type: TransactionType.received,
+      ),
+      TransactionModel(
+        id: "2",
+        title: "Coffee Corner",
+        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
+        amount: "-1,500 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "3",
+        title: "ရှမ်းခေါက်ဆွဲဆိုင်",
+        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
+        amount: "-2,800 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 27, 18, 30, 0)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "4",
+        title: "ပေးပို့သူ",
+        subtitle: "ကျောင်းသားရေးရာ",
+        amount: "+200 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 18, 9, 15, 20)),
+        type: TransactionType.received,
+      ),
+      TransactionModel(
+        id: "5",
+        title: "Snack Station",
+        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
+        amount: "-600 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 17, 14, 45, 10)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "6",
+        title: "ပေးပို့သူ",
+        subtitle: "ကျောင်းသားရေးရာ",
+        amount: "+1,000 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 15, 10, 0, 0)),
+        type: TransactionType.received,
+      ),
+    ];
+  }
+
+  // Limit to only the 5 most recent transactions
+  List<TransactionModel> get recentTransactions {
+    return transactions.take(5).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final list = filteredTransactions;
+    final list = recentTransactions;
 
     return Scaffold(
       backgroundColor: const Color(0xFFE3F2FD),
@@ -125,7 +121,7 @@ class _WalletScreenState extends State<WalletScreen> {
 
             const SizedBox(height: 20),
 
-            /// 3. RECENT HISTORY SECTION HEADER & FILTERS
+            /// 3. RECENT HISTORY SECTION HEADER
             _buildHistoryHeader(),
 
             const SizedBox(height: 12),
@@ -182,20 +178,37 @@ class _WalletScreenState extends State<WalletScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.userName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    "ID: ${widget.studentId}",
+                    "သုံးစွဲနိုင်သော လက်ကျန်ပွိုင့်",
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.8),
-                      fontSize: 12,
+                      fontSize: 13,
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      const SizedBox(width: 50),
+                      Text(
+                        NumberFormat('#,###').format(currentBalance),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        "ပွိုင့်",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -217,7 +230,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     ),
                     SizedBox(width: 4),
                     Text(
-                      "Wallet",
+                      "ပိုက်ဆံအိတ်",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -228,24 +241,6 @@ class _WalletScreenState extends State<WalletScreen> {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            "Available Balance",
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "${NumberFormat('#,###').format(currentBalance)} pts",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -0.5,
-            ),
           ),
         ],
       ),
@@ -274,7 +269,7 @@ class _WalletScreenState extends State<WalletScreen> {
         children: [
           _buildActionButton(
             icon: Icons.send_rounded,
-            label: "Transfer",
+            label: "ပွိုင့်လွှဲမည်",
             onTap: () {
               Navigator.push(
                 context,
@@ -289,10 +284,12 @@ class _WalletScreenState extends State<WalletScreen> {
                           TransactionModel(
                             id: DateTime.now().millisecondsSinceEpoch
                                 .toString(),
-                            title: "Points Transferred",
-                            subtitle: "To $recipient",
-                            amount: "-$amount pts",
-                            time: "Just now",
+                            title: "ငွေလွှဲမည် သို့",
+                            subtitle: recipient,
+                            amount: "-$amount ပွိုင့်",
+                            time: _kpayDateFormat.format(
+                              DateTime.now(),
+                            ), // Kpay Format အသုံးပြုထားပါသည်[cite: 1]
                             type: TransactionType.spent,
                           ),
                         );
@@ -305,19 +302,19 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           _buildActionButton(
             icon: Icons.qr_code_2_rounded,
-            label: "Receive",
+            label: "ပွိုင့်လက်ခံမည်",
             onTap: () => _showReceiveQRModal(context),
           ),
           _buildActionButton(
             icon: Icons.qr_code_scanner_rounded,
-            label: "Scanner",
+            label: "QR စကင်ဖတ်မည်",
             onTap: () {
               widget.onOpenScanner?.call();
             },
           ),
           _buildActionButton(
             icon: Icons.history_rounded,
-            label: "History",
+            label: "ပွိုင့်လွှဲမှတ်တမ်း",
             onTap: () {
               Navigator.push(
                 context,
@@ -366,163 +363,121 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  /// 3. HISTORY HEADER & FILTER TABS
+  /// 3. HISTORY HEADER
   Widget _buildHistoryHeader() {
-    final tabs = ["All", "Received", "Spent"];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Recent History",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xff1E293B),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          TransactionHistoryScreen(transactions: transactions),
-                    ),
-                  );
-                },
-                child: const Text(
-                  "View All",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: List.generate(tabs.length, (index) {
-              final isSelected = selectedTab == index;
-              return Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedTab = index;
-                    });
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(right: index == 2 ? 0 : 8),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isSelected ? primaryColor : Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: isSelected ? primaryColor : Colors.grey.shade200,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        tabs[index],
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                          color: isSelected
-                              ? Colors.white
-                              : const Color(0xff64748B),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
+          Text(
+            "မကြာသေးမီက ပွိုင့်လွှဲထားသည်များ",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xff1E293B),
+            ),
           ),
         ],
       ),
     );
   }
 
-  /// TRANSACTION CARD
+  /// TRANSACTION CARD (Updated KBZ Pay format)
   Widget _buildTransactionCard(TransactionModel item) {
     final isReceived = item.type == TransactionType.received;
     final accentColor = isReceived
         ? const Color(0xff10B981)
         : const Color(0xffF59E0B);
 
+    // Kpay Style Title Format
+    final String displayTitle = item.subtitle.isNotEmpty
+        ? "${item.title} ${item.subtitle}"
+        : item.title;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200),
       ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              isReceived ? Icons.add_card_rounded : Icons.shopping_bag_outlined,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HistoryScreenDetail(transaction: item),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
               children: [
-                Text(
-                  item.title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xff1E293B),
+                // Icon
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isReceived
+                        ? Icons.add_card_rounded
+                        : Icons.shopping_bag_outlined,
+                    color: accentColor,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(width: 12),
+
+                // Title and Time
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        item.time, // Kpay Style ရက်စွဲ စာသား ပြသပေးမည်[cite: 1]
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 8),
+
+                // Amount
                 Text(
-                  item.subtitle,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  item.amount,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: isReceived
+                        ? const Color(0xff059669)
+                        : const Color(0xffE11D48),
+                  ),
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                item.amount,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: isReceived
-                      ? const Color(0xff059669)
-                      : const Color(0xffE11D48),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                item.time,
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -539,7 +494,7 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            "No transactions found",
+            "ပွိုင့်လွှဲမှတ်တမ်း မရှိသေးပါ",
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey.shade600,
@@ -578,7 +533,7 @@ class _WalletScreenState extends State<WalletScreen> {
             const SizedBox(height: 20),
 
             const Text(
-              "Receive Points",
+              "ပွိုင့်လက်ခံမည်",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -587,7 +542,7 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              "Show this QR code to the sender to receive points",
+              "Point လက်ခံရန် ဤ QR Code ကို ပေးပို့သူအား ပြပါ",
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
@@ -619,7 +574,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    "ID: ${widget.studentId}",
+                    "အိုင်ဒီ - ${widget.studentId}",
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.grey.shade600,
@@ -645,7 +600,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   ),
                 ),
                 child: const Text(
-                  "Done",
+                  "ပြီးပြီ",
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

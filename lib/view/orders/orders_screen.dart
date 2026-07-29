@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import '../home/widgets/recent_order_card.dart';
-import '../orders/widgets/pickup_qr_dialog.dart';
+import 'order_detail.dart';
 
-// Order Status Enum for Canteen Lifecycle
 enum OrderStatus { pending, preparing, ready, completed }
 
-// Date Filter Options
 enum DateFilter { allTime, today, thisWeek, thisMonth }
 
 class OrdersScreen extends StatefulWidget {
@@ -17,79 +14,75 @@ class OrdersScreen extends StatefulWidget {
 
 class _OrdersScreenState extends State<OrdersScreen> {
   int _selectedTabIndex = 0;
-  DateFilter _selectedDateFilter = DateFilter.allTime;
+  DateFilter _selectedDateFilter = DateFilter.today;
   static const Color primaryColor = Color(0xff117992);
 
-  // Status Filter Categories
+  // Status Filter များကို မြန်မာလို ပြောင်းလဲထားပါသည်
   final List<String> _filters = [
-    'All',
-    'Pending',
-    'Preparing',
-    'Ready',
-    'Completed',
+    'အားလုံး',
+    'စောင့်ဆိုင်းဆဲ',
+    'ပြင်ဆင်နေဆဲ',
+    'အသင့်ဖြစ်ပြီ',
+    'ပြီးစီးပြီ',
   ];
 
-  // Smart Canteen Orders Data with raw DateTime for precise date filtering
   final List<Map<String, dynamic>> _canteenOrders = [
     {
-      'shopName': 'Noodle & Rice Express',
-      'orderDate': 'Today, 12:15 PM',
+      'shopName': 'အန်တီမွန်',
+      'orderDate': 'ယနေ့ ညနေ ၁၂:၁၅',
       'dateTime': DateTime.now(),
       'pickupCode': 'MBK-1003',
       'status': OrderStatus.ready,
       'items': [
         {
-          'item': const OrderItem(
-            name: 'Fried Rice w/ Chicken Cutlet',
-            quantity: 1,
-          ),
+          'item': {'name': 'ကြက်ကြော်ထမင်းကြော်', 'quantity': 1},
           'unitPoints': 500,
         },
         {
-          'item': const OrderItem(name: 'Iced Lemon Tea', quantity: 1),
+          'item': {'name': 'သံပုရာ အေးခဲလက်ဖက်ရည်', 'quantity': 1},
           'unitPoints': 150,
         },
       ],
     },
     {
-      'shopName': 'Burger & Grill Corner',
-      'orderDate': 'Today, 12:40 PM',
+      'shopName': 'ဘာဂါနှင့် ဂရီးလ် ထမင်းဆိုင်',
+      'orderDate': 'ယနေ့ ညနေ ၁၂:၄၀ ',
       'dateTime': DateTime.now(),
       'pickupCode': 'MBK-1004',
       'status': OrderStatus.preparing,
       'items': [
         {
-          'item': const OrderItem(name: 'Double Cheese Burger', quantity: 1),
+          'item': {'name': 'ဒိန်ခဲနှစ်ထပ် ဘာဂါ', 'quantity': 1},
           'unitPoints': 620,
         },
         {
-          'item': const OrderItem(name: 'French Fries (M)', quantity: 2),
+          'item': {'name': 'အာလူးကြော် (M)', 'quantity': 2},
           'unitPoints': 100,
         },
       ],
     },
     {
-      'shopName': 'Fresh Juice & Drinks',
-      'orderDate': 'Yesterday, 12:45 PM',
+      'shopName': 'လတ်ဆတ် သစ်သီးဖျော်ရည်နှင့် အအေးဆိုင်',
+      'orderDate': 'မနေ့ ညနေ ၁၂:၁၅',
       'dateTime': DateTime.now().subtract(const Duration(days: 1)),
       'pickupCode': 'MBK-1001',
       'status': OrderStatus.pending,
       'items': [
         {
-          'item': const OrderItem(name: 'Mango Smoothie', quantity: 1),
+          'item': {'name': 'သရက်သီး ဖျော်ရည်', 'quantity': 1},
           'unitPoints': 300,
         },
       ],
     },
     {
-      'shopName': 'Pasta & Italian Counter',
-      'orderDate': '3 days ago, 1:10 PM',
+      'shopName': 'ပါစတာနှင့် အီတလီ အစားအစာဆိုင်',
+      'orderDate': '၃ ရက်မတိုင်မီ၊ညနေ ၁:၁၀ ',
       'dateTime': DateTime.now().subtract(const Duration(days: 3)),
       'pickupCode': 'MBK-0998',
       'status': OrderStatus.completed,
       'items': [
         {
-          'item': const OrderItem(name: 'Creamy Carbonara Pasta', quantity: 1),
+          'item': {'name': 'ခရမ်မီ ပါစတာ', 'quantity': 1},
           'unitPoints': 750,
         },
       ],
@@ -99,20 +92,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
   String _getDateFilterLabel(DateFilter filter) {
     switch (filter) {
       case DateFilter.today:
-        return 'Today';
+        return 'ယနေ့';
       case DateFilter.thisWeek:
-        return 'This Week';
+        return 'ဒီတစ်ပတ်';
       case DateFilter.thisMonth:
-        return 'This Month';
+        return 'ဒီလ';
       case DateFilter.allTime:
       default:
-        return 'All Time';
+        return 'အချိန်အားလုံး';
     }
   }
 
-  // Place this at the VERY BOTTOM of orders_screen.dart (outside _OrdersScreenState)
-
-  // Opens the Date Filter Selection Sheet
   void _showDateFilterPicker() {
     showModalBottomSheet(
       context: context,
@@ -129,7 +119,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4),
                 child: Text(
-                  "Filter by Date",
+                  "ရက်စွဲအလိုက် စစ်ဆေးရန်",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -182,9 +172,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
 
-    // Filter orders according to selected tab and selected date option
     final filteredOrders = _canteenOrders.where((order) {
-      // Status Filter Logic
       bool matchesStatus = true;
       if (_selectedTabIndex == 1)
         matchesStatus = order['status'] == OrderStatus.pending;
@@ -197,7 +185,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
       if (!matchesStatus) return false;
 
-      // Date Filter Logic
       final DateTime date = order['dateTime'];
       switch (_selectedDateFilter) {
         case DateFilter.today:
@@ -246,7 +233,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Order History",
+                      "မှာယူမှု မှတ်တမ်း",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -256,7 +243,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      "Track your previous meals",
+                      "သင်မှာယူခဲ့သော အစားအသောက်များ",
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 13,
@@ -265,7 +252,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     ),
                   ],
                 ),
-                // High-Contrast Date Filter Pill
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -376,16 +362,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
   /// CANTEEN ORDER CARD
   Widget _buildCanteenOrderCard(Map<String, dynamic> order) {
     final OrderStatus status = order['status'];
-    final String code = order['pickupCode'] ?? 'MBK-1000';
-    final List<Map<String, dynamic>> rawItems = List<Map<String, dynamic>>.from(
-      order['items'],
-    );
 
     int totalPoints = 0;
-    for (var itemData in rawItems) {
-      final OrderItem item = itemData['item'];
+    for (var itemData in order['items']) {
+      final int qty = itemData['item']['quantity'] ?? 1;
       final int unitPoints = itemData['unitPoints'] ?? 0;
-      totalPoints += unitPoints * item.quantity;
+      totalPoints += unitPoints * qty;
     }
 
     return Container(
@@ -402,187 +384,128 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          // Tap handler: Opens pickup dialog if order status is ready
-          onTap: () {
-            if (status == OrderStatus.ready) {
-              showPickUpCodeDialog(context, code);
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.soup_kitchen_rounded,
-                              size: 20,
-                              color: primaryColor,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  order['shopName'],
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xff1E293B),
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  order['orderDate'],
-                                  style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.soup_kitchen_rounded,
+                          size: 20,
+                          color: primaryColor,
+                        ),
                       ),
-                    ),
-                    _buildStatusBadge(status),
-                  ],
-                ),
-
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(height: 1, color: Color(0xffE2E8F0)),
-                ),
-
-                Column(
-                  children: rawItems.map((itemData) {
-                    final OrderItem item = itemData['item'];
-                    final int unitPoints = itemData['unitPoints'] ?? 0;
-                    final int itemTotalPoints = unitPoints * item.quantity;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 2),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: primaryColor.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              "${item.quantity}x",
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              order['shopName'],
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                color: primaryColor,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                                color: Color(0xff1E293B),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade800,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "$unitPoints pts each",
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey.shade500,
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(height: 2),
+                            Text(
+                              order['orderDate'],
+                              style: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 11,
+                              ),
                             ),
-                          ),
-                          Text(
-                            "$itemTotalPoints pts",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                              color: Color(0xff1E293B),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    );
-                  }).toList(),
+                    ],
+                  ),
                 ),
-
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Divider(height: 1, color: Color(0xffE2E8F0)),
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                _buildStatusBadge(status),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(height: 1, color: Color(0xffE2E8F0)),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "TOTAL POINTS",
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.8,
-                            color: Color(0xff64748B),
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          "$totalPoints pts",
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: primaryColor,
-                          ),
-                        ),
-                      ],
+                    const Text(
+                      "စုစုပေါင်းကျသင့်ပွိုင့်",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.8,
+                        color: Color(0xff64748B),
+                      ),
                     ),
-                    _buildActionButton(status, code),
+                    const SizedBox(height: 2),
+                    Text(
+                      "$totalPoints ပွိုင့်",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: primaryColor,
+                      ),
+                    ),
                   ],
+                ),
+
+                /// ORDER DETAILS BUTTON
+                SizedBox(
+                  height: 38,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderDetailScreen(order: order),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "အသေးစိတ်ကြည့်ရန်",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-  /// HELPER: COLOR-CODED STATUS BADGES
   Widget _buildStatusBadge(OrderStatus status) {
     Color bg;
     Color fg;
@@ -593,25 +516,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
       case OrderStatus.pending:
         bg = const Color(0xffFEF3C7);
         fg = const Color(0xffD97706);
-        text = "Pending";
+        text = "စောင့်ဆိုင်းဆဲ";
         icon = Icons.hourglass_top_rounded;
         break;
       case OrderStatus.preparing:
         bg = const Color(0xffE0F2FE);
         fg = const Color(0xff0284C7);
-        text = "Preparing";
+        text = "ပြင်ဆင်နေဆဲ";
         icon = Icons.soup_kitchen_rounded;
         break;
       case OrderStatus.ready:
         bg = const Color(0xffDCFCE7);
         fg = const Color(0xff16A34A);
-        text = "Ready";
+        text = "အသင့်ဖြစ်ပြီ";
         icon = Icons.check_circle_rounded;
         break;
       case OrderStatus.completed:
         bg = const Color(0xffF1F5F9);
         fg = const Color(0xff64748B);
-        text = "Completed";
+        text = "ပြီးစီးပြီ";
         icon = Icons.task_alt_rounded;
         break;
     }
@@ -640,66 +563,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  /// HELPER: CONTEXTUAL ACTION BUTTON BASED ON STATUS
-  Widget _buildActionButton(OrderStatus status, String pickupCode) {
-    if (status == OrderStatus.ready) {
-      return SizedBox(
-        height: 38,
-        child: ElevatedButton.icon(
-          onPressed: () => showPickUpCodeDialog(context, pickupCode),
-          icon: const Icon(Icons.qr_code_rounded, size: 16),
-          label: const Text(
-            "Pick Up Code",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xff16A34A),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      );
-    } else if (status == OrderStatus.completed) {
-      return SizedBox(
-        height: 38,
-        child: OutlinedButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.refresh_rounded, size: 16),
-          label: const Text(
-            "Reorder",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ),
-      );
-    } else {
-      return SizedBox(
-        height: 38,
-        child: TextButton.icon(
-          onPressed: () {},
-          icon: const Icon(Icons.timer_outlined, size: 16),
-          label: const Text(
-            "In Progress",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          ),
-          style: TextButton.styleFrom(foregroundColor: const Color(0xff0284C7)),
-        ),
-      );
-    }
-  }
-
-  /// EMPTY STATE
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -708,7 +571,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           Icon(Icons.no_meals_rounded, size: 60, color: Colors.grey.shade300),
           const SizedBox(height: 16),
           Text(
-            "No food orders found",
+            "မှာယူထားသော အော်ဒါ မရှိပါ",
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -717,7 +580,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
           const SizedBox(height: 6),
           Text(
-            "Try changing your status or date filter.",
+            "အခြေအနေ သို့မဟုတ် ရက်စွဲအလိုက် အခြားစစ်ဆေးမှုများ ပြုလုပ်ကြည့်ပါ။",
             style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
           ),
         ],

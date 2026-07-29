@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:smartcanteen/view/wallet/history_screen_detail.dart';
 
 import '../../model/transaction_model.dart';
+// Detail Screen ကို Import လုပ်ပေးပါ
 
 class TransactionHistoryScreen extends StatefulWidget {
   final List<TransactionModel> transactions;
@@ -15,32 +17,54 @@ class TransactionHistoryScreen extends StatefulWidget {
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   static const Color primaryColor = Color(0xff117992);
-  int _selectedTab = 0; // 0: All, 1: Received, 2: Spent
+  int _selectedTab = 0; // 0: အားလုံး, 1: လက်ခံရရှိငွေ, 2: လွှဲပြောင်းငွေ
   String _searchQuery = "";
   DateTimeRange? _selectedDateRange;
+
+  // ရက်စွဲအမျိုးမျိုးကို Parse လုပ်ပြီး Kpay ပုံစံ "d/M/yyyy HH:mm:ss" ပြောင်းပေးသည့် Helper
+  String _formatToEnglishDate(String time) {
+    final now = DateTime.now();
+    final normalizedTime = time.trim();
+
+    DateTime parsedDate = now;
+
+    if (normalizedTime.startsWith("Today") ||
+        normalizedTime.startsWith("ယနေ့")) {
+      parsedDate = DateTime(now.year, now.month, now.day, 12, 15);
+    } else if (normalizedTime.startsWith("Yesterday") ||
+        normalizedTime.startsWith("မနေ့က")) {
+      parsedDate = now.subtract(const Duration(days: 1));
+    } else if (normalizedTime.startsWith("Just now") ||
+        normalizedTime.startsWith("ခုနက")) {
+      parsedDate = now;
+    } else {
+      try {
+        parsedDate = DateFormat("dd MMM yyyy").parse(normalizedTime);
+      } catch (_) {
+        parsedDate = now;
+      }
+    }
+
+    return DateFormat("d/M/yyyy HH:mm:ss").format(parsedDate);
+  }
 
   DateTime? _parseTransactionDate(String time) {
     final now = DateTime.now();
     final normalizedTime = time.trim();
 
-    // Handles: "Today • 11:15 AM"
-    if (normalizedTime.startsWith("Today")) {
+    if (normalizedTime.startsWith("Today") ||
+        normalizedTime.startsWith("ယနေ့") ||
+        normalizedTime.startsWith("Just now") ||
+        normalizedTime.startsWith("ခုနက")) {
       return DateTime(now.year, now.month, now.day);
     }
 
-    // Handles: "Yesterday"
-    if (normalizedTime.startsWith("Yesterday")) {
+    if (normalizedTime.startsWith("Yesterday") ||
+        normalizedTime.startsWith("မနေ့က")) {
       final yesterday = now.subtract(const Duration(days: 1));
-
       return DateTime(yesterday.year, yesterday.month, yesterday.day);
     }
 
-    // Handles newly created transaction: "Just now"
-    if (normalizedTime.startsWith("Just now")) {
-      return DateTime(now.year, now.month, now.day);
-    }
-
-    // Handles: "18 Jul 2026"
     try {
       return DateFormat("dd MMM yyyy").parseStrict(normalizedTime);
     } catch (_) {
@@ -54,8 +78,6 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     }
 
     final transactionDate = _parseTransactionDate(transactionTime);
-
-    // Hide unrecognized dates while a date filter is active
     if (transactionDate == null) {
       return false;
     }
@@ -87,25 +109,20 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   List<TransactionModel> get _filteredTransactions {
     return widget.transactions.where((transaction) {
-      // 1. Filter by All / Received / Spent
       final matchesTab =
           _selectedTab == 0 ||
           (_selectedTab == 1 && transaction.type == TransactionType.received) ||
           (_selectedTab == 2 && transaction.type == TransactionType.spent);
 
-      // 2. Filter by search text
       final query = _searchQuery.trim().toLowerCase();
-
       final matchesSearch =
           query.isEmpty ||
           transaction.title.toLowerCase().contains(query) ||
           transaction.subtitle.toLowerCase().contains(query) ||
           transaction.amount.toLowerCase().contains(query);
 
-      // 3. Filter by selected date range
       final matchesDate = _isTransactionInsideDateRange(transaction.time);
 
-      // Transaction must match all active filters
       return matchesTab && matchesSearch && matchesDate;
     }).toList();
   }
@@ -118,9 +135,9 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime(now.year + 5),
       initialDateRange: _selectedDateRange,
-      helpText: "Select transaction dates",
-      saveText: "Apply",
-      cancelText: "Cancel",
+      helpText: "ရက်စွဲ ရွေးချယ်ပါ",
+      saveText: "အတည်ပြုမည်",
+      cancelText: "မလုပ်တော့ပါ",
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -183,7 +200,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   ),
                   const Expanded(
                     child: Text(
-                      "Transaction History",
+                      "ပွိုင့်လွှဲမှတ်တမ်း",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
@@ -192,7 +209,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // Balances out back button layout
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
@@ -219,20 +236,16 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                         });
                       },
                       decoration: InputDecoration(
-                        hintText: "Search transactions...",
+                        hintText: "မှတ်တမ်းများ ရှာဖွေပါ...",
                         hintStyle: TextStyle(
                           color: Colors.grey.shade400,
                           fontSize: 14,
                         ),
-
-                        // Search icon on the left
                         prefixIcon: const Icon(
                           Icons.search_rounded,
                           color: primaryColor,
                           size: 20,
                         ),
-
-                        // Calendar filter button on the right
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(6),
                           child: Material(
@@ -243,10 +256,8 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                             child: InkWell(
                               onTap: () {
                                 if (_selectedDateRange != null) {
-                                  // Clear the selected date filter
                                   _clearDateFilter();
                                 } else {
-                                  // Open the date picker
                                   _selectDateRange();
                                 }
                               },
@@ -263,19 +274,16 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                             ),
                           ),
                         ),
-
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 16,
                         ),
-
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(color: Colors.grey.shade200),
                         ),
-
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(
@@ -285,7 +293,6 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                             width: _selectedDateRange != null ? 1.5 : 1,
                           ),
                         ),
-
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: const BorderSide(
@@ -297,12 +304,14 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    /// FILTER TABS (All, Received, Spent)
+                    /// FILTER TABS
                     Row(
-                      children: ["All", "Received", "Spent"]
-                          .asMap()
-                          .entries
-                          .map((entry) {
+                      children:
+                          [
+                            "အားလုံး",
+                            "လက်ခံရရှိပွိုင့်",
+                            "လွှဲပြောင်းပွိုင့်",
+                          ].asMap().entries.map((entry) {
                             final index = entry.key;
                             final label = entry.value;
                             final isSelected = _selectedTab == index;
@@ -351,8 +360,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                                 ),
                               ),
                             );
-                          })
-                          .toList(),
+                          }).toList(),
                     ),
                     const SizedBox(height: 16),
 
@@ -370,7 +378,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
-                                    "No transactions found",
+                                    "ပွိုင့်လွှဲမှတ်တမ်း ရှာမတွေ့ပါ",
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade600,
@@ -390,9 +398,13 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                                     ? const Color(0xff10B981)
                                     : const Color(0xffF59E0B);
 
+                                final String displayTitle =
+                                    item.subtitle.isNotEmpty
+                                    ? "${item.title} ${item.subtitle}"
+                                    : item.title;
+
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 10),
-                                  padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(16),
@@ -400,72 +412,98 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                                       color: Colors.grey.shade200,
                                     ),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                          color: accentColor.withOpacity(0.12),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          isReceived
-                                              ? Icons.add_card_rounded
-                                              : Icons.shopping_bag_outlined,
-                                          color: accentColor,
-                                          size: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                  // Click feedback ရအောင် InkWell သုံးထားပါသည်
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(16),
+                                      onTap: () {
+                                        // Detail Screen သို့ သွားရန် Navigation
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                HistoryScreenDetail(
+                                                  transaction: item,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              item.title,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(0xff1E293B),
+                                            // Icon
+                                            Container(
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: accentColor.withOpacity(
+                                                  0.12,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                isReceived
+                                                    ? Icons.add_card_rounded
+                                                    : Icons
+                                                          .shopping_bag_outlined,
+                                                color: accentColor,
+                                                size: 20,
                                               ),
                                             ),
-                                            const SizedBox(height: 2),
+                                            const SizedBox(width: 12),
+
+                                            // Left: Title & Date (English Format)
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    displayTitle,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Color(0xff1E293B),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    _formatToEnglishDate(
+                                                      item.time,
+                                                    ),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color:
+                                                          Colors.grey.shade500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            const SizedBox(width: 8),
+
+                                            // Right: Amount
                                             Text(
-                                              item.subtitle,
+                                              item.amount,
                                               style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey.shade500,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: isReceived
+                                                    ? const Color(0xff059669)
+                                                    : const Color(0xffE11D48),
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            item.amount,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: isReceived
-                                                  ? const Color(0xff059669)
-                                                  : const Color(0xffE11D48),
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            item.time,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.grey.shade400,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 );
                               },
