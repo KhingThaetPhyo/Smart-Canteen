@@ -690,11 +690,104 @@
 //       ),
 //     );
 //   }
+// // }
+// import 'package:flutter/material.dart';
+// import 'package:go_router/go_router.dart';
+// import 'package:intl/intl.dart';
+// import 'package:smartcanteen/model/user_model.dart';
+// import 'package:smartcanteen/model/wallet_model.dart';
+// import 'package:smartcanteen/service/shared_preferences_service.dart';
+
+// class HomeHeader extends StatefulWidget implements PreferredSizeWidget {
+//   const HomeHeader({super.key});
+
+//   @override
+//   Size get preferredSize => const Size.fromHeight(330);
+
+//   @override
+//   State<HomeHeader> createState() => _HomeHeaderState();
 // }
+
+// class _HomeHeaderState extends State<HomeHeader> {
+//   UserModel? currentUser;
+//   WalletModel? currentUserWallet;
+//   bool isLoading = true;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _loadUserData();
+//   }
+
+//   // Future<void> _loadUserData() async {
+//   //   final user = await SharedPreferencesService.getUser();
+//   //   if (mounted) {
+//   //     setState(() {
+//   //       currentUser = user;
+//   //       currentUserWallet = user?.wallet;
+//   //       isLoading = false;
+//   //     });
+//   //   }
+
+//   //   if (user != null) {
+//   //     print("HomeHeader loaded user: ${user.userName}");
+//   //   }
+//   // }
+// Future<void> _loadUserData() async {
+//   try {
+//     final user = await SharedPreferencesService.getUser();
+//     if (mounted) {
+//       setState(() {
+//         currentUser = user;
+//         currentUserWallet = user?.wallet;
+//       });
+//     }
+//   } catch (e, stackTrace) {
+//     debugPrint("Error loading user data in HomeHeader: $e");
+//     debugPrint(stackTrace.toString());
+//   } finally {
+//     if (mounted) {
+//       setState(() {
+//         isLoading = false; // Always disable loading state
+//       });
+//     }
+//   }
+// }
+// // Example when navigating to login/profile:
+// void _handleProtectedAction(VoidCallback onAuthenticated) async {
+//   if (currentUser == null) {
+//     await context.push('/login');
+//     _loadUserData(); // Reload user state after returning from login screen
+//   } else {
+//     onAuthenticated();
+//   }
+// }
+//   // /// Helper to guard actions that require authentication
+//   // void _handleProtectedAction(VoidCallback onAuthenticated) {
+//   //   if (currentUser == null) {
+//   //     context.go('/login');
+//   //   } else {
+//   //     onAuthenticated();
+//   //   }
+//   // }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     const double halfCardHeight = 48;
+//     final bool hasNotification = false;
+
+//     // Dynamically derive values from SharedPreferences user model
+//     final String userName = currentUser?.userName ?? "Guest";
+//     final String major = currentUser?.student != null
+//         ? "${currentUser!.student!.yearLevel ?? 'Student'}"
+//         : "သင့်အကောင့်သို့";
+//     final String studentId = currentUser?.student?.studentId ?? "လော့ဂ်အင် ၀င်ပါ...";
+//     final int points = currentUserWallet?.balance ?? 0;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smartcanteen/model/user_model.dart';
+import 'package:smartcanteen/model/wallet_model.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
 
 class HomeHeader extends StatefulWidget implements PreferredSizeWidget {
@@ -709,6 +802,7 @@ class HomeHeader extends StatefulWidget implements PreferredSizeWidget {
 
 class _HomeHeaderState extends State<HomeHeader> {
   UserModel? currentUser;
+  WalletModel? currentUserWallet;
   bool isLoading = true;
 
   @override
@@ -716,25 +810,40 @@ class _HomeHeaderState extends State<HomeHeader> {
     super.initState();
     _loadUserData();
   }
-
-  Future<void> _loadUserData() async {
+Future<void> _loadUserData() async {
+  try {
     final user = await SharedPreferencesService.getUser();
+    
+    // 1. Get stored wallet or fallback to user.wallet
+    WalletModel? wallet = await SharedPreferencesService.getUserWallet();
+    wallet ??= user?.wallet;
+
+    // 2. Save wallet to SharedPreferences if present
+    if (wallet != null) {
+      await SharedPreferencesService.saveUserWallet(wallet);
+    }
+
     if (mounted) {
       setState(() {
         currentUser = user;
+        currentUserWallet = wallet;
+      });
+    }
+  } catch (e, stackTrace) {
+    debugPrint("Error loading user data in HomeHeader: $e");
+    debugPrint(stackTrace.toString());
+  } finally {
+    if (mounted) {
+      setState(() {
         isLoading = false;
       });
     }
-
-    if (user != null) {
-      print("HomeHeader loaded user: ${user.userName}");
-    }
   }
-
-  /// Helper to guard actions that require authentication
-  void _handleProtectedAction(VoidCallback onAuthenticated) {
+}
+  void _handleProtectedAction(VoidCallback onAuthenticated) async {
     if (currentUser == null) {
-      context.go('/login');
+      await context.push('/login');
+      _loadUserData(); // Reload user state after returning from login
     } else {
       onAuthenticated();
     }
@@ -745,14 +854,12 @@ class _HomeHeaderState extends State<HomeHeader> {
     const double halfCardHeight = 48;
     final bool hasNotification = false;
 
-    // Dynamically derive values from SharedPreferences user model
     final String userName = currentUser?.userName ?? "Guest";
     final String major = currentUser?.student != null
         ? "${currentUser!.student!.yearLevel ?? 'Student'}"
         : "သင့်အကောင့်သို့";
     final String studentId = currentUser?.student?.studentId ?? "လော့ဂ်အင် ၀င်ပါ...";
-    final int points = currentUser?.wallet?.balance?.toInt() ?? 0;
-
+    final int points = currentUserWallet?.balance ?? 0;
     return Stack(
       clipBehavior: Clip.none,
       children: [

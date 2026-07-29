@@ -10,7 +10,7 @@ WalletModel _$WalletModelFromJson(Map<String, dynamic> json) => WalletModel(
   walletId: (json['wallet_id'] as num?)?.toInt(),
   userId: (json['user_id'] as num).toInt(),
   shopId: (json['shop_id'] as num?)?.toInt(),
-  balance: (json['balance'] as num).toInt(),
+  balance: (WalletModel._readBalance(json, 'balance') as num).toInt(),
   isPinChanged: (json['is_pin_changed'] as num).toInt(),
   failedAttempts: (json['failed_attempts'] as num).toInt(),
   lockedUntil: json['locked_until'] as String?,

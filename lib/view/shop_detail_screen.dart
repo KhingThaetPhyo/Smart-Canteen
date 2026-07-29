@@ -794,6 +794,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:smartcanteen/service/api_service.dart';
+import 'package:smartcanteen/service/shared_preferences_service.dart';
 import 'package:smartcanteen/view/add_to_cart_screen.dart';
 
 class ShopDetailScreen extends StatefulWidget {
@@ -813,6 +814,7 @@ class ShopDetailScreen extends StatefulWidget {
 class _ShopDetailScreenState extends State<ShopDetailScreen> {
   static const Color primaryColor = Color(0xff117992);
   final ApiService _apiService = ApiService();
+  late int currentBalance = 0;
 
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = "";
@@ -836,15 +838,30 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   @override
   void initState() {
     super.initState();
+     _loadUserData();
     _fetchShopMenus();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+   
     super.dispose();
   }
+Future<void> _loadUserData() async {
+  try {
+    final wallet = await SharedPreferencesService.getUserWallet();
 
+    if (mounted && wallet != null) {
+      setState(() {
+        currentBalance = wallet.balance;
+      });
+      debugPrint("User wallet loaded in ShopDetail: ${wallet.balance}");
+    }
+  } catch (e) {
+    debugPrint("Error loading wallet in ShopDetail: $e");
+  }
+}
   Future<void> _fetchShopMenus() async {
     setState(() {
       isLoading = true;
@@ -990,7 +1007,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     menuItems: menuItems,
                     onAddToCart: _addToCart,
                     onRemoveFromCart: _removeFromCart,
-                    onConfirmOrder: _resetOrder,
+                    onConfirmOrder: _resetOrder, currentBalance:currentBalance ,
                   ),
                 );
               },

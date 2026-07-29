@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
+import 'package:smartcanteen/model/wallet_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -463,7 +464,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       updatedAt: DateTime.now().toString(),
       createdAt: DateTime.now().toString(),
       student: null, 
-      userPassword: passwordController.text,
+      userPassword: passwordController.text, 
     );
 
 

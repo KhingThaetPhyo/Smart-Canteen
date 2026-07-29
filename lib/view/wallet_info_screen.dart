@@ -626,7 +626,7 @@ if (result != null && result.success) {
   });
 
 // Save user object
-  if (result.user != null) {
+  if (result.user != null && result.user?.wallet !=null) {
     await SharedPreferencesService.saveUser(result.user!);
   }
 

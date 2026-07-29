@@ -1,10 +1,11 @@
+
 // import 'package:flutter/material.dart';
 // import 'package:smartcanteen/navigation_bar.dart';
-
+// import 'package:smartcanteen/view/choose_table_screen.dart';
+// import 'package:smartcanteen/view/transfer_point_screen.dart';
 
 // class AddToCartScreen extends StatefulWidget {
 //   final String shopName;
-//   final String? selectedSeatId;
 //   final List<Map<String, dynamic>> menuItems;
 //   final Function(Map<String, dynamic>) onAddToCart;
 //   final Function(Map<String, dynamic>) onRemoveFromCart;
@@ -13,7 +14,6 @@
 //   const AddToCartScreen({
 //     super.key,
 //     required this.shopName,
-//     this.selectedSeatId,
 //     required this.menuItems,
 //     required this.onAddToCart,
 //     required this.onRemoveFromCart,
@@ -28,21 +28,22 @@
 //   static const Color primaryColor = Color(0xff117992);
 
 //   // Default selected dining option
-// String selectedOrderType = "ပါဆယ်ထုတ်မည်"; 
+//   String selectedOrderType = "ပါဆယ်ထုတ်မည်";
 
-// // Options list with labels and icons
-// final List<Map<String, dynamic>> orderTypeOptions = [
-//   {
-//     "value": "ဆိုင်ထိုင်စားမည်",
-//     "label": "ဆိုင်ထိုင်စားမည်",
-//     "icon": Icons.chair_alt_rounded,
-//   },
-//   {
-//     "value": "ပါဆယ်ထုတ်မည်",
-//     "label": "ပါဆယ်ထုတ်မည်",
-//     "icon": Icons.shopping_bag_outlined,
-//   },
-// ];
+//   // Options list with labels and icons
+//   final List<Map<String, dynamic>> orderTypeOptions = [
+//     {
+//       "value": "ဆိုင်ထိုင်စားမည်",
+//       "label": "ဆိုင်ထိုင်စားမည်",
+//       "icon": Icons.chair_alt_rounded,
+//     },
+//     {
+//       "value": "ပါဆယ်ထုတ်မည်",
+//       "label": "ပါဆယ်ထုတ်မည်",
+//       "icon": Icons.shopping_bag_outlined,
+//     },
+//   ];
+
 //   // Helper to extract numeric points from strings like "250 pts"
 //   int _parsePrice(String priceStr) {
 //     final numStr = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
@@ -69,305 +70,304 @@
 //     return Container(
 //       color: Colors.transparent,
 //       padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
+//       // Constrain height so that receipt content can scroll properly
+//       constraints: BoxConstraints(
+//         maxHeight: MediaQuery.of(context).size.height * 0.85,
+//       ),
 //       child: Column(
 //         mainAxisSize: MainAxisSize.min,
 //         children: [
 //           /// RECEIPT PAPER BODY WITH ZIGZAG CLIPPER
-//           ClipPath(
-//             clipper: ReceiptClipper(),
-//             child: Container(
-//               color: Colors.white,
-//               padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.center,
-//                 children: [
-//                   /// RECEIPT HEADER
-//                   Container(
-//                     width: 44,
-//                     height: 44,
-//                     decoration: BoxDecoration(
-//                       color: primaryColor.withOpacity(0.1),
-//                       shape: BoxShape.circle,
-//                     ),
-//                     child: const Icon(
-//                       Icons.receipt_long_rounded,
-//                       color: primaryColor,
-//                       size: 24,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 10),
-//                   Text(
-//                     widget.shopName.toUpperCase(),
-//                     style: const TextStyle(
-//                       fontWeight: FontWeight.w900,
-//                       fontSize: 18,
-//                       letterSpacing: 1.5,
-//                       color: Color(0xff1E293B),
-//                     ),
-//                   ),
-//                   // const SizedBox(height: 4),
-//                   // Text(
-//                   //   "အော်ဒါ အကျဉ်းချုပ်",
-//                   //   style: TextStyle(
-//                   //     fontSize: 11,
-//                   //     fontWeight: FontWeight.w600,
-//                   //     letterSpacing: 2.0,
-//                   //     color: Colors.grey.shade500,
-//                   //   ),
-//                   // ),
+//           Expanded(
+//             child: ClipPath(
+//               clipper: ReceiptClipper(),
+//               child: Container(
+//                 color: Colors.white,
+//                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+//                 child: SingleChildScrollView(
+//                   physics: const BouncingScrollPhysics(),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       /// RECEIPT HEADER
+//                       Container(
+//                         width: 44,
+//                         height: 44,
+//                         decoration: BoxDecoration(
+//                           color: primaryColor.withOpacity(0.1),
+//                           shape: BoxShape.circle,
+//                         ),
+//                         child: const Icon(
+//                           Icons.receipt_long_rounded,
+//                           color: primaryColor,
+//                           size: 24,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 10),
+//                       Text(
+//                         widget.shopName.toUpperCase(),
+//                         style: const TextStyle(
+//                           fontWeight: FontWeight.w900,
+//                           fontSize: 18,
+//                           letterSpacing: 1.5,
+//                           color: Color(0xff1E293B),
+//                         ),
+//                       ),
 
-//                   const SizedBox(height: 16),
-// /// SEAT / ORDER TYPE DROPDOWN BOX
-// PopupMenuButton<String>(
-//   tooltip: "ရွေးချယ်ပါ",
-//   offset: const Offset(0, 42), // Opens menu right below the box
-//   shape: RoundedRectangleBorder(
-//     borderRadius: BorderRadius.circular(12),
-//   ),
-//   onSelected: (String newValue) {
-//     setState(() {
-//       selectedOrderType = newValue;
-//     });
-//   },
-//   itemBuilder: (BuildContext context) {
-//     return orderTypeOptions.map((option) {
-//       return PopupMenuItem<String>(
-//         value: option["value"] as String,
-//         child: Row(
-//           children: [
-//             Icon(
-//               option["icon"] as IconData,
-//               size: 18,
-//               color: primaryColor,
-//             ),
-//             const SizedBox(width: 8),
-//             Text(
-//               option["label"] as String,
-//               style: const TextStyle(
-//                 fontSize: 13,
-//                 fontWeight: FontWeight.w600,
-//               ),
-//             ),
-//           ],
-//         ),
-//       );
-//     }).toList();
-//   },
-//   child: Container(
-//     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-//     decoration: BoxDecoration(
-//       color: Colors.grey.shade100,
-//       borderRadius: BorderRadius.circular(10),
-//       border: Border.all(color: Colors.grey.shade300),
-//     ),
-//     child: Row(
-//       mainAxisSize: MainAxisSize.min,
-//       children: [
-//         // 1. Single Leading Icon based on current selection
-//         Icon(
-//           orderTypeOptions.firstWhere(
-//             (e) => e["value"] == selectedOrderType,
-//           )["icon"] as IconData,
-//           size: 18,
-//           color: primaryColor,
-//         ),
-//         const SizedBox(width: 8),
-//         // 2. Selected Text
-//         Text(
-//           orderTypeOptions.firstWhere(
-//             (e) => e["value"] == selectedOrderType,
-//           )["label"] as String,
-//           style: const TextStyle(
-//             fontSize: 13,
-//             fontWeight: FontWeight.w600,
-//             color: Colors.black87,
-//           ),
-//         ),
-//         const SizedBox(width: 6),
-//         // 3. Dropdown Indicator Arrow
-//         Icon(
-//           Icons.arrow_drop_down_rounded,
-//           color: Colors.grey.shade600,
-//           size: 20,
-//         ),
-//       ],
-//     ),
-//   ),
-// ),
-//                   const SizedBox(height: 20),
-//                   _buildDottedDivider(),
-//                   const SizedBox(height: 16),
+//                       const SizedBox(height: 16),
 
-//                   /// CART ITEMS LIST
-//                   if (cartItems.isEmpty)
-//                     Padding(
-//                       padding: const EdgeInsets.symmetric(vertical: 30),
-//                       child: Column(
-//                         children: [
-//                           Icon(
-//                             Icons.shopping_bag_outlined,
-//                             size: 40,
-//                             color: Colors.grey.shade300,
+//                       /// SEAT / ORDER TYPE DROPDOWN BOX
+//                       PopupMenuButton<String>(
+//                         tooltip: "ရွေးချယ်ပါ",
+//                         offset: const Offset(0, 42), // Opens menu right below the box
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(12),
+//                         ),
+//                         onSelected: (String newValue) {
+//                           setState(() {
+//                             selectedOrderType = newValue;
+//                           });
+//                         },
+//                         itemBuilder: (BuildContext context) {
+//                           return orderTypeOptions.map((option) {
+//                             return PopupMenuItem<String>(
+//                               value: option["value"] as String,
+//                               child: Row(
+//                                 children: [
+//                                   Icon(
+//                                     option["icon"] as IconData,
+//                                     size: 18,
+//                                     color: primaryColor,
+//                                   ),
+//                                   const SizedBox(width: 8),
+//                                   Text(
+//                                     option["label"] as String,
+//                                     style: const TextStyle(
+//                                       fontSize: 13,
+//                                       fontWeight: FontWeight.w600,
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ),
+//                             );
+//                           }).toList();
+//                         },
+//                         child: Container(
+//                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+//                           decoration: BoxDecoration(
+//                             color: Colors.grey.shade100,
+//                             borderRadius: BorderRadius.circular(10),
+//                             border: Border.all(color: Colors.grey.shade300),
 //                           ),
-//                           const SizedBox(height: 8),
-//                           Text(
-//                             "Your cart is empty",
+//                           child: Row(
+//                             mainAxisSize: MainAxisSize.min,
+//                             children: [
+//                               // 1. Single Leading Icon based on current selection
+//                               Icon(
+//                                 orderTypeOptions.firstWhere(
+//                                   (e) => e["value"] == selectedOrderType,
+//                                 )["icon"] as IconData,
+//                                 size: 18,
+//                                 color: primaryColor,
+//                               ),
+//                               const SizedBox(width: 8),
+//                               // 2. Selected Text
+//                               Text(
+//                                 orderTypeOptions.firstWhere(
+//                                   (e) => e["value"] == selectedOrderType,
+//                                 )["label"] as String,
+//                                 style: const TextStyle(
+//                                   fontSize: 13,
+//                                   fontWeight: FontWeight.w600,
+//                                   color: Colors.black87,
+//                                 ),
+//                               ),
+//                               const SizedBox(width: 6),
+//                               // 3. Dropdown Indicator Arrow
+//                               Icon(
+//                                 Icons.arrow_drop_down_rounded,
+//                                 color: Colors.grey.shade600,
+//                                 size: 20,
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 20),
+//                       _buildDottedDivider(),
+//                       const SizedBox(height: 16),
+
+//                       /// CART ITEMS LIST
+//                       if (cartItems.isEmpty)
+//                         Padding(
+//                           padding: const EdgeInsets.symmetric(vertical: 30),
+//                           child: Column(
+//                             children: [
+//                               Icon(
+//                                 Icons.shopping_bag_outlined,
+//                                 size: 40,
+//                                 color: Colors.grey.shade300,
+//                               ),
+//                               const SizedBox(height: 8),
+//                               Text(
+//                                 "Your cart is empty",
+//                                 style: TextStyle(
+//                                   color: Colors.grey.shade500,
+//                                   fontWeight: FontWeight.w500,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         )
+//                       else
+//                         ListView.separated(
+//                           shrinkWrap: true,
+//                           physics: const NeverScrollableScrollPhysics(),
+//                           itemCount: cartItems.length,
+//                           separatorBuilder: (context, index) =>
+//                               const SizedBox(height: 12),
+//                           itemBuilder: (context, index) {
+//                             final item = cartItems[index];
+//                             final int qty = item["cartQuantity"];
+//                             final int unitPrice = _parsePrice(item["price"]);
+//                             final int itemTotalPts = unitPrice * qty;
+
+//                             return Row(
+//                               children: [
+//                                 /// ITEM DETAILS
+//                                 Expanded(
+//                                   child: Column(
+//                                     crossAxisAlignment: CrossAxisAlignment.start,
+//                                     children: [
+//                                       Text(
+//                                         item["name"],
+//                                         style: const TextStyle(
+//                                           fontWeight: FontWeight.bold,
+//                                           fontSize: 14,
+//                                           color: Color(0xff1E293B),
+//                                         ),
+//                                       ),
+//                                       const SizedBox(height: 2),
+//                                       Text(
+//                                         "$unitPrice ပွိုင့်",
+//                                         style: TextStyle(
+//                                           fontSize: 11,
+//                                           color: Colors.grey.shade500,
+//                                         ),
+//                                       ),
+//                                     ],
+//                                   ),
+//                                 ),
+
+//                                 /// QUANTITY MODIFIER BUTTONS
+//                                 Container(
+//                                   height: 32,
+//                                   decoration: BoxDecoration(
+//                                     color: Colors.grey.shade100,
+//                                     borderRadius: BorderRadius.circular(8),
+//                                     border: Border.all(color: Colors.grey.shade300),
+//                                   ),
+//                                   child: Row(
+//                                     children: [
+//                                       IconButton(
+//                                         padding: EdgeInsets.zero,
+//                                         constraints: const BoxConstraints(
+//                                           minWidth: 28,
+//                                         ),
+//                                         icon: const Icon(
+//                                           Icons.remove,
+//                                           size: 14,
+//                                           color: Colors.redAccent,
+//                                         ),
+//                                         onPressed: () {
+//                                           setState(() {
+//                                             widget.onRemoveFromCart(item);
+//                                           });
+//                                         },
+//                                       ),
+//                                       Text(
+//                                         '$qty',
+//                                         style: const TextStyle(
+//                                           fontWeight: FontWeight.bold,
+//                                           fontSize: 12,
+//                                         ),
+//                                       ),
+//                                       IconButton(
+//                                         padding: EdgeInsets.zero,
+//                                         constraints: const BoxConstraints(
+//                                           minWidth: 28,
+//                                         ),
+//                                         icon: const Icon(
+//                                           Icons.add,
+//                                           size: 14,
+//                                           color: primaryColor,
+//                                         ),
+//                                         onPressed: () {
+//                                           setState(() {
+//                                             widget.onAddToCart(item);
+//                                           });
+//                                         },
+//                                       ),
+//                                     ],
+//                                   ),
+//                                 ),
+
+//                                 const SizedBox(width: 14),
+
+//                                 /// TOTAL POINTS FOR ITEM
+//                                 SizedBox(
+//                                   width: 60,
+//                                   child: Text(
+//                                     "$itemTotalPts ပွိုင့်",
+//                                     textAlign: TextAlign.right,
+//                                     style: const TextStyle(
+//                                       fontWeight: FontWeight.w800,
+//                                       fontSize: 13,
+//                                       color: Color(0xff1E293B),
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ],
+//                             );
+//                           },
+//                         ),
+
+//                       const SizedBox(height: 20),
+//                       _buildDottedDivider(),
+//                       const SizedBox(height: 16),
+
+//                       /// TOTAL POINTS DISPLAY
+//                       Row(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           const Text(
+//                             "စုစုပေါင်း",
 //                             style: TextStyle(
-//                               color: Colors.grey.shade500,
-//                               fontWeight: FontWeight.w500,
+//                               fontWeight: FontWeight.w900,
+//                               fontSize: 15,
+//                               letterSpacing: 1.0,
+//                               color: Color(0xff1E293B),
+//                             ),
+//                           ),
+//                           Text(
+//                             "$totalPoints ပွိုင့်",
+//                             style: const TextStyle(
+//                               fontWeight: FontWeight.w900,
+//                               fontSize: 20,
+//                               color: primaryColor,
 //                             ),
 //                           ),
 //                         ],
 //                       ),
-//                     )
-//                   else
-//                     ListView.separated(
-//                       shrinkWrap: true,
-//                       physics: const NeverScrollableScrollPhysics(),
-//                       itemCount: cartItems.length,
-//                       separatorBuilder: (context, index) =>
-//                           const SizedBox(height: 12),
-//                       itemBuilder: (context, index) {
-//                         final item = cartItems[index];
-//                         final int qty = item["cartQuantity"];
-//                         final int unitPrice = _parsePrice(item["price"]);
-//                         final int itemTotalPts = unitPrice * qty;
-
-//                         return Row(
-//                           children: [
-//                             /// ITEM DETAILS
-//                             Expanded(
-//                               child: Column(
-//                                 crossAxisAlignment: CrossAxisAlignment.start,
-//                                 children: [
-//                                   Text(
-//                                     item["name"],
-//                                     style: const TextStyle(
-//                                       fontWeight: FontWeight.bold,
-//                                       fontSize: 14,
-//                                       color: Color(0xff1E293B),
-//                                     ),
-//                                   ),
-//                                   const SizedBox(height: 2),
-//                                   Text(
-//                                     "$unitPrice ပွိုင့်",
-//                                     style: TextStyle(
-//                                       fontSize: 11,
-//                                       color: Colors.grey.shade500,
-//                                     ),
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-
-//                             /// QUANTITY MODIFIER BUTTONS
-//                             Container(
-//                               height: 32,
-//                               decoration: BoxDecoration(
-//                                 color: Colors.grey.shade100,
-//                                 borderRadius: BorderRadius.circular(8),
-//                                 border: Border.all(color: Colors.grey.shade300),
-//                               ),
-//                               child: Row(
-//                                 children: [
-//                                   IconButton(
-//                                     padding: EdgeInsets.zero,
-//                                     constraints: const BoxConstraints(
-//                                       minWidth: 28,
-//                                     ),
-//                                     icon: const Icon(
-//                                       Icons.remove,
-//                                       size: 14,
-//                                       color: Colors.redAccent,
-//                                     ),
-//                                     onPressed: () {
-//                                       setState(() {
-//                                         widget.onRemoveFromCart(item);
-//                                       });
-//                                     },
-//                                   ),
-//                                   Text(
-//                                     '$qty',
-//                                     style: const TextStyle(
-//                                       fontWeight: FontWeight.bold,
-//                                       fontSize: 12,
-//                                     ),
-//                                   ),
-//                                   IconButton(
-//                                     padding: EdgeInsets.zero,
-//                                     constraints: const BoxConstraints(
-//                                       minWidth: 28,
-//                                     ),
-//                                     icon: const Icon(
-//                                       Icons.add,
-//                                       size: 14,
-//                                       color: primaryColor,
-//                                     ),
-//                                     onPressed: () {
-//                                       setState(() {
-//                                         widget.onAddToCart(item);
-//                                       });
-//                                     },
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-
-//                             const SizedBox(width: 14),
-
-//                             /// TOTAL POINTS FOR ITEM
-//                             SizedBox(
-//                               width: 60,
-//                               child: Text(
-//                                 "$itemTotalPts ပွိုင့်",
-//                                 textAlign: TextAlign.right,
-//                                 style: const TextStyle(
-//                                   fontWeight: FontWeight.w800,
-//                                   fontSize: 13,
-//                                   color: Color(0xff1E293B),
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         );
-//                       },
-//                     ),
-
-//                   const SizedBox(height: 20),
-//                   _buildDottedDivider(),
-//                   const SizedBox(height: 16),
-
-//                   /// TOTAL POINTS DISPLAY
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       const Text(
-//                         "စုစုပေါင်း",
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.w900,
-//                           fontSize: 15,
-//                           letterSpacing: 1.0,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-//                       Text(
-//                         "$totalPoints ပွိုင့်",
-//                         style: const TextStyle(
-//                           fontWeight: FontWeight.w900,
-//                           fontSize: 20,
-//                           color: primaryColor,
-//                         ),
-//                       ),
 //                     ],
 //                   ),
-//                 ],
+//                 ),
 //               ),
 //             ),
 //           ),
 
 //           const SizedBox(height: 16),
-
-//           /// CONFIRM ORDER / PLACE ORDER BUTTON
+// /// CONFIRM ORDER / PLACE ORDER BUTTON
 //           SizedBox(
 //             width: double.infinity,
 //             height: 52,
@@ -375,27 +375,32 @@
 //               onPressed: cartItems.isEmpty
 //                   ? null
 //                   : () {
-//                       final activeCartSnapshot =
-//                           List<Map<String, dynamic>>.from(
-//                             cartItems.map(
-//                               (item) => Map<String, dynamic>.from(item),
-//                             ),
-//                           );
-//                       final capturedTotal = totalPoints;
-
-//                       Navigator.pop(context);
+//                       Navigator.pop(context); // Close bottom sheet / modal first
 //                       widget.onConfirmOrder();
 
-//                       // Navigator.push(
-//                       //   context,
-//                       //   MaterialPageRoute(
-//                       //     builder: (context) => OrderSuccessScreen(
-//                       //       shopName: widget.shopName,
-//                       //       cartItems: activeCartSnapshot,
-//                       //       totalPoints: capturedTotal,
-//                       //     ),
-//                       //   ),
-//                       // );
+//                       if (selectedOrderType == "ပါဆယ်ထုတ်မည်") {
+//                         // Navigate to Transfer Point Screen
+//                         //Navigator.pushNamed(context, '/transfer_point_screen');
+//                         // Or if you use direct class instantiation:
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) => TransferPointScreen(currentBalance: 0, onTransferCompleted: (int amount, String recipient) {  },),
+//                           ),
+//                         );
+                        
+//                       } else if (selectedOrderType == "ဆိုင်ထိုင်စားမည်") {
+//                         // Navigate to Choose Table Screen
+//                         //Navigator.pushNamed(context, '/choose_table_screen');
+//                         // Or if you use direct class instantiation:
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) =>  ChooseTableScreen(),
+//                           ),
+//                         );
+                        
+//                       }
 //                     },
 //               style: ElevatedButton.styleFrom(
 //                 backgroundColor: primaryColor,
@@ -421,7 +426,6 @@
 //       ),
 //     );
 //   }
-
 //   Widget _buildDottedDivider() {
 //     return LayoutBuilder(
 //       builder: (context, constraints) {
@@ -472,492 +476,43 @@
 //   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 // }
 
-// // =============================================================================
-// // ORDER SUCCESS SCREEN
-// // =============================================================================
-// class OrderSuccessScreen extends StatelessWidget {
-//   final String shopName;
-//   final String? selectedSeatId;
-//   final List<Map<String, dynamic>> cartItems;
-//   final int totalPoints;
 
-//   const OrderSuccessScreen({
-//     super.key,
-//     required this.shopName,
-//     required this.selectedSeatId,
-//     required this.cartItems,
-//     required this.totalPoints,
-//   });
-
-//   static const Color primaryColor = Color(0xff117992);
-
-//   int _parsePrice(String priceStr) {
-//     final numStr = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
-//     return int.tryParse(numStr) ?? 0;
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: const Color(0xffF6F8FC),
-//       appBar: AppBar(
-//         backgroundColor: primaryColor,
-//         elevation: 0,
-//         leading: IconButton(
-//           icon: const Icon(Icons.arrow_back, color: Colors.white),
-//           onPressed: () => Navigator.pop(context),
-//         ),
-//         title: const Text(
-//           "Order Success",
-//           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-//         ),
-//       ),
-//       body: SingleChildScrollView(
-//         physics: const BouncingScrollPhysics(),
-//         padding: const EdgeInsets.all(20),
-//         child: Column(
-//           children: [
-//             const SizedBox(height: 10),
-//             // Success Icon Banner
-//             Center(
-//               child: Container(
-//                 width: 80,
-//                 height: 80,
-//                 decoration: BoxDecoration(
-//                   color: primaryColor.withOpacity(0.12),
-//                   shape: BoxShape.circle,
-//                 ),
-//                 child: const Center(
-//                   child: Icon(
-//                     Icons.check_circle_rounded,
-//                     color: primaryColor,
-//                     size: 48,
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 16),
-//             const Text(
-//               "Order Confirmed!",
-//               style: TextStyle(
-//                 fontSize: 22,
-//                 fontWeight: FontWeight.w900,
-//                 color: Color(0xff1E293B),
-//               ),
-//             ),
-//             const SizedBox(height: 4),
-//             Text(
-//               "Your delicious meal is being prepared.",
-//               style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-//             ),
-//             const SizedBox(height: 24),
-
-//             // Estimated Prep Time Card
-//             Container(
-//               padding: const EdgeInsets.all(16),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(16),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.03),
-//                     blurRadius: 10,
-//                     offset: const Offset(0, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Row(
-//                 children: [
-//                   Container(
-//                     padding: const EdgeInsets.all(10),
-//                     decoration: BoxDecoration(
-//                       color: primaryColor.withOpacity(0.1),
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                     child: const Icon(
-//                       Icons.access_time_rounded,
-//                       color: primaryColor,
-//                       size: 24,
-//                     ),
-//                   ),
-//                   const SizedBox(width: 14),
-//                   Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         "Estimated Preparation Time",
-//                         style: TextStyle(
-//                           fontSize: 12,
-//                           color: Colors.grey.shade500,
-//                           fontWeight: FontWeight.w500,
-//                         ),
-//                       ),
-//                       const SizedBox(height: 2),
-//                       const Text(
-//                         "15-20 mins",
-//                         style: TextStyle(
-//                           fontSize: 16,
-//                           fontWeight: FontWeight.w900,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 16),
-
-//             // Order Details Card
-//             Container(
-//               padding: const EdgeInsets.all(16),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(16),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.03),
-//                     blurRadius: 10,
-//                     offset: const Offset(0, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       const Text(
-//                         "Order Details",
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 15,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-//                       Container(
-//                         padding: const EdgeInsets.symmetric(
-//                           horizontal: 10,
-//                           vertical: 4,
-//                         ),
-//                         decoration: BoxDecoration(
-//                           color: Colors.grey.shade100,
-//                           borderRadius: BorderRadius.circular(8),
-//                         ),
-//                         child: Text(
-//                           "#ORD-2849",
-//                           style: TextStyle(
-//                             fontSize: 11,
-//                             fontWeight: FontWeight.bold,
-//                             color: Colors.grey.shade600,
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 14),
-//                   const Divider(height: 1),
-//                   const SizedBox(height: 14),
-
-//                   // Dynamic list of ordered items
-//                   ListView.separated(
-//                     shrinkWrap: true,
-//                     physics: const NeverScrollableScrollPhysics(),
-//                     itemCount: cartItems.length,
-//                     separatorBuilder: (context, index) =>
-//                         const SizedBox(height: 12),
-//                     itemBuilder: (context, index) {
-//                       final item = cartItems[index];
-//                       final int qty = item["cartQuantity"];
-//                       final int unitPrice = _parsePrice(item["price"]);
-//                       final int itemTotal = unitPrice * qty;
-
-//                       return Row(
-//                         children: [
-//                           Text(
-//                             "${qty}x",
-//                             style: const TextStyle(
-//                               fontWeight: FontWeight.bold,
-//                               color: primaryColor,
-//                               fontSize: 13,
-//                             ),
-//                           ),
-//                           const SizedBox(width: 10),
-//                           Expanded(
-//                             child: Text(
-//                               item["name"],
-//                               style: const TextStyle(
-//                                 fontWeight: FontWeight.w600,
-//                                 fontSize: 13,
-//                                 color: Color(0xff1E293B),
-//                               ),
-//                             ),
-//                           ),
-//                           Text(
-//                             "$itemTotal pts",
-//                             style: const TextStyle(
-//                               fontWeight: FontWeight.w700,
-//                               fontSize: 13,
-//                               color: Color(0xff1E293B),
-//                             ),
-//                           ),
-//                         ],
-//                       );
-//                     },
-//                   ),
-
-//                   const SizedBox(height: 14),
-//                   Container(height: 1, color: Colors.grey.shade200),
-//                   const SizedBox(height: 14),
-
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       const Text(
-//                         "Total Points Spent",
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 13,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-//                       Text(
-//                         "$totalPoints pts",
-//                         style: const TextStyle(
-//                           fontWeight: FontWeight.w900,
-//                           fontSize: 18,
-//                           color: primaryColor,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 16),
-
-//             // Pickup Location Card
-//             Container(
-//               padding: const EdgeInsets.all(16),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(16),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.03),
-//                     blurRadius: 10,
-//                     offset: const Offset(0, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Row(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Container(
-//                     padding: const EdgeInsets.all(8),
-//                     decoration: BoxDecoration(
-//                       color: primaryColor.withOpacity(0.1),
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                     child: const Icon(
-//                       Icons.location_on_rounded,
-//                       color: primaryColor,
-//                       size: 20,
-//                     ),
-//                   ),
-//                   const SizedBox(width: 12),
-//                   Expanded(
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         const Text(
-//                           "Pickup Location",
-//                           style: TextStyle(
-//                             fontSize: 11,
-//                             color: Colors.grey,
-//                             fontWeight: FontWeight.w500,
-//                           ),
-//                         ),
-//                         const SizedBox(height: 2),
-//                         Text(
-//                           shopName,
-//                           style: const TextStyle(
-//                             fontWeight: FontWeight.bold,
-//                             fontSize: 15,
-//                             color: Color(0xff1E293B),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 6),
-//                         Row(
-//                           children: [
-//                             if (selectedSeatId != null) ...[
-//                               Container(
-//                                 padding: const EdgeInsets.symmetric(
-//                                   horizontal: 8,
-//                                   vertical: 3,
-//                                 ),
-//                                 decoration: BoxDecoration(
-//                                   color: primaryColor.withOpacity(0.1),
-//                                   borderRadius: BorderRadius.circular(6),
-//                                 ),
-//                                 child: Text(
-//                                   "Seat $selectedSeatId",
-//                                   style: const TextStyle(
-//                                     fontSize: 11,
-//                                     fontWeight: FontWeight.bold,
-//                                     color: primaryColor,
-//                                   ),
-//                                 ),
-//                               ),
-//                               const SizedBox(width: 8),
-//                             ],
-//                             const Text(
-//                               "Academic Plaza, Level 2",
-//                               style: TextStyle(
-//                                 fontSize: 12,
-//                                 color: Colors.grey,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 24),
-
-//             // Bottom Action Buttons inside OrderSuccessScreen
-//             SizedBox(
-//               width: double.infinity,
-//               height: 50,
-//               child: ElevatedButton(
-//                 onPressed: () {
-//                   // MainNavigation.navigationNotifier.value =
-//                       1; // Jump to Orders tab (Index 1)[cite: 5, 6]
-//                   Navigator.of(context).popUntil((route) => route.isFirst);
-//                 },
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: primaryColor,
-//                   elevation: 0,
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(14),
-//                   ),
-//                 ),
-//                 child: const Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Icon(
-//                       Icons.track_changes_rounded,
-//                       color: Colors.white,
-//                       size: 18,
-//                     ),
-//                     SizedBox(width: 8),
-//                     Text(
-//                       "Track My Order",
-//                       style: TextStyle(
-//                         color: Colors.white,
-//                         fontWeight: FontWeight.bold,
-//                         fontSize: 14,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 12),
-//             SizedBox(
-//               width: double.infinity,
-//               height: 50,
-//               child: OutlinedButton(
-//                 onPressed: () {
-//                   // Pop back all the way to home / first route
-//                   Navigator.of(context).popUntil((route) => route.isFirst);
-//                 },
-//                 style: OutlinedButton.styleFrom(
-//                   side: BorderSide(color: Colors.grey.shade300),
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(14),
-//                   ),
-//                 ),
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Icon(
-//                       Icons.home_outlined,
-//                       color: Colors.grey.shade700,
-//                       size: 18,
-//                     ),
-//                     const SizedBox(width: 8),
-//                     Text(
-//                       "Back to Home",
-//                       style: TextStyle(
-//                         color: Colors.grey.shade700,
-//                         fontWeight: FontWeight.bold,
-//                         fontSize: 14,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
-import 'package:smartcanteen/navigation_bar.dart';
-import 'package:smartcanteen/view/choose_table_screen.dart';
-import 'package:smartcanteen/view/transfer_point_screen.dart';
+import 'package:smartcanteen/view/order_success_screen.dart';
+import 'package:smartcanteen/view/transfer_screen.dart';
 
 class AddToCartScreen extends StatefulWidget {
   final String shopName;
+  final List<Map<String, dynamic>> seats;
   final List<Map<String, dynamic>> menuItems;
   final Function(Map<String, dynamic>) onAddToCart;
   final Function(Map<String, dynamic>) onRemoveFromCart;
   final VoidCallback onConfirmOrder;
-
+  final int currentBalance;
   const AddToCartScreen({
     super.key,
     required this.shopName,
+    this.seats = const [],
     required this.menuItems,
     required this.onAddToCart,
     required this.onRemoveFromCart,
     required this.onConfirmOrder,
+    required this.currentBalance,
   });
-
   @override
   State<AddToCartScreen> createState() => _AddToCartScreenState();
 }
 
 class _AddToCartScreenState extends State<AddToCartScreen> {
   static const Color primaryColor = Color(0xff117992);
+  // ORDER TYPE STATE: "dinein" (reserve table) or "takeaway"
+  String orderType = "takeaway";
+  String? selectedSeatId;
+  String? selectedSeatLabel;
 
-  // Default selected dining option
-  String selectedOrderType = "ပါဆယ်ထုတ်မည်";
+  // OPTIONAL NOTE STATE
+  final TextEditingController _noteController = TextEditingController();
 
-  // Options list with labels and icons
-  final List<Map<String, dynamic>> orderTypeOptions = [
-    {
-      "value": "ဆိုင်ထိုင်စားမည်",
-      "label": "ဆိုင်ထိုင်စားမည်",
-      "icon": Icons.chair_alt_rounded,
-    },
-    {
-      "value": "ပါဆယ်ထုတ်မည်",
-      "label": "ပါဆယ်ထုတ်မည်",
-      "icon": Icons.shopping_bag_outlined,
-    },
-  ];
-
-  // Helper to extract numeric points from strings like "250 pts"
   int _parsePrice(String priceStr) {
     final numStr = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
     return int.tryParse(numStr) ?? 0;
@@ -971,7 +526,40 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
         total += _parsePrice(item["price"]) * qty;
       }
     }
+    print("Current Balance is ---------${widget.currentBalance}");
     return total;
+  }
+
+  bool get _isReadyToOrder {
+    if (totalPoints == 0) return false;
+    if (orderType == "dine-in" && selectedSeatId == null) return false;
+    return true;
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  // Navigate to the separate Select Seat page and wait for the result.
+  Future<void> _openSelectSeatPage() async {
+    final result = await Navigator.push<Map<String, String>?>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SelectSeatScreen(
+          shopName: widget.shopName,
+          seats: widget.seats,
+          currentSeatId: selectedSeatId,
+        ),
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        selectedSeatId = result["id"];
+        selectedSeatLabel = result["label"];
+      });
+    }
   }
 
   @override
@@ -979,366 +567,599 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
     final cartItems = widget.menuItems
         .where((item) => (item["cartQuantity"] as int? ?? 0) > 0)
         .toList();
-
     return Container(
       color: Colors.transparent,
       padding: const EdgeInsets.fromLTRB(16, 40, 16, 20),
-      // Constrain height so that receipt content can scroll properly
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          /// RECEIPT PAPER BODY WITH ZIGZAG CLIPPER
-          Expanded(
-            child: ClipPath(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            /// RECEIPT PAPER BODY WITH ZIGZAG CLIPPER
+            ClipPath(
               clipper: ReceiptClipper(),
               child: Container(
                 color: Colors.white,
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      /// RECEIPT HEADER
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.receipt_long_rounded,
-                          color: primaryColor,
-                          size: 24,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    /// RECEIPT HEADER
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.receipt_long_rounded,
+                        color: primaryColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      widget.shopName.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
+                        letterSpacing: 1.5,
+                        color: Color(0xff1E293B),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "အော်ဒါ အနှစ်ချုပ်",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    /// =========================================================
+                    /// ORDER TYPE SELECTOR (Dine-in / Take Away)
+                    /// =========================================================
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "မှာယူပုံ ရွေးချယ်ပါ",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey.shade700,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        widget.shopName.toUpperCase(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          fontSize: 18,
-                          letterSpacing: 1.5,
-                          color: Color(0xff1E293B),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _buildOrderTypeCard(
+                          type: "dine-in",
+                          icon: Icons.event_seat_rounded,
+                          title: "ဆိုင်တွင်ထိုင်စား",
                         ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      /// SEAT / ORDER TYPE DROPDOWN BOX
-                      PopupMenuButton<String>(
-                        tooltip: "ရွေးချယ်ပါ",
-                        offset: const Offset(0, 42), // Opens menu right below the box
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        const SizedBox(width: 10),
+                        _buildOrderTypeCard(
+                          type: "takeaway",
+                          icon: Icons.shopping_bag_rounded,
+                          title: "ပါဆယ်",
                         ),
-                        onSelected: (String newValue) {
-                          setState(() {
-                            selectedOrderType = newValue;
-                          });
-                        },
-                        itemBuilder: (BuildContext context) {
-                          return orderTypeOptions.map((option) {
-                            return PopupMenuItem<String>(
-                              value: option["value"] as String,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    option["icon"] as IconData,
-                                    size: 18,
+                      ],
+                    ),
+
+                    /// =========================================================
+                    /// TABLE RESERVATION ROW (only when dine-in)
+                    /// Opens the SEPARATE select-seat page.
+                    /// =========================================================
+                    if (orderType == "dine-in") ...[
+                      const SizedBox(height: 14),
+                      selectedSeatId == null
+                          ? _buildSelectTableButton()
+                          : _buildReservedTableCard(),
+                    ],
+                    const SizedBox(height: 20),
+                    _buildDottedDivider(),
+                    const SizedBox(height: 16),
+
+                    /// CART ITEMS LIST
+                    if (cartItems.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 30),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.shopping_bag_outlined,
+                              size: 40,
+                              color: Colors.grey.shade300,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "ဈေးဝယ်ခြင်း ဗလာဖြစ်နေသည်",
+                              style: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: cartItems.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final item = cartItems[index];
+                          final int qty = item["cartQuantity"];
+                          final int unitPrice = _parsePrice(item["price"]);
+                          final int itemTotalPts = unitPrice * qty;
+                          return Row(
+                            children: [
+                              /// ITEM DETAILS
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item["name"],
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: Color(0xff1E293B),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      "တစ်ခုလျှင် $unitPrice ပွိုင့်",
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              /// QUANTITY COUNT
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  "x$qty",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
                                     color: primaryColor,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    option["label"] as String,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList();
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // 1. Single Leading Icon based on current selection
-                              Icon(
-                                orderTypeOptions.firstWhere(
-                                  (e) => e["value"] == selectedOrderType,
-                                )["icon"] as IconData,
-                                size: 18,
-                                color: primaryColor,
-                              ),
-                              const SizedBox(width: 8),
-                              // 2. Selected Text
-                              Text(
-                                orderTypeOptions.firstWhere(
-                                  (e) => e["value"] == selectedOrderType,
-                                )["label"] as String,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              // 3. Dropdown Indicator Arrow
-                              Icon(
-                                Icons.arrow_drop_down_rounded,
-                                color: Colors.grey.shade600,
-                                size: 20,
+                              const SizedBox(width: 14),
+
+                              /// TOTAL POINTS FOR ITEM
+                              SizedBox(
+                                width: 64,
+                                child: Text(
+                                  "$itemTotalPts ပွိုင့်",
+                                  textAlign: TextAlign.right,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                    color: Color(0xff1E293B),
+                                  ),
+                                ),
                               ),
                             ],
-                          ),
+                          );
+                        },
+                      ),
+
+                    /// =========================================================
+                    /// OPTIONAL NOTE FIELD
+                    /// =========================================================
+                    if (cartItems.isNotEmpty) ...[
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.edit_note_rounded,
+                              size: 16,
+                              color: Colors.grey.shade600,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              "မှတ်ချက် (ရွေးချယ်ရန်)",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      _buildDottedDivider(),
-                      const SizedBox(height: 16),
-
-                      /// CART ITEMS LIST
-                      if (cartItems.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 30),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.shopping_bag_outlined,
-                                size: 40,
-                                color: Colors.grey.shade300,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "Your cart is empty",
-                                style: TextStyle(
-                                  color: Colors.grey.shade500,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: cartItems.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final item = cartItems[index];
-                            final int qty = item["cartQuantity"];
-                            final int unitPrice = _parsePrice(item["price"]);
-                            final int itemTotalPts = unitPrice * qty;
-
-                            return Row(
-                              children: [
-                                /// ITEM DETAILS
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item["name"],
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: Color(0xff1E293B),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        "$unitPrice ပွိုင့်",
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                /// QUANTITY MODIFIER BUTTONS
-                                Container(
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.grey.shade300),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 28,
-                                        ),
-                                        icon: const Icon(
-                                          Icons.remove,
-                                          size: 14,
-                                          color: Colors.redAccent,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            widget.onRemoveFromCart(item);
-                                          });
-                                        },
-                                      ),
-                                      Text(
-                                        '$qty',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 28,
-                                        ),
-                                        icon: const Icon(
-                                          Icons.add,
-                                          size: 14,
-                                          color: primaryColor,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            widget.onAddToCart(item);
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                const SizedBox(width: 14),
-
-                                /// TOTAL POINTS FOR ITEM
-                                SizedBox(
-                                  width: 60,
-                                  child: Text(
-                                    "$itemTotalPts ပွိုင့်",
-                                    textAlign: TextAlign.right,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 13,
-                                      color: Color(0xff1E293B),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _noteController,
+                        maxLines: 2,
+                        minLines: 1,
+                        textInputAction: TextInputAction.done,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xff1E293B),
                         ),
-
-                      const SizedBox(height: 20),
-                      _buildDottedDivider(),
-                      const SizedBox(height: 16),
-
-                      /// TOTAL POINTS DISPLAY
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "စုစုပေါင်း",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15,
-                              letterSpacing: 1.0,
-                              color: Color(0xff1E293B),
-                            ),
+                        decoration: InputDecoration(
+                          hintText:
+                              "ဥပမာ - အစပ်နည်းနည်း၊ ကြက်ဥ ပိုထည့်ပေးပါ...",
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontSize: 12,
                           ),
-                          Text(
-                            "$totalPoints ပွိုင့်",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 20,
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
                               color: primaryColor,
+                              width: 1.4,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ],
+                    const SizedBox(height: 20),
+                    _buildDottedDivider(),
+                    const SizedBox(height: 16),
+
+                    /// ORDER TYPE SUMMARY ROW
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "မှာယူပုံ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        Text(
+                          orderType == "dine-in"
+                              ? (selectedSeatId != null
+                                    ? "ဆိုင်တွင်ထိုင်စား · ${selectedSeatLabel ?? selectedSeatId}"
+                                    : "ဆိုင်တွင်ထိုင်စား")
+                              : "ပါဆယ်",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    /// TOTAL POINTS DISPLAY
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "စုစုပေါင်း ပွိုင့်",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15,
+                            color: Color(0xff1E293B),
+                          ),
+                        ),
+                        Text(
+                          "$totalPoints ပွိုင့်",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 20,
+                            color: primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            /// DINE-IN HINT (if table not yet picked)
+            if (orderType == "dine-in" &&
+                selectedSeatId == null &&
+                cartItems.isNotEmpty) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xffFEF3C7),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      size: 18,
+                      color: Color(0xffD97706),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "အော်ဒါမတင်မီ စားပွဲ ရွေးချယ်ပေးပါ။",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange.shade900,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+
+            /// CONFIRM ORDER / PLACE ORDER BUTTON
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: !_isReadyToOrder
+                    ? null
+                    : () {
+                        final activeCartSnapshot =
+                            List<Map<String, dynamic>>.from(
+                              cartItems.map(
+                                (item) => Map<String, dynamic>.from(item),
+                              ),
+                            );
+                        final capturedTotal = totalPoints;
+                        final String orderNote = _noteController.text.trim();
+                        final String capturedOrderType = orderType;
+                        final String? capturedSeat =
+                            selectedSeatLabel ?? selectedSeatId;
+                        final navigator = Navigator.of(context);
+
+                        // Close the order-summary bottom sheet first.
+                        Navigator.pop(context);
+
+                        // Then open the locked transfer screen.
+                        Future.microtask(() {
+                          navigator.push(
+                            MaterialPageRoute(
+                              builder: (_) => TransferScreen(
+                                currentBalance: widget.currentBalance,
+                                initialRecipient: widget.shopName,
+                                initialAmount: capturedTotal,
+                                readOnlyTransfer: true,
+                                onTransferCompleted: (amount, recipient) {
+                                  widget.onConfirmOrder();
+
+                                  // TransferScreen closes itself after a successful
+                                  // transfer. Open the success page immediately after.
+                                  Future.microtask(() {
+                                    navigator.pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (_) => OrderSuccessScreen(
+                                          shopName: widget.shopName,
+                                          orderType: capturedOrderType,
+                                          selectedSeatId: capturedSeat,
+                                          cartItems: activeCartSnapshot,
+                                          totalPoints: capturedTotal,
+                                          note: orderNote,
+                                        ),
+                                      ),
+                                    );
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        });
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  disabledBackgroundColor: Colors.grey.shade400,
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  cartItems.isEmpty
+                      ? "ဈေးဝယ်ခြင်း ဗလာဖြစ်နေသည်"
+                      : "အော်ဒါတင်မည် ($totalPoints ပွိုင့်)",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
                   ),
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // ORDER TYPE CARD
+  // ===========================================================================
+  Widget _buildOrderTypeCard({
+    required String type,
+    required IconData icon,
+    required String title,
+  }) {
+    final bool isSelected = orderType == type;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            orderType = type;
+            if (type == "takeaway") {
+              // clear reservation when switching to takeaway
+              selectedSeatId = null;
+              selectedSeatLabel = null;
+            }
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? primaryColor.withOpacity(0.08) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? primaryColor : Colors.grey.shade300,
+              width: isSelected ? 1.6 : 1,
+            ),
           ),
-
-          const SizedBox(height: 16),
-/// CONFIRM ORDER / PLACE ORDER BUTTON
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: cartItems.isEmpty
-                  ? null
-                  : () {
-                      Navigator.pop(context); // Close bottom sheet / modal first
-                      widget.onConfirmOrder();
-
-                      if (selectedOrderType == "ပါဆယ်ထုတ်မည်") {
-                        // Navigate to Transfer Point Screen
-                        //Navigator.pushNamed(context, '/transfer_point_screen');
-                        // Or if you use direct class instantiation:
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TransferPointScreen(currentBalance: 0, onTransferCompleted: (int amount, String recipient) {  },),
-                          ),
-                        );
-                        
-                      } else if (selectedOrderType == "ဆိုင်ထိုင်စားမည်") {
-                        // Navigate to Choose Table Screen
-                        //Navigator.pushNamed(context, '/choose_table_screen');
-                        // Or if you use direct class instantiation:
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>  ChooseTableScreen(),
-                          ),
-                        );
-                        
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                disabledBackgroundColor: Colors.grey.shade400,
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? primaryColor : Colors.grey.shade500,
+                size: 26,
               ),
-              child: Text(
-                cartItems.isEmpty
-                    ? "ရွေးချယ်ထားခြင်းမရှိပါ"
-                    : "အော်ဒါတင်မည်",
-                style: const TextStyle(
-                  color: Colors.white,
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 15,
+                  fontSize: 13,
+                  color: isSelected ? primaryColor : const Color(0xff1E293B),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // "SELECT TABLE" BUTTON (no table picked yet) -> opens separate page
+  // ===========================================================================
+  Widget _buildSelectTableButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: _openSelectSeatPage,
+        icon: const Icon(Icons.event_seat_rounded, size: 18),
+        label: const Text(
+          "စားပွဲ ရွေးချယ်မည်",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryColor,
+          side: const BorderSide(color: primaryColor, width: 1.4),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ===========================================================================
+  // RESERVED TABLE CARD (table picked) -> shows table + "Change" button
+  // ===========================================================================
+  Widget _buildReservedTableCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: primaryColor.withOpacity(0.4), width: 1.2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.event_seat_rounded,
+              color: primaryColor,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "ရွေးထားသောစားပွဲ",
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  selectedSeatLabel ?? selectedSeatId ?? "-",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: _openSelectSeatPage,
+            style: TextButton.styleFrom(
+              foregroundColor: primaryColor,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+            ),
+            child: const Text(
+              "ပြောင်းမည်",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
           ),
         ],
       ),
     );
   }
+
   Widget _buildDottedDivider() {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1364,22 +1185,432 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
   }
 }
 
+// =============================================================================
+// SELECT SEAT SCREEN
+// =============================================================================
+class SelectSeatScreen extends StatefulWidget {
+  final String shopName;
+  final List<Map<String, dynamic>> seats;
+  final String? currentSeatId;
+  const SelectSeatScreen({
+    super.key,
+    required this.shopName,
+    required this.seats,
+    this.currentSeatId,
+  });
+  @override
+  State<SelectSeatScreen> createState() => _SelectSeatScreenState();
+}
+
+class _SelectSeatScreenState extends State<SelectSeatScreen> {
+  static const Color primaryColor = Color(0xff117992);
+  String? selectedSeatId;
+  @override
+  void initState() {
+    super.initState();
+    selectedSeatId = widget.currentSeatId;
+  }
+
+  Map<String, dynamic>? get _selectedSeat {
+    for (var s in widget.seats) {
+      if (s["id"] == selectedSeatId) return s;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xffF6F8FC),
+      body: Column(
+        children: [
+          /// CUSTOM GRADIENT HEADER (spaced below the status bar)
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xff117992), Color(0xff0D5B6E)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 44, 16, 14),
+                child: Row(
+                  children: [
+                    Material(
+                      color: Colors.white.withOpacity(0.15),
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => Navigator.pop(context),
+                        child: const SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "စားပွဲ ရွေးချယ်ပါ",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            "ဆိုင်တွင်ထိုင်စားရန် စားပွဲရွေးပါ",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          /// BODY
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "စားပွဲ အပြင်အဆင်",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Color(0xff1E293B),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "စားပွဲတစ်ခုစီတွင် ထိုင်ခုံ ၄ ခုံ ပါဝင်မှာ ဖြစ်ပါသည်။",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    /// COUNTER banner
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.point_of_sale_rounded,
+                            size: 16,
+                            color: Colors.grey.shade600,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            "ကောင်တာ",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+
+                    /// TABLE GRID (4 per row, like the shop-owner layout)
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: widget.seats.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 0.9,
+                          ),
+                      itemBuilder: (context, index) {
+                        final seat = widget.seats[index];
+                        return _buildSeatCard(seat);
+                      },
+                    ),
+                    const SizedBox(height: 18),
+                    const Divider(height: 1),
+                    const SizedBox(height: 14),
+
+                    /// LEGEND
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 8,
+                      children: [
+                        _buildLegendItem(
+                          color: const Color(0xff34D399),
+                          label: "အားလပ်",
+                        ),
+                        _buildLegendItem(
+                          color: const Color(0xffF87171),
+                          label: "လူရှိ",
+                        ),
+                        _buildLegendItem(
+                          color: const Color(0xffFBBF24),
+                          label: "မှာထား",
+                        ),
+                        _buildLegendItem(
+                          color: Colors.grey.shade400,
+                          label: "ပိတ်ထား",
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+
+      /// BOTTOM CONFIRM BAR
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+          child: SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: selectedSeatId == null
+                  ? null
+                  : () {
+                      final seat = _selectedSeat;
+                      Navigator.pop(context, {
+                        "id": selectedSeatId!,
+                        "label": (seat?["label"] ?? selectedSeatId).toString(),
+                      });
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                disabledBackgroundColor: Colors.grey.shade400,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: Text(
+                selectedSeatId == null
+                    ? "စားပွဲ ရွေးချယ်ပါ"
+                    : "${_selectedSeat?["label"] ?? selectedSeatId} ကို အတည်ပြုမည်",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSeatCard(Map<String, dynamic> seat) {
+    final String seatId = seat["id"];
+    final String label = seat["label"] ?? seatId;
+    final String status = seat["status"];
+    final bool isSelected = selectedSeatId == seatId;
+    final bool isAvailable = status == "available";
+    Color bgColor;
+    Color borderColor;
+    Color iconColor;
+    Color textColor;
+    Color statusColor;
+    String statusText;
+    if (isSelected) {
+      bgColor = primaryColor;
+      borderColor = primaryColor;
+      iconColor = Colors.white;
+      textColor = Colors.white;
+      statusColor = Colors.white;
+      statusText = "ရွေးထားသည်";
+    } else {
+      switch (status) {
+        case "occupied":
+          bgColor = const Color(0xffFEE2E2);
+          borderColor = const Color(0xffFCA5A5);
+          iconColor = const Color(0xffEF4444);
+          textColor = const Color(0xff1E293B);
+          statusColor = const Color(0xffEF4444);
+          statusText = "လူရှိ";
+          break;
+        case "reserved":
+          bgColor = const Color(0xffFEF3C7);
+          borderColor = const Color(0xffFCD34D);
+          iconColor = const Color(0xffF59E0B);
+          textColor = const Color(0xff1E293B);
+          statusColor = const Color(0xffD97706);
+          statusText = "မှာထား";
+          break;
+        case "disabled":
+          bgColor = Colors.grey.shade100;
+          borderColor = Colors.grey.shade200;
+          iconColor = Colors.grey.shade400;
+          textColor = Colors.grey.shade400;
+          statusColor = Colors.grey.shade400;
+          statusText = "ပိတ်ထား";
+          break;
+        case "available":
+        default:
+          bgColor = const Color(0xffECFDF5);
+          borderColor = const Color(0xffA7F3D0);
+          iconColor = const Color(0xff10B981);
+          textColor = const Color(0xff1E293B);
+          statusColor = const Color(0xff10B981);
+          statusText = "အားလပ်";
+          break;
+      }
+    }
+    return GestureDetector(
+      onTap: isAvailable
+          ? () {
+              setState(() {
+                selectedSeatId = isSelected ? null : seatId;
+              });
+            }
+          : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: borderColor, width: 1.4),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  Icons.table_restaurant_rounded,
+                  size: 26,
+                  color: iconColor,
+                ),
+                Positioned(
+                  right: -15,
+                  top: -2,
+                  child: Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              seatId,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              statusText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color: statusColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLegendItem({required Color color, required String label}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class ReceiptClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     Path path = Path();
     path.lineTo(0, size.height - 12);
-
     const double waveWidth = 8.0;
     const double waveHeight = 8.0;
-
     double x = 0;
     while (x < size.width) {
       x += waveWidth;
       path.lineTo(x - (waveWidth / 2), size.height - 12 + waveHeight);
       path.lineTo(x, size.height - 12);
     }
-
     path.lineTo(size.width, 0);
     path.close();
     return path;
@@ -1388,442 +1619,3 @@ class ReceiptClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
-
-// // =============================================================================
-// // ORDER SUCCESS SCREEN
-// // =============================================================================
-// class OrderSuccessScreen extends StatelessWidget {
-//   final String shopName;
-//   final String? selectedSeatId;
-//   final List<Map<String, dynamic>> cartItems;
-//   final int totalPoints;
-
-//   const OrderSuccessScreen({
-//     super.key,
-//     required this.shopName,
-//     required this.selectedSeatId,
-//     required this.cartItems,
-//     required this.totalPoints,
-//   });
-
-//   static const Color primaryColor = Color(0xff117992);
-
-//   int _parsePrice(String priceStr) {
-//     final numStr = priceStr.replaceAll(RegExp(r'[^0-9]'), '');
-//     return int.tryParse(numStr) ?? 0;
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: const Color(0xffF6F8FC),
-//       appBar: AppBar(
-//         backgroundColor: primaryColor,
-//         elevation: 0,
-//         leading: IconButton(
-//           icon: const Icon(Icons.arrow_back, color: Colors.white),
-//           onPressed: () => Navigator.pop(context),
-//         ),
-//         title: const Text(
-//           "Order Success",
-//           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-//         ),
-//       ),
-//       body: SingleChildScrollView(
-//         physics: const BouncingScrollPhysics(),
-//         padding: const EdgeInsets.all(20),
-//         child: Column(
-//           children: [
-//             const SizedBox(height: 10),
-//             // Success Icon Banner
-//             Center(
-//               child: Container(
-//                 width: 80,
-//                 height: 80,
-//                 decoration: BoxDecoration(
-//                   color: primaryColor.withOpacity(0.12),
-//                   shape: BoxShape.circle,
-//                 ),
-//                 child: const Center(
-//                   child: Icon(
-//                     Icons.check_circle_rounded,
-//                     color: primaryColor,
-//                     size: 48,
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 16),
-//             const Text(
-//               "Order Confirmed!",
-//               style: TextStyle(
-//                 fontSize: 22,
-//                 fontWeight: FontWeight.w900,
-//                 color: Color(0xff1E293B),
-//               ),
-//             ),
-//             const SizedBox(height: 4),
-//             Text(
-//               "Your delicious meal is being prepared.",
-//               style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-//             ),
-//             const SizedBox(height: 24),
-
-//             // Estimated Prep Time Card
-//             Container(
-//               padding: const EdgeInsets.all(16),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(16),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.03),
-//                     blurRadius: 10,
-//                     offset: const Offset(0, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Row(
-//                 children: [
-//                   Container(
-//                     padding: const EdgeInsets.all(10),
-//                     decoration: BoxDecoration(
-//                       color: primaryColor.withOpacity(0.1),
-//                       borderRadius: BorderRadius.circular(12),
-//                     ),
-//                     child: const Icon(
-//                       Icons.access_time_rounded,
-//                       color: primaryColor,
-//                       size: 24,
-//                     ),
-//                   ),
-//                   const SizedBox(width: 14),
-//                   Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         "Estimated Preparation Time",
-//                         style: TextStyle(
-//                           fontSize: 12,
-//                           color: Colors.grey.shade500,
-//                           fontWeight: FontWeight.w500,
-//                         ),
-//                       ),
-//                       const SizedBox(height: 2),
-//                       const Text(
-//                         "15-20 mins",
-//                         style: TextStyle(
-//                           fontSize: 16,
-//                           fontWeight: FontWeight.w900,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 16),
-
-//             // Order Details Card
-//             Container(
-//               padding: const EdgeInsets.all(16),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(16),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.03),
-//                     blurRadius: 10,
-//                     offset: const Offset(0, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       const Text(
-//                         "Order Details",
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 15,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-//                       Container(
-//                         padding: const EdgeInsets.symmetric(
-//                           horizontal: 10,
-//                           vertical: 4,
-//                         ),
-//                         decoration: BoxDecoration(
-//                           color: Colors.grey.shade100,
-//                           borderRadius: BorderRadius.circular(8),
-//                         ),
-//                         child: Text(
-//                           "#ORD-2849",
-//                           style: TextStyle(
-//                             fontSize: 11,
-//                             fontWeight: FontWeight.bold,
-//                             color: Colors.grey.shade600,
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 14),
-//                   const Divider(height: 1),
-//                   const SizedBox(height: 14),
-
-//                   // Dynamic list of ordered items
-//                   ListView.separated(
-//                     shrinkWrap: true,
-//                     physics: const NeverScrollableScrollPhysics(),
-//                     itemCount: cartItems.length,
-//                     separatorBuilder: (context, index) =>
-//                         const SizedBox(height: 12),
-//                     itemBuilder: (context, index) {
-//                       final item = cartItems[index];
-//                       final int qty = item["cartQuantity"];
-//                       final int unitPrice = _parsePrice(item["price"]);
-//                       final int itemTotal = unitPrice * qty;
-
-//                       return Row(
-//                         children: [
-//                           Text(
-//                             "${qty}x",
-//                             style: const TextStyle(
-//                               fontWeight: FontWeight.bold,
-//                               color: primaryColor,
-//                               fontSize: 13,
-//                             ),
-//                           ),
-//                           const SizedBox(width: 10),
-//                           Expanded(
-//                             child: Text(
-//                               item["name"],
-//                               style: const TextStyle(
-//                                 fontWeight: FontWeight.w600,
-//                                 fontSize: 13,
-//                                 color: Color(0xff1E293B),
-//                               ),
-//                             ),
-//                           ),
-//                           Text(
-//                             "$itemTotal pts",
-//                             style: const TextStyle(
-//                               fontWeight: FontWeight.w700,
-//                               fontSize: 13,
-//                               color: Color(0xff1E293B),
-//                             ),
-//                           ),
-//                         ],
-//                       );
-//                     },
-//                   ),
-
-//                   const SizedBox(height: 14),
-//                   Container(height: 1, color: Colors.grey.shade200),
-//                   const SizedBox(height: 14),
-
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       const Text(
-//                         "Total Points Spent",
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 13,
-//                           color: Color(0xff1E293B),
-//                         ),
-//                       ),
-//                       Text(
-//                         "$totalPoints pts",
-//                         style: const TextStyle(
-//                           fontWeight: FontWeight.w900,
-//                           fontSize: 18,
-//                           color: primaryColor,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 16),
-
-//             // Pickup Location Card
-//             Container(
-//               padding: const EdgeInsets.all(16),
-//               decoration: BoxDecoration(
-//                 color: Colors.white,
-//                 borderRadius: BorderRadius.circular(16),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black.withOpacity(0.03),
-//                     blurRadius: 10,
-//                     offset: const Offset(0, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Row(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Container(
-//                     padding: const EdgeInsets.all(8),
-//                     decoration: BoxDecoration(
-//                       color: primaryColor.withOpacity(0.1),
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                     child: const Icon(
-//                       Icons.location_on_rounded,
-//                       color: primaryColor,
-//                       size: 20,
-//                     ),
-//                   ),
-//                   const SizedBox(width: 12),
-//                   Expanded(
-//                     child: Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         const Text(
-//                           "Pickup Location",
-//                           style: TextStyle(
-//                             fontSize: 11,
-//                             color: Colors.grey,
-//                             fontWeight: FontWeight.w500,
-//                           ),
-//                         ),
-//                         const SizedBox(height: 2),
-//                         Text(
-//                           shopName,
-//                           style: const TextStyle(
-//                             fontWeight: FontWeight.bold,
-//                             fontSize: 15,
-//                             color: Color(0xff1E293B),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 6),
-//                         Row(
-//                           children: [
-//                             if (selectedSeatId != null) ...[
-//                               Container(
-//                                 padding: const EdgeInsets.symmetric(
-//                                   horizontal: 8,
-//                                   vertical: 3,
-//                                 ),
-//                                 decoration: BoxDecoration(
-//                                   color: primaryColor.withOpacity(0.1),
-//                                   borderRadius: BorderRadius.circular(6),
-//                                 ),
-//                                 child: Text(
-//                                   "Seat $selectedSeatId",
-//                                   style: const TextStyle(
-//                                     fontSize: 11,
-//                                     fontWeight: FontWeight.bold,
-//                                     color: primaryColor,
-//                                   ),
-//                                 ),
-//                               ),
-//                               const SizedBox(width: 8),
-//                             ],
-//                             const Text(
-//                               "Academic Plaza, Level 2",
-//                               style: TextStyle(
-//                                 fontSize: 12,
-//                                 color: Colors.grey,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: 24),
-
-//             // Bottom Action Buttons inside OrderSuccessScreen
-//             SizedBox(
-//               width: double.infinity,
-//               height: 50,
-//               child: ElevatedButton(
-//                 onPressed: () {
-//                   Navigator.of(context).popUntil((route) => route.isFirst);
-//                 },
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: primaryColor,
-//                   elevation: 0,
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(14),
-//                   ),
-//                 ),
-//                 child: const Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Icon(
-//                       Icons.track_changes_rounded,
-//                       color: Colors.white,
-//                       size: 18,
-//                     ),
-//                     SizedBox(width: 8),
-//                     Text(
-//                       "Track My Order",
-//                       style: TextStyle(
-//                         color: Colors.white,
-//                         fontWeight: FontWeight.bold,
-//                         fontSize: 14,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 12),
-//             SizedBox(
-//               width: double.infinity,
-//               height: 50,
-//               child: OutlinedButton(
-//                 onPressed: () {
-//                   // Pop back all the way to home / first route
-//                   Navigator.of(context).popUntil((route) => route.isFirst);
-//                 },
-//                 style: OutlinedButton.styleFrom(
-//                   side: BorderSide(color: Colors.grey.shade300),
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(14),
-//                   ),
-//                 ),
-//                 child: Row(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     Icon(
-//                       Icons.home_outlined,
-//                       color: Colors.grey.shade700,
-//                       size: 18,
-//                     ),
-//                     const SizedBox(width: 8),
-//                     Text(
-//                       "Back to Home",
-//                       style: TextStyle(
-//                         color: Colors.grey.shade700,
-//                         fontWeight: FontWeight.bold,
-//                         fontSize: 14,
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

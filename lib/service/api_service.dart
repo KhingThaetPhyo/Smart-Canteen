@@ -10,8 +10,9 @@ import 'package:smartcanteen/model/view_menu_model.dart'; // Make sure this path
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "http://192.168.1.10:8000/api";
-
+  //static const String baseUrl = "http://192.168.1.12:8000/api";
+  static const String baseUrl = "https://7d031e28c4fff2cc-202-165-86-143.serveousercontent.com/api";
+//https://0c087b6d8fabd90f-202-165-86-143.serveousercontent.com/api/login
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: baseUrl,
