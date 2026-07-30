@@ -295,6 +295,7 @@ if (result != null && result.success == true) {
 
   // Create QR data
   final qrData = jsonEncode({
+    'user_id' : result.user?.userId ?? '',
     'user_name': result.user?.userName ?? '',
     'student_id': result.user?.student?.studentId ?? '',
   });

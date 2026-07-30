@@ -88,6 +88,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:smartcanteen/provider/user_provider.dart';
 import 'package:smartcanteen/router/user_router.dart';
 
 void main() async {
@@ -105,7 +107,16 @@ void main() async {
     overlays: [SystemUiOverlay.bottom],
   );
 
-  runApp(const MyApp());
+  //runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        // Add other providers here if needed
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

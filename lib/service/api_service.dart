@@ -12,8 +12,8 @@ import 'package:smartcanteen/service/secure_storage_service.dart'; // Make sure 
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  //static const String baseUrl = "http://192.168.1.12:8000/api";
-  static const String baseUrl = "http://192.168.1.7:8000/api";
+  static const String baseUrl = "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
+ // static const String baseUrl = "http://192.168.1.12:8000/api";
 //https://0c087b6d8fabd90f-202-165-86-143.serveousercontent.com/api/login
   final Dio _dio = Dio(
     BaseOptions(
@@ -249,65 +249,57 @@ Future<LoginModel?> loginUser({
     }
   }
  
-
-//  /// Call Order Creation Endpoint
 // Future<Map<String, dynamic>?> createOrder({
 //   required int shopId,
 //   required String orderType,
 //   required String walletPassword,
+//   int? foodTableId,
 //   String? deliveryLocation,
 //   required List<Map<String, dynamic>> items,
 // }) async {
+//   final url = Uri.parse('$baseUrl/orders/order-create'); // Check endpoint path
+//   final token = await SecureStorageService.getToken();
+
+//   final Map<String, dynamic> body = {
+//     "shop_id": shopId,
+//     "order_type": orderType,
+//     "food_table_id": foodTableId,
+//     "wallet_password": walletPassword,
+//     "delivery_location": deliveryLocation,
+//     "items": items,
+//   };
+
+//   print("=== DEBUG API REQUEST BODY ===");
+//   print(jsonEncode(body));
+
 //   try {
-//     final token = await SecureStorageService.getToken();
-    
-//     final response = await _dio.post(
-//       "/orders/order-create",
-//       data: {
-//         "shop_id": shopId,
-//         "order_type": orderType,
-//         "wallet_password": walletPassword,
-//         "delivery_location": deliveryLocation,
-//         "items": items,
+//     final response = await http.post(
+//       url,
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Accept': 'application/json',
+//         if (token != null) 'Authorization': 'Bearer $token',
 //       },
-//       options: Options(
-//         headers: {
-//           if (token != null) "Authorization": "Bearer $token",
-//         },
-//       ),
+//       body: jsonEncode(body),
 //     );
 
-//     if (response.statusCode == 200 || response.statusCode == 201) {
-//       return response.data as Map<String, dynamic>;
-//     }
+//     print("=== DEBUG API RESPONSE ===");
+//     print("Status Code: ${response.statusCode}");
+//     print("Body: ${response.body}");
+//     print("=== EXACT JSON BODY SENT ===");
+// print(jsonEncode(body));
+// print("=== ITEMS RUNTIME TYPES ===");
+// for (var item in items) {
+//   print("menu_id: ${item['menu_id']} (${item['menu_id'].runtimeType})");
+// }
+
+//     return jsonDecode(response.body);
+//   } catch (e) {
+//     print("API Error: $e");
 //     return null;
-//   } on DioException catch (e) {
-//     if (e.response != null && e.response?.data != null) {
-//       final data = e.response!.data;
-
-//       // Extract specific validation messages if 'errors' field exists
-//       if (data is Map && data['errors'] != null) {
-//         final Map<String, dynamic> errors = data['errors'];
-//         List<String> errorMessages = [];
-
-//         errors.forEach((key, value) {
-//           if (value is List && value.isNotEmpty) {
-//             errorMessages.add(value.first.toString());
-//           }
-//         });
-
-//         if (errorMessages.isNotEmpty) {
-//           throw errorMessages.join('\n'); // Shows detailed validation rules
-//         }
-//       }
-
-//       if (data is Map && data.containsKey('message')) {
-//         throw data['message'].toString();
-//       }
-//     }
-//     throw 'Unable to connect to server. Please check your connection.';
 //   }
 // }
+
 Future<Map<String, dynamic>?> createOrder({
   required int shopId,
   required String orderType,
@@ -316,8 +308,16 @@ Future<Map<String, dynamic>?> createOrder({
   String? deliveryLocation,
   required List<Map<String, dynamic>> items,
 }) async {
-  final url = Uri.parse('$baseUrl/orders/order-create'); // Check endpoint path
+  final url = Uri.parse('$baseUrl/orders/order-create');
   final token = await SecureStorageService.getToken();
+
+  // Ensures menu_id and quantity are parsed as integers to prevent validation errors
+  final formattedItems = items.map((item) {
+    return {
+      "menu_id": int.parse(item['menu_id'].toString()),
+      "quantity": int.parse(item['quantity'].toString()),
+    };
+  }).toList();
 
   final Map<String, dynamic> body = {
     "shop_id": shopId,
@@ -325,7 +325,7 @@ Future<Map<String, dynamic>?> createOrder({
     "food_table_id": foodTableId,
     "wallet_password": walletPassword,
     "delivery_location": deliveryLocation,
-    "items": items,
+    "items": formattedItems,
   };
 
   print("=== DEBUG API REQUEST BODY ===");
@@ -345,16 +345,55 @@ Future<Map<String, dynamic>?> createOrder({
     print("=== DEBUG API RESPONSE ===");
     print("Status Code: ${response.statusCode}");
     print("Body: ${response.body}");
-    print("=== EXACT JSON BODY SENT ===");
-print(jsonEncode(body));
-print("=== ITEMS RUNTIME TYPES ===");
-for (var item in items) {
-  print("menu_id: ${item['menu_id']} (${item['menu_id'].runtimeType})");
+
+    final decoded = jsonDecode(response.body);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return decoded is Map<String, dynamic>
+          ? decoded
+          : {"success": true, "data": decoded};
+    } else {
+      return {
+        "success": false,
+        "message": decoded is Map && decoded.containsKey("message")
+            ? decoded["message"]
+            : "အော်ဒါ မှာယူမှု မအောင်မြင်ပါ",
+      };
+    }
+  } catch (e) {
+    print("API Exception: $e");
+    return {
+      "success": false,
+      "message": "ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ: $e",
+    };
+  }
 }
 
-    return jsonDecode(response.body);
-  } catch (e) {
-    print("API Error: $e");
+/// Fetch updated user wallet balance directly
+Future<Map<String, dynamic>?> getWalletBalance() async {
+  try {
+    final token = await SecureStorageService.getToken();
+
+    final response = await _dio.get(
+      "/user/wallet/balance",
+      options: Options(
+        headers: {
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data as Map<String, dynamic>;
+    }
+    return null;
+  } on DioException catch (e) {
+    print("========== FETCH WALLET BALANCE ERROR ==========");
+    print("Type: ${e.type}");
+    print("Message: ${e.message}");
+    print("Status Code: ${e.response?.statusCode}");
+    print("Response: ${e.response?.data}");
+    print("================================================");
     return null;
   }
 }

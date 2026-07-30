@@ -213,7 +213,7 @@ import 'package:smartcanteen/service/secure_storage_service.dart';
 // import 'package:smartcanteen/view/home/home_screen.dart';
 import 'package:smartcanteen/view/home/homescreen.dart';
 // import 'package:smartcanteen/view/orders/orders_screen.dart';
-import 'package:smartcanteen/view/orderscreen.dart';
+import 'package:smartcanteen/view/order_screen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
 // import 'package:smartcanteen/view/scanner/scanner_screen.dart';
 // import 'package:smartcanteen/view/wallet/wallet_screen.dart'; // Updated import
@@ -283,7 +283,7 @@ Future<void> _loadQrData() async {
   // 4: Profile
   final List<Widget> screens = const [
     Homescreen(), // Index 0
-    OrderScreen(), // Index 1
+    OrdersScreen(), // Index 1
     //QrScannerScreen(), // Index 2
     SizedBox.shrink(),
     WalletScreen(), // Index 3

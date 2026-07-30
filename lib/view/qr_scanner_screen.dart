@@ -344,7 +344,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 
 class QrScannerScreen extends StatefulWidget {
-  const QrScannerScreen({super.key});
+  const QrScannerScreen({super.key, String? qrData});
 
   @override
   State<QrScannerScreen> createState() => _QrScannerScreenState();

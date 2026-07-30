@@ -1,14 +1,18 @@
+
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
 // import 'package:qr_flutter/qr_flutter.dart';
 
-// class OrderSuccessScreen extends StatelessWidget {
+// class OrderSuccessScreen extends StatefulWidget {
 //   final String shopName;
 //   final String orderType;
 //   final String? selectedSeatId;
 //   final List<Map<String, dynamic>> cartItems;
 //   final int totalPoints;
 //   final String note;
+//   final String orderId;
+//   final String qrCodeToken;
+//   final String orderStatus;
 
 //   const OrderSuccessScreen({
 //     super.key,
@@ -17,25 +21,29 @@
 //     required this.selectedSeatId,
 //     required this.cartItems,
 //     required this.totalPoints,
-//     this.note = '', required String orderId, required qrCodeToken, required orderStatus,
+//     required this.orderId,
+//     required this.qrCodeToken,
+//     this.orderStatus = 'paid',
+//     this.note = '',
 //   });
 
+//   @override
+//   State<OrderSuccessScreen> createState() => _OrderSuccessScreenState();
+// }
+
+// class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
 //   static const Color primaryColor = Color(0xff117992);
 
-//   bool get isDineIn => orderType =='dine-in';
+//   // State variable to toggle QR visibility
+//   bool _isQrExpanded = false;
 
-//   // Replace this temporary reference with the real order ID from your API.
-//   String get orderReference => 'ORD-2849';
+//   bool get isDineIn => widget.orderType == 'dine-in';
 
-//   // Both dine-in and takeaway orders receive a QR code.
-//   String get orderQrData => [
-//     'SMART_CANTEEN_ORDER',
-//     'order=$orderReference',
-//     'shop=$shopName',
-//     'points=$totalPoints',
-//     'type=$orderType',
-//     if (isDineIn && selectedSeatId != null) 'table=$selectedSeatId',
-//   ].join('|');
+//   String get orderReference =>
+//       widget.orderId.isNotEmpty ? 'ORD-${widget.orderId}' : 'ORD-SUCCESS';
+
+//   String get orderQrData =>
+//       widget.qrCodeToken.isNotEmpty ? widget.qrCodeToken : orderReference;
 
 //   int _parsePrice(String value) {
 //     final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
@@ -55,6 +63,7 @@
 //               padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
 //               child: Column(
 //                 children: [
+//                   const SizedBox(height: 20,),
 //                   _buildSuccessHero(),
 //                   const SizedBox(height: 22),
 //                   _buildPreparationCard(),
@@ -85,54 +94,51 @@
 //           end: Alignment.bottomRight,
 //         ),
 //       ),
-//       child: SafeArea(
-//         bottom: false,
-//         child: Padding(
-//           padding: const EdgeInsets.fromLTRB(16, 44, 16, 14),
-//           child: Stack(
-//             alignment: Alignment.center,
-//             children: [
-//               // Back button on the left
-//               Align(
-//                 alignment: Alignment.centerLeft,
-//                 child: Container(
-//                   width: 40,
-//                   height: 40,
-//                   decoration: BoxDecoration(
-//                     color: Colors.white.withOpacity(0.15),
-//                     shape: BoxShape.circle,
-//                   ),
-//                   child: IconButton(
-//                     padding: EdgeInsets.zero,
-//                     icon: const Icon(
-//                       Icons.arrow_back_ios_new_rounded,
-//                       color: Colors.white,
-//                       size: 16,
-//                     ),
-//                     onPressed: () => Navigator.pop(context),
-//                   ),
-//                 ),
-//               ),
-
-//               // Title remains exactly in the screen center
-//               const Padding(
-//                 padding: EdgeInsets.symmetric(horizontal: 52),
-//                 child: Text(
-//                   'အော်ဒါ အောင်မြင်ပါသည်',
-//                   textAlign: TextAlign.center,
-//                   maxLines: 1,
-//                   overflow: TextOverflow.ellipsis,
-//                   style: TextStyle(
-//                     color: Colors.white,
-//                     fontSize: 19,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
+//       // child: SafeArea(
+//       //   bottom: false,
+//       //   child: Padding(
+//       //     padding: const EdgeInsets.fromLTRB(16, 44, 16, 14),
+//       //     child: Stack(
+//       //       alignment: Alignment.center,
+//       //       children: [
+//       //         Align(
+//       //           alignment: Alignment.centerLeft,
+//       //           child: Container(
+//       //             width: 40,
+//       //             height: 40,
+//       //             decoration: BoxDecoration(
+//       //               color: Colors.white.withOpacity(0.15),
+//       //               shape: BoxShape.circle,
+//       //             ),
+//       //             child: IconButton(
+//       //               padding: EdgeInsets.zero,
+//       //               icon: const Icon(
+//       //                 Icons.arrow_back_ios_new_rounded,
+//       //                 color: Colors.white,
+//       //                 size: 16,
+//       //               ),
+//       //               onPressed: () => Navigator.pop(context),
+//       //             ),
+//       //           ),
+//       //         ),
+//       //         const Padding(
+//       //           padding: EdgeInsets.symmetric(horizontal: 52),
+//       //           child: Text(
+//       //             'အော်ဒါ အောင်မြင်ပါသည်',
+//       //             textAlign: TextAlign.center,
+//       //             maxLines: 1,
+//       //             overflow: TextOverflow.ellipsis,
+//       //             style: TextStyle(
+//       //               color: Colors.white,
+//       //               fontSize: 19,
+//       //               fontWeight: FontWeight.bold,
+//       //             ),
+//       //           ),
+//       //         ),
+//       //       ],
+//       //     ),
+//       //   ),
+//       // ),
 //     );
 //   }
 
@@ -168,7 +174,7 @@
 //         ),
 //         const SizedBox(height: 5),
 //         Text(
-//           '$shopName ဆိုင်မှ သင့်အော်ဒါကို လက်ခံရရှိပါပြီ။',
+//           '${widget.shopName} ဆိုင်မှ သင့်အော်ဒါကို လက်ခံရရှိပါပြီ။',
 //           textAlign: TextAlign.center,
 //           style: TextStyle(
 //             fontSize: 13,
@@ -230,9 +236,9 @@
 //               color: const Color(0xffFEF3C7),
 //               borderRadius: BorderRadius.circular(8),
 //             ),
-//             child: const Text(
-//               'ပြင်ဆင်နေသည်',
-//               style: TextStyle(
+//             child: Text(
+//               widget.orderStatus == 'paid' ? 'ပေးချေပြီး' : 'ပြင်ဆင်နေသည်',
+//               style: const TextStyle(
 //                 color: Color(0xffD97706),
 //                 fontSize: 10,
 //                 fontWeight: FontWeight.bold,
@@ -272,9 +278,9 @@
 //                   color: const Color(0xffF1F5F9),
 //                   borderRadius: BorderRadius.circular(8),
 //                 ),
-//                 child: const Text(
-//                   '#ORD-2849',
-//                   style: TextStyle(
+//                 child: Text(
+//                   '#$orderReference',
+//                   style: const TextStyle(
 //                     fontSize: 11,
 //                     fontWeight: FontWeight.bold,
 //                     color: Color(0xff64748B),
@@ -289,11 +295,12 @@
 //           ListView.separated(
 //             shrinkWrap: true,
 //             physics: const NeverScrollableScrollPhysics(),
-//             itemCount: cartItems.length,
+//             itemCount: widget.cartItems.length,
 //             separatorBuilder: (_, __) => const SizedBox(height: 13),
 //             itemBuilder: (context, index) {
-//               final item = cartItems[index];
-//               final int quantity = item['cartQuantity'] as int? ?? 0;
+//               final item = widget.cartItems[index];
+//               final int quantity =
+//                   item['cartQuantity'] ?? item['quantity'] ?? 1;
 //               final int itemTotal =
 //                   _parsePrice(item['price'].toString()) * quantity;
 
@@ -342,7 +349,7 @@
 //               );
 //             },
 //           ),
-//           if (note.trim().isNotEmpty) ...[
+//           if (widget.note.trim().isNotEmpty) ...[
 //             const SizedBox(height: 14),
 //             Divider(height: 1, color: Colors.grey.shade200),
 //             const SizedBox(height: 14),
@@ -369,7 +376,7 @@
 //                       ),
 //                       const SizedBox(height: 3),
 //                       Text(
-//                         note.trim(),
+//                         widget.note.trim(),
 //                         style: const TextStyle(
 //                           fontSize: 13,
 //                           fontWeight: FontWeight.w600,
@@ -397,7 +404,7 @@
 //                 ),
 //               ),
 //               Text(
-//                 '${NumberFormat('#,###').format(totalPoints)} ပွိုင့်',
+//                 '${NumberFormat('#,###').format(widget.totalPoints)} ပွိုင့်',
 //                 style: const TextStyle(
 //                   fontWeight: FontWeight.w900,
 //                   fontSize: 18,
@@ -446,7 +453,7 @@
 //                 ),
 //                 const SizedBox(height: 2),
 //                 Text(
-//                   shopName,
+//                   widget.shopName,
 //                   style: const TextStyle(
 //                     fontWeight: FontWeight.bold,
 //                     fontSize: 15,
@@ -465,7 +472,7 @@
 //                   ),
 //                   child: Text(
 //                     isDineIn
-//                         ? (selectedSeatId ?? 'စားပွဲ မသတ်မှတ်ရသေးပါ')
+//                         ? (widget.selectedSeatId ?? 'စားပွဲ မသတ်မှတ်ရသေးပါ')
 //                         : 'ပါဆယ်',
 //                     style: const TextStyle(
 //                       color: primaryColor,
@@ -489,93 +496,114 @@
 //       decoration: _cardDecoration(),
 //       child: Column(
 //         children: [
-//           Row(
-//             children: [
-//               Container(
-//                 padding: const EdgeInsets.all(9),
-//                 decoration: BoxDecoration(
-//                   color: primaryColor.withOpacity(0.1),
-//                   borderRadius: BorderRadius.circular(11),
+//           // Header Row with InkWell to toggle dropdown state
+//           InkWell(
+//             onTap: () {
+//               setState(() {
+//                 _isQrExpanded = !_isQrExpanded;
+//               });
+//             },
+//             borderRadius: BorderRadius.circular(8),
+//             child: Row(
+//               children: [
+//                 Container(
+//                   padding: const EdgeInsets.all(9),
+//                   decoration: BoxDecoration(
+//                     color: primaryColor.withOpacity(0.1),
+//                     borderRadius: BorderRadius.circular(11),
+//                   ),
+//                   child: const Icon(
+//                     Icons.qr_code_2_rounded,
+//                     color: primaryColor,
+//                     size: 23,
+//                   ),
 //                 ),
-//                 child: const Icon(
-//                   Icons.qr_code_2_rounded,
-//                   color: primaryColor,
-//                   size: 23,
-//                 ),
-//               ),
-//               const SizedBox(width: 12),
-//               Expanded(
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       isDineIn ? 'ထိုင်စားရန် QR' : 'ပါဆယ်ထုတ်ယူရန် QR',
-//                       style: const TextStyle(
-//                         color: Color(0xff1E293B),
-//                         fontSize: 15,
-//                         fontWeight: FontWeight.bold,
+//                 const SizedBox(width: 12),
+//                 Expanded(
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Text(
+//                         isDineIn ? 'ထိုင်စားရန် QR' : 'ပါဆယ်ထုတ်ယူရန် QR',
+//                         style: const TextStyle(
+//                           color: Color(0xff1E293B),
+//                           fontSize: 15,
+//                           fontWeight: FontWeight.bold,
+//                         ),
 //                       ),
-//                     ),
-//                     const SizedBox(height: 2),
-//                     Text(
-//                       isDineIn
-//                           ? 'စားပွဲအော်ဒါ အတည်ပြုရန် Scan ဖတ်ပါ'
-//                           : 'အစားအစာ ထုတ်ယူရန် Scan ဖတ်ပါ',
-//                       style: TextStyle(
-//                         color: Colors.grey.shade600,
-//                         fontSize: 11,
+//                       const SizedBox(height: 2),
+//                       Text(
+//                         isDineIn
+//                             ? 'စားပွဲအော်ဒါ အတည်ပြုရန် Scan ဖတ်ပါ'
+//                             : 'အစားအစာ ထုတ်ယူရန် Scan ဖတ်ပါ',
+//                         style: TextStyle(
+//                           color: Colors.grey.shade600,
+//                           fontSize: 11,
+//                         ),
 //                       ),
-//                     ),
-//                   ],
+//                     ],
+//                   ),
+//                 ),
+//                 // Dropdown icon at the right side
+//                 Icon(
+//                   _isQrExpanded
+//                       ? Icons.keyboard_arrow_up_rounded
+//                       : Icons.keyboard_arrow_down_rounded,
+//                   color: const Color(0xff64748B),
+//                   size: 26,
+//                 ),
+//               ],
+//             ),
+//           ),
+//           // Conditionally display the QR code content below when expanded
+//           if (_isQrExpanded) ...[
+//             const SizedBox(height: 16),
+//             Container(
+//               padding: const EdgeInsets.all(14),
+//               decoration: BoxDecoration(
+//                 color: Colors.white,
+//                 borderRadius: BorderRadius.circular(16),
+//                 border: Border.all(color: Colors.grey.shade200),
+//               ),
+//               child: QrImageView(
+//                 data: orderQrData,
+//                 version: QrVersions.auto,
+//                 size: 170,
+//                 backgroundColor: Colors.white,
+//                 eyeStyle: const QrEyeStyle(
+//                   eyeShape: QrEyeShape.square,
+//                   color: Color(0xff117992),
+//                 ),
+//                 dataModuleStyle: const QrDataModuleStyle(
+//                   dataModuleShape: QrDataModuleShape.square,
+//                   color: Color(0xff0F172A),
 //                 ),
 //               ),
-//             ],
-//           ),
-//           const SizedBox(height: 16),
-//           Container(
-//             padding: const EdgeInsets.all(14),
-//             decoration: BoxDecoration(
-//               color: Colors.white,
-//               borderRadius: BorderRadius.circular(16),
-//               border: Border.all(color: Colors.grey.shade200),
 //             ),
-//             child: QrImageView(
-//               data: orderQrData,
-//               version: QrVersions.auto,
-//               size: 170,
-//               backgroundColor: Colors.white,
-//               eyeStyle: const QrEyeStyle(
-//                 eyeShape: QrEyeShape.square,
-//                 color: Color(0xff117992),
-//               ),
-//               dataModuleStyle: const QrDataModuleStyle(
-//                 dataModuleShape: QrDataModuleShape.square,
-//                 color: Color(0xff0F172A),
+//             const SizedBox(height: 10),
+//             Text(
+//               orderQrData,
+//               textAlign: TextAlign.center,
+//               style: const TextStyle(
+//                 color: primaryColor,
+//                 fontSize: 13,
+//                 fontWeight: FontWeight.bold,
+//                 letterSpacing: 0.5,
 //               ),
 //             ),
-//           ),
-//           const SizedBox(height: 10),
-//           Text(
-//             '#$orderReference',
-//             style: const TextStyle(
-//               color: primaryColor,
-//               fontSize: 13,
-//               fontWeight: FontWeight.bold,
-//               letterSpacing: 0.5,
+//             const SizedBox(height: 5),
+//             Text(
+//               isDineIn
+//                   ? 'ဆိုင်ဝန်ထမ်းအား QR ကိုပြပြီး ရွေးထားသောစားပွဲအတွက် အော်ဒါကို အတည်ပြုပါ။'
+//                   : 'အစားအစာအသင့်ဖြစ်သောအခါ ဆိုင်ကောင်တာတွင် QR ကိုပြပါ။',
+//               textAlign: TextAlign.center,
+//               style: TextStyle(
+//                 color: Colors.grey.shade600,
+//                 fontSize: 11,
+//                 height: 1.4,
+//               ),
 //             ),
-//           ),
-//           const SizedBox(height: 5),
-//           Text(
-//             isDineIn
-//                 ? 'ဆိုင်ဝန်ထမ်းအား QR ကိုပြပြီး ရွေးထားသောစားပွဲအတွက် အော်ဒါကို အတည်ပြုပါ။'
-//                 : 'အစားအစာအသင့်ဖြစ်သောအခါ ဆိုင်ကောင်တာတွင် QR ကိုပြပါ။',
-//             textAlign: TextAlign.center,
-//             style: TextStyle(
-//               color: Colors.grey.shade600,
-//               fontSize: 11,
-//               height: 1.4,
-//             ),
-//           ),
+//           ],
 //         ],
 //       ),
 //     );
@@ -589,7 +617,6 @@
 //           height: 50,
 //           child: ElevatedButton.icon(
 //             onPressed: () {
-//               // Connect this button to your Orders tab when that route is ready.
 //               Navigator.of(context).popUntil((route) => route.isFirst);
 //             },
 //             icon: const Icon(
@@ -662,10 +689,15 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:smartcanteen/provider/user_provider.dart';
+// Import your UserProvider file here
+// import 'path/to/user_provider.dart';
 
-class OrderSuccessScreen extends StatelessWidget {
+class OrderSuccessScreen extends StatefulWidget {
   final String shopName;
   final String orderType;
   final String? selectedSeatId;
@@ -689,15 +721,33 @@ class OrderSuccessScreen extends StatelessWidget {
     this.note = '',
   });
 
+  @override
+  State<OrderSuccessScreen> createState() => _OrderSuccessScreenState();
+}
+
+class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   static const Color primaryColor = Color(0xff117992);
 
-  bool get isDineIn => orderType == 'dine-in';
+  bool _isQrExpanded = false;
+
+  bool get isDineIn => widget.orderType == 'dine-in';
 
   String get orderReference =>
-      orderId.isNotEmpty ? 'ORD-$orderId' : 'ORD-SUCCESS';
+      widget.orderId.isNotEmpty ? 'ORD-${widget.orderId}' : 'ORD-SUCCESS';
 
   String get orderQrData =>
-      qrCodeToken.isNotEmpty ? qrCodeToken : orderReference;
+      widget.qrCodeToken.isNotEmpty ? widget.qrCodeToken : orderReference;
+
+  @override
+  void initState() {
+    super.initState();
+    // Deduct points from Provider right after screen renders
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<UserProvider>().deductPoints(widget.totalPoints);
+      }
+    });
+  }
 
   int _parsePrice(String value) {
     final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
@@ -717,6 +767,7 @@ class OrderSuccessScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
               child: Column(
                 children: [
+                  const SizedBox(height: 20),
                   _buildSuccessHero(),
                   const SizedBox(height: 22),
                   _buildPreparationCard(),
@@ -747,50 +798,9 @@ class OrderSuccessScreen extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: SafeArea(
+      child: const SafeArea(
         bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 44, 16, 14),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    icon: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 52),
-                child: Text(
-                  'အော်ဒါ အောင်မြင်ပါသည်',
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        child: SizedBox(height: 50),
       ),
     );
   }
@@ -827,7 +837,7 @@ class OrderSuccessScreen extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text(
-          '$shopName ဆိုင်မှ သင့်အော်ဒါကို လက်ခံရရှိပါပြီ။',
+          '${widget.shopName} ဆိုင်မှ သင့်အော်ဒါကို လက်ခံရရှိပါပြီ။',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
@@ -890,7 +900,7 @@ class OrderSuccessScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              orderStatus == 'paid' ? 'ပေးချေပြီး' : 'ပြင်ဆင်နေသည်',
+              widget.orderStatus == 'paid' ? 'ပေးချေပြီး' : 'ပြင်ဆင်နေသည်',
               style: const TextStyle(
                 color: Color(0xffD97706),
                 fontSize: 10,
@@ -948,10 +958,10 @@ class OrderSuccessScreen extends StatelessWidget {
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: cartItems.length,
+            itemCount: widget.cartItems.length,
             separatorBuilder: (_, __) => const SizedBox(height: 13),
             itemBuilder: (context, index) {
-              final item = cartItems[index];
+              final item = widget.cartItems[index];
               final int quantity =
                   item['cartQuantity'] ?? item['quantity'] ?? 1;
               final int itemTotal =
@@ -1002,7 +1012,7 @@ class OrderSuccessScreen extends StatelessWidget {
               );
             },
           ),
-          if (note.trim().isNotEmpty) ...[
+          if (widget.note.trim().isNotEmpty) ...[
             const SizedBox(height: 14),
             Divider(height: 1, color: Colors.grey.shade200),
             const SizedBox(height: 14),
@@ -1029,7 +1039,7 @@ class OrderSuccessScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        note.trim(),
+                        widget.note.trim(),
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -1057,7 +1067,7 @@ class OrderSuccessScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                '${NumberFormat('#,###').format(totalPoints)} ပွိုင့်',
+                '${NumberFormat('#,###').format(widget.totalPoints)} ပွိုင့်',
                 style: const TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 18,
@@ -1106,7 +1116,7 @@ class OrderSuccessScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  shopName,
+                  widget.shopName,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
@@ -1125,7 +1135,7 @@ class OrderSuccessScreen extends StatelessWidget {
                   ),
                   child: Text(
                     isDineIn
-                        ? (selectedSeatId ?? 'စားပွဲ မသတ်မှတ်ရသေးပါ')
+                        ? (widget.selectedSeatId ?? 'စားပွဲ မသတ်မှတ်ရသေးပါ')
                         : 'ပါဆယ်',
                     style: const TextStyle(
                       color: primaryColor,
@@ -1149,94 +1159,111 @@ class OrderSuccessScreen extends StatelessWidget {
       decoration: _cardDecoration(),
       child: Column(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(9),
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(11),
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isQrExpanded = !_isQrExpanded;
+              });
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: const Icon(
+                    Icons.qr_code_2_rounded,
+                    color: primaryColor,
+                    size: 23,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.qr_code_2_rounded,
-                  color: primaryColor,
-                  size: 23,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isDineIn ? 'ထိုင်စားရန် QR' : 'ပါဆယ်ထုတ်ယူရန် QR',
-                      style: const TextStyle(
-                        color: Color(0xff1E293B),
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isDineIn ? 'ထိုင်စားရန် QR' : 'ပါဆယ်ထုတ်ယူရန် QR',
+                        style: const TextStyle(
+                          color: Color(0xff1E293B),
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      isDineIn
-                          ? 'စားပွဲအော်ဒါ အတည်ပြုရန် Scan ဖတ်ပါ'
-                          : 'အစားအစာ ထုတ်ယူရန် Scan ဖတ်ပါ',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 11,
+                      const SizedBox(height: 2),
+                      Text(
+                        isDineIn
+                            ? 'စားပွဲအော်ဒါ အတည်ပြုရန် Scan ဖတ်ပါ'
+                            : 'အစားအစာ ထုတ်ယူရန် Scan ဖတ်ပါ',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 11,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+                Icon(
+                  _isQrExpanded
+                      ? Icons.keyboard_arrow_up_rounded
+                      : Icons.keyboard_arrow_down_rounded,
+                  color: const Color(0xff64748B),
+                  size: 26,
+                ),
+              ],
+            ),
+          ),
+          if (_isQrExpanded) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: QrImageView(
+                data: orderQrData,
+                version: QrVersions.auto,
+                size: 170,
+                backgroundColor: Colors.white,
+                eyeStyle: const QrEyeStyle(
+                  eyeShape: QrEyeShape.square,
+                  color: Color(0xff117992),
+                ),
+                dataModuleStyle: const QrDataModuleStyle(
+                  dataModuleShape: QrDataModuleShape.square,
+                  color: Color(0xff0F172A),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
             ),
-            child: QrImageView(
-              data: orderQrData,
-              version: QrVersions.auto,
-              size: 170,
-              backgroundColor: Colors.white,
-              eyeStyle: const QrEyeStyle(
-                eyeShape: QrEyeShape.square,
-                color: Color(0xff117992),
-              ),
-              dataModuleStyle: const QrDataModuleStyle(
-                dataModuleShape: QrDataModuleShape.square,
-                color: Color(0xff0F172A),
+            const SizedBox(height: 10),
+            Text(
+              orderQrData,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: primaryColor,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            orderQrData,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: primaryColor,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+            const SizedBox(height: 5),
+            Text(
+              isDineIn
+                  ? 'ဆိုင်ဝန်ထမ်းအား QR ကိုပြပြီး ရွေးထားသောစားပွဲအတွက် အော်ဒါကို အတည်ပြုပါ။'
+                  : 'အစားအစာအသင့်ဖြစ်သောအခါ ဆိုင်ကောင်တာတွင် QR ကိုပြပါ။',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 11,
+                height: 1.4,
+              ),
             ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            isDineIn
-                ? 'ဆိုင်ဝန်ထမ်းအား QR ကိုပြပြီး ရွေးထားသောစားပွဲအတွက် အော်ဒါကို အတည်ပြုပါ။'
-                : 'အစားအစာအသင့်ဖြစ်သောအခါ ဆိုင်ကောင်တာတွင် QR ကိုပြပါ။',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 11,
-              height: 1.4,
-            ),
-          ),
+          ],
         ],
       ),
     );

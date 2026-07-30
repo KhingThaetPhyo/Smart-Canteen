@@ -7,7 +7,7 @@ import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/view/home/homescreen.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/notification_screen.dart';
-import 'package:smartcanteen/view/orderscreen.dart';
+import 'package:smartcanteen/view/order_screen.dart';
 import 'package:smartcanteen/view/profilescreen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
@@ -143,7 +143,7 @@ GoRoute(
 ),
     GoRoute(
       path: '/order',
-      builder: (context, state) => const OrderScreen(),
+      builder: (context, state) =>  OrdersScreen(),
     ),
     GoRoute(
       path: '/wallet',

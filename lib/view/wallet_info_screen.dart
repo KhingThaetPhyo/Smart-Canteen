@@ -658,6 +658,7 @@ if (result != null && result.success) {
 // );
 // Create QR data with username and student ID
 var qrData = jsonEncode({
+  'user_id' : result.user?.userId ?? '',
   'user_name': result.user?.userName ?? '',
   'student_id': result.user?.student?.studentId ?? '',
 });

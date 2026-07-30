@@ -848,18 +848,39 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
    
     super.dispose();
   }
+
+// Future<void> _loadUserData() async {
+//   try {
+//     final wallet = await SharedPreferencesService.getUserWallet();
+
+//     if (mounted && wallet != null) {
+//       setState(() {
+//         currentBalance = wallet.balance;
+//       });
+//       debugPrint("User wallet loaded in ShopDetail: ${wallet.balance}");
+//     }
+//   } catch (e) {
+//     debugPrint("Error loading wallet in ShopDetail: $e");
+//   }
+// }
 Future<void> _loadUserData() async {
   try {
     final wallet = await SharedPreferencesService.getUserWallet();
 
-    if (mounted && wallet != null) {
+    if (!mounted) return;
+
+    if (wallet != null) {
       setState(() {
-        currentBalance = wallet.balance;
+        // Safely extract the integer value
+        currentBalance = wallet.balance ?? 0;
       });
-      debugPrint("User wallet loaded in ShopDetail: ${wallet.balance}");
+      debugPrint("SUCCESS: User wallet loaded in ShopDetail: ${wallet.balance}");
+    } else {
+      debugPrint("WARNING: SharedPreferencesService.getUserWallet() returned null");
     }
-  } catch (e) {
-    debugPrint("Error loading wallet in ShopDetail: $e");
+  } catch (e, stackTrace) {
+    debugPrint("ERROR loading wallet in ShopDetail: $e");
+    debugPrint(stackTrace.toString());
   }
 }
   Future<void> _fetchShopMenus() async {
@@ -1007,7 +1028,12 @@ Future<void> _loadUserData() async {
                     menuItems: menuItems,
                     onAddToCart: _addToCart,
                     onRemoveFromCart: _removeFromCart,
-                    onConfirmOrder: _resetOrder, currentBalance:currentBalance, shopId: widget.shopId ,
+                    //onConfirmOrder: _resetOrder,
+                    onConfirmOrder: () {
+                _resetOrder();
+                _loadUserData(); // Refresh balance after order confirmation
+              },
+                     currentBalance:currentBalance, shopId: widget.shopId ,
                   ),
                 );
               },
