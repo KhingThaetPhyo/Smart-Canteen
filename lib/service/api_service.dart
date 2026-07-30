@@ -6,9 +6,9 @@ import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
 
 class ApiService {
-  // static const String baseUrl = "http://192.168.1.12:8000/api";
-  static const String baseUrl =
-      "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
+  static const String baseUrl = "http://192.168.1.12:8000/api";
+  // static const String baseUrl =
+  //     "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
 
   final Dio _dio = Dio(
     BaseOptions(
