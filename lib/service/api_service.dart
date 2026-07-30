@@ -12,8 +12,8 @@ import 'package:smartcanteen/service/secure_storage_service.dart'; // Make sure 
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
-  static const String baseUrl = "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
- // static const String baseUrl = "http://192.168.1.12:8000/api";
+  //static const String baseUrl = "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
+  static const String baseUrl = "http://192.168.1.12:8000/api";
 //https://0c087b6d8fabd90f-202-165-86-143.serveousercontent.com/api/login
   final Dio _dio = Dio(
     BaseOptions(
@@ -26,6 +26,7 @@ class ApiService {
       },
     ),
   );
+  
 
   Future<RegisterModel?> registerUser({
   required String name,
@@ -395,6 +396,36 @@ Future<Map<String, dynamic>?> getWalletBalance() async {
     print("Response: ${e.response?.data}");
     print("================================================");
     return null;
+  }
+}
+
+/// Fetch all tables for a specific shop
+Future<List<Map<String, dynamic>>> getShopTables(int shopId) async {
+  try {
+    final token = await SecureStorageService.getToken();
+
+    final response = await _dio.get(
+      "/shops/$shopId/all-tables",
+      options: Options(
+        headers: {
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      final List list = response.data['data'] ?? [];
+      return List<Map<String, dynamic>>.from(list);
+    }
+    return [];
+  } on DioException catch (e) {
+    print("========== FETCH TABLES DIO ERROR ==========");
+    print("Type: ${e.type}");
+    print("Message: ${e.message}");
+    print("Status Code: ${e.response?.statusCode}");
+    print("Response: ${e.response?.data}");
+    print("===========================================");
+    return [];
   }
 }
 }

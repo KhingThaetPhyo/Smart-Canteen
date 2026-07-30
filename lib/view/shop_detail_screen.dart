@@ -834,12 +834,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   String breakfastTime = "6AM-10AM";
   String lunchTime = "11AM-2PM";
   bool isOpen = true;
+  List<Map<String, dynamic>> shopTables = [];
 
   @override
   void initState() {
     super.initState();
      _loadUserData();
     _fetchShopMenus();
+    _fetchShopTables();
   }
 
   @override
@@ -849,6 +851,20 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     super.dispose();
   }
 
+
+// Call inside initState or create a combined loading function
+Future<void> _fetchShopTables() async {
+  try {
+    final tables = await _apiService.getShopTables(widget.shopId);
+    if (mounted) {
+      setState(() {
+        shopTables = tables;
+      });
+    }
+  } catch (e) {
+    debugPrint("Error loading tables: $e");
+  }
+}
 // Future<void> _loadUserData() async {
 //   try {
 //     final wallet = await SharedPreferencesService.getUserWallet();
@@ -1026,6 +1042,7 @@ Future<void> _loadUserData() async {
                   builder: (context) => AddToCartScreen(
                     shopName: widget.shopName,
                     menuItems: menuItems,
+                    //seats: shopTables,
                     onAddToCart: _addToCart,
                     onRemoveFromCart: _removeFromCart,
                     //onConfirmOrder: _resetOrder,
@@ -1033,7 +1050,8 @@ Future<void> _loadUserData() async {
                 _resetOrder();
                 _loadUserData(); // Refresh balance after order confirmation
               },
-                     currentBalance:currentBalance, shopId: widget.shopId ,
+                     currentBalance:currentBalance, 
+                     shopId: widget.shopId ,
                   ),
                 );
               },
