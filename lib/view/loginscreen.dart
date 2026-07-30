@@ -1,10 +1,33 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
+
+// Email Formatter: အစစာလုံး ဂဏန်း/သင်္ကေတ မရ၊ a-z ဖြင့်သာ စရမည်
+class LowercaseEmailInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String text = newValue.text;
+    if (text.isEmpty) return newValue;
+
+    if (RegExp(r'[A-Z]').hasMatch(text)) {
+      return oldValue;
+    }
+
+    if (!RegExp(r'^[a-z]').hasMatch(text)) {
+      return oldValue;
+    }
+
+    return newValue;
+  }
+}
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -17,7 +40,6 @@ class _LoginscreenState extends State<Loginscreen> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
-
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
@@ -123,20 +145,37 @@ class _LoginscreenState extends State<Loginscreen> {
                         ),
                         child: Column(
                           children: [
+                            // Email Field (စစချင်း ဂဏန်း/သင်္ကေတ ရိုက်မရပါ)
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
+                              inputFormatters: [LowercaseEmailInputFormatter()],
                               autovalidateMode:
                                   AutovalidateMode.onUserInteraction,
                               decoration: decoration(
                                 "Email Address",
                                 Icons.email_outlined,
-                                "you@gmail.com",
+                                "you@ucstt.edu.mm",
                               ),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return "Email is required";
                                 }
+
+                                if (RegExp(r'[A-Z]').hasMatch(value)) {
+                                  return "Capital letters are not allowed in email";
+                                }
+
+                                if (!value.contains("@")) {
+                                  return "Edu mail must contain @";
+                                }
+
+                                if (!RegExp(
+                                  r'^[a-z][a-z0-9._%+-]*@ucstt\.edu\.mm$',
+                                ).hasMatch(value)) {
+                                  return "Use username@ucstt.edu.mm";
+                                }
+
                                 return null;
                               },
                             ),
@@ -228,33 +267,28 @@ class _LoginscreenState extends State<Loginscreen> {
                                       if (result != null &&
                                           result.success == true) {
                                         print("Login successful");
-                                        // Save user object
                                         await SharedPreferencesService.saveUser(
                                           result.user!,
                                         );
 
-                                        // Save token if available
                                         if (result.token != null) {
                                           await SharedPreferencesService.saveToken(
                                             result.token!,
                                           );
                                         }
 
-                                        // Save auth token
                                         if (result.token != null) {
                                           await SecureStorageService.saveToken(
                                             result.token!,
                                           );
                                         }
 
-                                        // Save FCM token
                                         if (result.user?.fcmToken != null) {
                                           await SecureStorageService.saveFcmToken(
                                             result.user!.fcmToken!,
                                           );
                                         }
 
-                                        // Create QR data
                                         final qrData = jsonEncode({
                                           'user_name':
                                               result.user?.userName ?? '',
@@ -263,7 +297,6 @@ class _LoginscreenState extends State<Loginscreen> {
                                               '',
                                         });
 
-                                        // Save QR permanently
                                         await SecureStorageService.saveQrData(
                                           qrData,
                                         );

@@ -1,310 +1,11 @@
-// import 'package:flutter/material.dart';
-// import 'package:go_router/go_router.dart'; // GoRouter သုံးဖို့အတွက် import ထည့်ထားပါတယ်
-
-// class ProfileScreen extends StatefulWidget {
-//   const ProfileScreen({super.key});
-
-//   @override
-//   State<ProfileScreen> createState() => _ProfileScreenState();
-// }
-
-// class _ProfileScreenState extends State<ProfileScreen> {
-//   bool _notificationsOn = false;
-//   bool _darkModeOn = false;
-//   String _selectedLanguage = 'EN';
-
-//   @override
-//   Widget build(BuildContext context) {
-//     // Custom colors from the UI image
-//     const primaryTeal = Color(0xFF006D60);
-//     const goldColor = Color(0xFFB48346);
-
-//     return Scaffold(
-//       // Background Color ကို မိုးပြာရောင် (Light Blue) ပြောင်းလဲထားပါတယ်
-//       backgroundColor: Colors.lightBlue.shade50,
-
-//       // Home Screen ပြန်သွားဖို့အတွက် AppBar နှင့် Back Arrow ထည့်သွင်းထားပါတယ်
-//       appBar: AppBar(
-//         backgroundColor: Colors
-//             .transparent, // background နဲ့ တစ်သားတည်းဖြစ်အောင် transparent လုပ်ထားပါတယ်
-//         elevation: 0, // အောက်ခြေလိုင်း ပျောက်အောင်ပါ
-//         leading: IconButton(
-//           icon: const Icon(Icons.arrow_back, color: Colors.black87),
-//           onPressed: () {
-//             context.go('/home'); // Home Screen ကို ပြန်သွားမယ့် လမ်းကြောင်း
-//           },
-//         ),
-//       ),
-//       body: SafeArea(
-//         child: SingleChildScrollView(
-//           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.center,
-//             children: [
-//               // --- PROFILE HEADER ---
-//               CircleAvatar(
-//                 radius: 50,
-//                 backgroundColor: Colors.grey.shade400,
-//                 child: const Icon(Icons.person, size: 60, color: Colors.white),
-//               ),
-//               const SizedBox(height: 12),
-//               const Text(
-//                 'Wa Thon',
-//                 style: TextStyle(
-//                   fontSize: 22,
-//                   fontWeight: FontWeight.bold,
-//                   color: Colors.black87,
-//                 ),
-//               ),
-//               const Text(
-//                 'wathon.dev@email.mm',
-//                 style: TextStyle(color: Colors.grey, fontSize: 13),
-//               ),
-//               const Text(
-//                 '+95 9 778 123 456',
-//                 style: TextStyle(color: Colors.grey, fontSize: 13),
-//               ),
-//               const SizedBox(height: 24),
-
-//               // --- ACCOUNT SETTINGS ---
-//               _buildSectionHeader('ACCOUNT SETTINGS', goldColor),
-//               _buildSectionCard([
-//                 _buildListTile(
-//                   Icons.person_outline,
-//                   'Edit Profile',
-//                   onTap: () {},
-//                 ),
-//                 _buildDivider(),
-//                 _buildSwitchTile(
-//                   Icons.notifications_none_outlined,
-//                   'Notifications',
-//                   _notificationsOn,
-//                   (val) {
-//                     setState(() => _notificationsOn = val);
-//                   },
-//                 ),
-//                 _buildDivider(),
-//                 _buildLanguageTile(Icons.language_outlined, 'Language'),
-//                 _buildDivider(),
-//                 _buildSwitchTile(
-//                   Icons.dark_mode_outlined,
-//                   'Dark Mode',
-//                   _darkModeOn,
-//                   (val) {
-//                     setState(() => _darkModeOn = val);
-//                   },
-//                 ),
-//                 _buildDivider(),
-//                 _buildListTile(
-//                   Icons.help_outline_outlined,
-//                   'Help Center',
-//                   onTap: () {},
-//                 ),
-//                 _buildDivider(),
-//                 _buildListTile(
-//                   Icons.description_outlined,
-//                   'Terms & Conditions',
-//                   onTap: () {},
-//                 ),
-//               ]),
-//               const SizedBox(height: 32),
-
-//               // --- LOG OUT BUTTON ---
-//               SizedBox(
-//                 width: double.infinity,
-//                 height: 54,
-//                 child: ElevatedButton(
-//                   onPressed: () {
-//                     // Log out action
-//                   },
-//                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: primaryTeal,
-//                     elevation: 0,
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(27),
-//                     ),
-//                   ),
-//                   child: const Row(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Icon(Icons.logout, color: Colors.white, size: 20),
-//                       const SizedBox(width: 8),
-//                       Text(
-//                         'Log Out',
-//                         style: TextStyle(
-//                           color: Colors.white,
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 16,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//               const SizedBox(height: 16),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   // Section Label Layout
-//   Widget _buildSectionHeader(String title, Color color) {
-//     return Container(
-//       width: double.infinity,
-//       padding: const EdgeInsets.only(top: 16, bottom: 8, left: 4),
-//       child: Text(
-//         title,
-//         style: TextStyle(
-//           color: color,
-//           fontSize: 13,
-//           fontWeight: FontWeight.bold,
-//           letterSpacing: 0.5,
-//         ),
-//       ),
-//     );
-//   }
-
-//   // White Card Wrap holding items
-//   Widget _buildSectionCard(List<Widget> children) {
-//     return Container(
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(16),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.black.withOpacity(0.03),
-//             spreadRadius: 1,
-//             blurRadius: 10,
-//             offset: const Offset(0, 2),
-//           ),
-//         ],
-//       ),
-//       child: Column(children: children),
-//     );
-//   }
-
-//   // Navigation Rows
-//   Widget _buildListTile(
-//     IconData icon,
-//     String title, {
-//     required VoidCallback onTap,
-//   }) {
-//     return ListTile(
-//       leading: Icon(icon, color: const Color(0xFF006D60), size: 24),
-//       title: Text(
-//         title,
-//         style: const TextStyle(
-//           fontSize: 15,
-//           fontWeight: FontWeight.w500,
-//           color: Colors.black87,
-//         ),
-//       ),
-//       dense: false,
-//       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-//       onTap: onTap,
-//     );
-//   }
-
-//   // Toggle rows
-//   Widget _buildSwitchTile(
-//     IconData icon,
-//     String title,
-//     bool value,
-//     ValueChanged<bool> onChanged,
-//   ) {
-//     return ListTile(
-//       leading: Icon(icon, color: const Color(0xFF006D60), size: 24),
-//       title: Text(
-//         title,
-//         style: const TextStyle(
-//           fontSize: 15,
-//           fontWeight: FontWeight.w500,
-//           color: Colors.black87,
-//         ),
-//       ),
-//       trailing: Switch(
-//         value: value,
-//         onChanged: onChanged,
-//         activeColor: Colors.white,
-//         activeTrackColor: const Color(0xFF006D60),
-//         inactiveTrackColor: Colors.grey.shade300,
-//         inactiveThumbColor: Colors.white,
-//         trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
-//       ),
-//       dense: false,
-//       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-//     );
-//   }
-
-//   // Custom Selector segment row for Languages
-//   Widget _buildLanguageTile(IconData icon, String title) {
-//     return ListTile(
-//       leading: Icon(icon, color: const Color(0xFF006D60), size: 24),
-//       title: Text(
-//         title,
-//         style: const TextStyle(
-//           fontSize: 15,
-//           fontWeight: FontWeight.w500,
-//           color: Colors.black87,
-//         ),
-//       ),
-//       trailing: Container(
-//         decoration: BoxDecoration(
-//           color: Colors.grey.shade200,
-//           borderRadius: BorderRadius.circular(20),
-//         ),
-//         padding: const EdgeInsets.all(2),
-//         child: Row(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [_buildLangOption('EN'), _buildLangOption('MY')],
-//         ),
-//       ),
-//       dense: false,
-//       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-//     );
-//   }
-
-//   Widget _buildLangOption(String lang) {
-//     bool isSelected = _selectedLanguage == lang;
-//     return GestureDetector(
-//       onTap: () => setState(() => _selectedLanguage = lang),
-//       child: Container(
-//         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-//         decoration: BoxDecoration(
-//           color: isSelected ? const Color(0xFF006D60) : Colors.transparent,
-//           borderRadius: BorderRadius.circular(18),
-//         ),
-//         child: Text(
-//           lang,
-//           style: TextStyle(
-//             fontSize: 12,
-//             fontWeight: FontWeight.bold,
-//             color: isSelected ? Colors.white : Colors.grey.shade600,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildDivider() {
-//     return Divider(
-//       height: 1,
-//       thickness: 0.8,
-//       color: Colors.grey.withOpacity(0.15),
-//       indent: 16,
-//       endIndent: 16,
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
 import 'package:smartcanteen/view/change_password.dart';
-import 'package:smartcanteen/view/edit_profile.dart'; // Import ထည့်သွင်းထားပါသည်
+import 'package:smartcanteen/view/change_phone.dart';
+import 'package:smartcanteen/view/change_wallet_pin.dart';
+// ဖိုင်လမ်းကြောင်းအမှန် ထည့်ပေးပါ
+import 'package:smartcanteen/view/forgot_wallet_pin/enter_email_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -332,7 +33,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserData();
   }
 
-  // Fetch user data from SharedPreferences using exact UserModel properties
+  // Roll Number ကို 3 Digits (001, 052) စသဖြင့် Auto Format လုပ်ပေးသည့် Function
+  String _formatStudentId(String rawId) {
+    if (rawId.isEmpty) return '';
+
+    // Dash (-) ပါဝင်ပါက အနောက်ဆုံးဂဏန်းကို 3-digits ဖြစ်အောင် padLeft လုပ်ခြင်း
+    if (rawId.contains('-')) {
+      List<String> parts = rawId.split('-');
+      String prefix = parts.sublist(0, parts.length - 1).join('-');
+      String rollNumStr = parts.last.trim();
+
+      // Number သီးသန့် ဖြစ်မဖြစ် စစ်ဆေးပြီး Padding ထည့်ခြင်း
+      if (RegExp(r'^\d+$').hasMatch(rollNumStr)) {
+        String paddedRoll = rollNumStr.padLeft(3, '0');
+        return '$prefix-$paddedRoll';
+      }
+    }
+    return rawId;
+  }
+
+  // Fetch user data from SharedPreferences
   Future<void> _loadUserData() async {
     try {
       UserModel? user = await SharedPreferencesService.getUser();
@@ -342,7 +62,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           email = user.userEmail;
           phone = user.userPhone;
 
-          studentId = user.student?.studentId?.toString() ?? '';
+          String rawStudentId = user.student?.studentId?.toString() ?? '';
+          studentId = _formatStudentId(rawStudentId);
 
           _updateInitials(name);
           isLoading = false;
@@ -374,6 +95,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  // Floating & Centered SnackBar
+  void _showCenteredSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+        backgroundColor: const Color(0xFF007A87),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.only(bottom: 40, left: 40, right: 40),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const primaryTeal = Color(0xFF007A87);
@@ -383,15 +126,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (isLoading) {
       return const Scaffold(
-        backgroundColor: Color(0xFFF8F9FA),
+        backgroundColor: Colors.white,
         body: Center(child: CircularProgressIndicator(color: primaryTeal)),
       );
     }
 
     return Scaffold(
-      backgroundColor: primaryTeal,
+      backgroundColor: Colors.white,
       body: Container(
-        color: const Color(0xFFF8F9FA),
+        color: Colors.white,
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
           child: Column(
@@ -421,24 +164,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       bottom: false,
                       child: Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                                onPressed: () {
-                                  if (context.canPop()) {
-                                    context.pop();
-                                  }
-                                },
-                              ),
-                              const SizedBox(width: 40),
-                            ],
-                          ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -462,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                name.isNotEmpty ? name : 'User',
+                                name.isNotEmpty ? name : 'အကောင့်ပိုင်ရှင်',
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 22,
@@ -516,8 +241,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               child: _buildContactInfoTile(
                                 icon: Icons.email_outlined,
-                                label: 'Email',
-                                value: email.isNotEmpty ? email : 'N/A',
+                                label: 'အီးမေးလ်',
+                                value: email.isNotEmpty ? email : '-',
                                 lightBgColor: lightBgColor,
                                 primaryTeal: primaryTeal,
                               ),
@@ -530,8 +255,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               child: _buildContactInfoTile(
                                 icon: Icons.phone_outlined,
-                                label: 'Phone',
-                                value: phone.isNotEmpty ? phone.trim() : 'N/A',
+                                label: 'ဖုန်းနံပါတ်',
+                                value: phone.isNotEmpty ? phone.trim() : '-',
                                 lightBgColor: lightBgColor,
                                 primaryTeal: primaryTeal,
                               ),
@@ -555,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'ACCOUNT SETTINGS',
+                        'အကောင့် ဆက်တင်များ',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -565,10 +290,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 10),
 
-                      // Edit Profile (Direct Navigation / Router Error Safe Method)
+                      // Notifications
                       _buildSettingItem(
-                        icon: Icons.person_outline,
-                        title: 'Edit Profile',
+                        icon: Icons.notifications_none,
+                        title: 'အသိပေးချက်များ',
+                        trailing: Switch(
+                          value: isNotificationOn,
+                          activeColor: primaryTeal,
+                          onChanged: (val) {
+                            setState(() => isNotificationOn = val);
+                          },
+                        ),
+                      ),
+
+                      // Edit Profile Navigation
+                      _buildSettingItem(
+                        icon: Icons.phone,
+                        title: 'ဖုန်းနံပါတ် ပြောင်းရန်',
                         trailing: const Icon(
                           Icons.edit_square,
                           color: primaryTeal,
@@ -577,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           final result = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => EditProfileScreen(
+                              builder: (context) => ChangePhone(
                                 initialData: {
                                   'name': name,
                                   'studentId': studentId,
@@ -590,14 +328,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           if (result == true && mounted) {
                             _loadUserData();
+                            _showCenteredSnackBar(
+                              'ပရိုဖိုင် အချက်အလက်များကို ပြင်ဆင်ပြီးပါပြီ',
+                            );
                           }
                         },
                       ),
 
-                      // Change Password
+                      // ===== FORGOT WALLET PIN =====
+                      _buildSettingItem(
+                        icon: Icons.wallet,
+                        title: 'Wallet PIN မေ့နေပါသလား',
+                        trailing: const Icon(
+                          Icons.edit_square,
+                          color: primaryTeal,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const EnterEmailScreen(),
+                            ),
+                          );
+                        },
+                      ),
+
+                      _buildSettingItem(
+                        icon: Icons.wallet,
+                        title: 'Wallet PIN ပြောင်းရန်',
+                        trailing: const Icon(
+                          Icons.edit_square,
+                          color: primaryTeal,
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ChangeWalletPinScreen(),
+                            ),
+                          );
+                        },
+                      ),
+
                       _buildSettingItem(
                         icon: Icons.lock_outline,
-                        title: 'Change Password',
+                        title: 'လျှို့ဝှက်နံပါတ် ပြောင်းရန်',
                         trailing: const Icon(
                           Icons.edit_square,
                           color: primaryTeal,
@@ -611,109 +387,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           );
                         },
-                      ),
-
-                      // Notifications
-                      _buildSettingItem(
-                        icon: Icons.notifications_none,
-                        title: 'Notifications',
-                        trailing: Switch(
-                          value: isNotificationOn,
-                          activeColor: primaryTeal,
-                          onChanged: (val) {
-                            setState(() => isNotificationOn = val);
-                          },
-                        ),
-                      ),
-
-                      // Language
-                      _buildSettingItem(
-                        icon: Icons.language,
-                        title: 'Language',
-                        trailing: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: const EdgeInsets.all(3),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildLangPill('EN', selectedLanguage == 'EN'),
-                              _buildLangPill('MY', selectedLanguage == 'MY'),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // Dark Mode
-                      _buildSettingItem(
-                        icon: Icons.nightlight_round_outlined,
-                        title: 'Dark Mode',
-                        trailing: Switch(
-                          value: isDarkModeOn,
-                          activeColor: primaryTeal,
-                          onChanged: (val) {
-                            setState(() => isDarkModeOn = val);
-                          },
-                        ),
-                      ),
-
-                      // Help Center
-                      _buildSettingItem(
-                        icon: Icons.help_outline,
-                        title: 'Help Center',
-                        trailing: const Icon(
-                          Icons.chevron_right,
-                          color: Colors.grey,
-                        ),
-                        onTap: () {},
-                      ),
-
-                      // Terms & Conditions
-                      _buildSettingItem(
-                        icon: Icons.article_outlined,
-                        title: 'Terms & Conditions',
-                        trailing: const Icon(
-                          Icons.chevron_right,
-                          color: Colors.grey,
-                        ),
-                        onTap: () {},
-                      ),
-
-                      const SizedBox(height: 25),
-
-                      // Log Out Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                              color: Color(0xFFD9534F),
-                              width: 1.5,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () {
-                            _showLogoutDialog(context);
-                          },
-                          icon: const Icon(
-                            Icons.logout,
-                            color: Color(0xFFD9534F),
-                            size: 20,
-                          ),
-                          label: const Text(
-                            'Log Out',
-                            style: TextStyle(
-                              color: Color(0xFFD9534F),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
                       ),
 
                       const SizedBox(height: 30),
@@ -801,66 +474,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const Divider(height: 1, color: Color(0xFFF0F0F0)),
       ],
-    );
-  }
-
-  Widget _buildLangPill(String label, bool isActive) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedLanguage = label;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF007A87) : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: isActive ? Colors.white : Colors.grey.shade600,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Log Out'),
-          content: const Text('Are you sure you want to log out?'),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(dialogContext).pop();
-                await SharedPreferencesService.clearAll();
-                if (context.mounted) {
-                  context.go('/login');
-                }
-              },
-              child: const Text(
-                'Log Out',
-                style: TextStyle(color: Color(0xFFD9534F)),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

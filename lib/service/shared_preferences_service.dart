@@ -30,6 +30,12 @@ class SharedPreferencesService {
     await prefs.setString(_tokenKey, token);
   }
 
+  // Retrieve Auth Token
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
+  }
+
   // Clear session on logout
   static Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();

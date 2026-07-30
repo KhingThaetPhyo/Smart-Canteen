@@ -33,16 +33,10 @@ class SecureStorageService {
   }
 
   static Future<void> saveQrData(String qrData) async {
-  await _storage.write(
-    key: "qr_data",
-    value: qrData,
-  );
-}
+    await _storage.write(key: "qr_data", value: qrData);
+  }
 
-
-static Future<String?> getQrData() async {
-  return await _storage.read(
-    key: "qr_data",
-  );
-}
+  static Future<String?> getQrData() async {
+    return await _storage.read(key: "qr_data");
+  }
 }

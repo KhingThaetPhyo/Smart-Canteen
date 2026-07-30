@@ -21,7 +21,7 @@
 
 // class _MainNavigationState extends State<MainNavigation> {
 //   int currentIndex = 0;
-  
+
 //   static const Color primaryColor = Color(0xFF117992);
 
 //   // Route mapping for GoRouter
@@ -41,7 +41,6 @@
 //      WalletScreen(), // Index 3
 //      ProfileScreen(), // Index 4
 //   ];
-  
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -219,53 +218,46 @@ import 'package:smartcanteen/view/qr_scanner_screen.dart';
 import 'package:smartcanteen/view/profilescreen.dart';
 import 'package:smartcanteen/view/user_qr_screen.dart';
 import 'package:smartcanteen/view/wallet_screen.dart';
+import 'package:smartcanteen/view/profilescreen.dart';
 
 class MainNavigation extends StatefulWidget {
-
   final String? qrData;
 
-  const MainNavigation({
-    super.key,
-    this.qrData,
-  });
+  const MainNavigation({super.key, this.qrData});
 
   @override
   State<MainNavigation> createState() => _MainNavigationState();
 }
 
- 
 class _MainNavigationState extends State<MainNavigation> {
- int currentIndex = 0;
-String? qrData;
+  int currentIndex = 0;
+  String? qrData;
 
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  qrData = widget.qrData;
+    qrData = widget.qrData;
 
-  print("Widget QR = $qrData");
+    print("Widget QR = $qrData");
 
-  _loadQrData();
-}
+    _loadQrData();
+  }
 
-Future<void> _loadQrData() async {
+  Future<void> _loadQrData() async {
+    if (qrData == null || qrData!.isEmpty) {
+      final savedQr = await SecureStorageService.getQrData();
 
-  if (qrData == null || qrData!.isEmpty) {
+      print("Saved QR from storage = $savedQr");
 
-    final savedQr =
-        await SecureStorageService.getQrData();
-
-    print("Saved QR from storage = $savedQr");
-
-    if(savedQr != null){
-
-      setState(() {
-        qrData = savedQr;
-      });
+      if (savedQr != null) {
+        setState(() {
+          qrData = savedQr;
+        });
+      }
     }
   }
-}
+
   static const Color primaryColor = Color(0xff117992);
 
   // Index mapping:
@@ -344,11 +336,7 @@ Future<void> _loadQrData() async {
 
               const SizedBox(width: 48), // Gap for middle Scanner button
 
-              _buildBottomNavItem(
-                Icons.favorite_border_sharp,
-                "နှစ်သက်သော",
-                3,
-              ),
+              _buildBottomNavItem(Icons.favorite_border_sharp, "နှစ်သက်သော", 3),
               _buildBottomNavItem(Icons.person_rounded, "ပရိုဖိုင်", 4),
             ],
           ),
@@ -358,68 +346,53 @@ Future<void> _loadQrData() async {
   }
 
   /// ELEVATED MIDDLE SCANNER BUTTON
- Widget _buildCenterScannerButton() {
-  final isScannerActive = currentIndex == 2;
+  Widget _buildCenterScannerButton() {
+    final isScannerActive = currentIndex == 2;
 
-  return GestureDetector(
-    onTap: () {
-
- if(qrData != null){
-
- context.go(
-   '/user_qr',
-   extra: qrData,
- );
-
-}
-else{
-
- ScaffoldMessenger.of(context)
- .showSnackBar(
-   const SnackBar(
-     content: Text(
-       "QR data not found",
-     ),
-   ),
- );
-
-}
-
-},
-    child: Container(
-      height: 60,
-      width: 60,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0D6B80), Color(0xFF117992)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(
-          color: isScannerActive
-              ? Colors.white
-              : Colors.white.withOpacity(0.8),
-          width: 3,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.4),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
+    return GestureDetector(
+      onTap: () {
+        if (qrData != null) {
+          context.go('/user_qr', extra: qrData);
+        } else {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("QR data not found")));
+        }
+      },
+      child: Container(
+        height: 60,
+        width: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0D6B80), Color(0xFF117992)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.qr_code_scanner_rounded,
-          color: Colors.white,
-          size: 26,
+          border: Border.all(
+            color: isScannerActive
+                ? Colors.white
+                : Colors.white.withOpacity(0.8),
+            width: 3,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withOpacity(0.4),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: const Center(
+          child: Icon(
+            Icons.qr_code_scanner_rounded,
+            color: Colors.white,
+            size: 26,
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   /// NAV ITEM BUILDER
   Widget _buildBottomNavItem(IconData icon, String label, int index) {
