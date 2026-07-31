@@ -1,14 +1,17 @@
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:smartcanteen/service/api_service.dart'; // Make sure ApiService is imported
 
 // Recipient Model
 class RecipientModel {
+  final int? userId;
   final String name;
   final String phone;
+  final String? role;
 
-  RecipientModel({required this.name, required this.phone});
+  RecipientModel({this.userId, required this.name, required this.phone, this.role});
 }
 
 class TransferPointScreen extends StatefulWidget {
@@ -31,19 +34,14 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
   final TextEditingController _recipientController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _pinController = TextEditingController();
+  final ApiService _apiService = ApiService();
 
   final List<int> _presetAmounts = [100, 500, 1000, 5000];
 
-  // Dummy Recent Recipients
-  final List<RecipientModel> _recentRecipients = [
-    RecipientModel(name: "U SWAN HTET KYAW", phone: "09777123456"),
-    RecipientModel(name: "DAW AUNG MYINT", phone: "09791234567"),
-    RecipientModel(name: "KO KO THANT", phone: "09789012345"),
-    RecipientModel(name: "MA SU SU", phone: "09961122334"),
-  ];
-
   List<RecipientModel> _filteredRecipients = [];
   RecipientModel? _selectedRecipient;
+  Timer? _debounce;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -53,6 +51,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _recipientController.removeListener(_onRecipientSearch);
     _recipientController.dispose();
     _amountController.dispose();
@@ -63,19 +62,45 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
   void _onRecipientSearch() {
     final query = _recipientController.text.trim();
 
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
     if (query.isEmpty || _selectedRecipient != null) {
       setState(() {
         _filteredRecipients = [];
+        _isLoading = false;
       });
       return;
     }
 
-    final matches = _recentRecipients.where((item) {
-      return item.phone.contains(query);
-    }).toList();
+    // Debounce to prevent spamming requests while typing
+    _debounce = Timer(const Duration(milliseconds: 300), () async {
+      setState(() {
+        _isLoading = true;
+      });
 
-    setState(() {
-      _filteredRecipients = matches;
+      try {
+        final results = await _apiService.searchUsers(query);
+        
+        if (!mounted) return;
+
+        setState(() {
+          _filteredRecipients = results.map((json) {
+            return RecipientModel(
+              userId: json['user_id'],
+              name: json['name'] ?? '',
+              phone: json['phone'] ?? '',
+              role: json['role'],
+            );
+          }).toList();
+          _isLoading = false;
+        });
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+          _filteredRecipients = [];
+        });
+      }
     });
   }
 
@@ -193,7 +218,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                   TextField(
                     controller: _pinController,
                     keyboardType: TextInputType.number,
-                    maxLength: 6, // ဂဏန်း ၆ လုံးအထိပဲ လက်ခံမည်
+                    maxLength: 6,
                     autofocus: true,
                     style: const TextStyle(color: Colors.transparent),
                     cursorColor: Colors.transparent,
@@ -203,8 +228,6 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                     ),
                     onChanged: (value) => setModalState(() {}),
                   ),
-
-                  /// PIN Box ၆ ကွက် ပြင်ဆင်ထားသည့်နေရာ (၃ ကွက် + "-" + ၃ ကွက်)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -213,7 +236,6 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                           return _buildPinBoxCell(index);
                         }),
                       ),
-
                       Row(
                         children: List.generate(3, (index) {
                           return _buildPinBoxCell(index + 3);
@@ -226,21 +248,12 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      // onPressed: _pinController.text.length == 6
-                      //     ? () {
-                      //         context.pop();
-                      //         _executeFinalTransfer(amount, recipient);
-                      //       }
-                      //     : null,
                       onPressed: _pinController.text.length == 6
-    ? () {
-        // Pop the Bottom Sheet safely
-        Navigator.of(context).pop(); 
-        
-        // Execute transfer after the sheet closes
-        _executeFinalTransfer(amount, recipient);
-      }
-    : null,
+                          ? () {
+                              Navigator.of(context).pop();
+                              _executeFinalTransfer(amount, recipient);
+                            }
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         disabledBackgroundColor: const Color(0xffF1F5F9),
@@ -275,7 +288,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
     final isFilled = index < text.length;
 
     return Container(
-      width: 36, // ၆ ကွက်ဖြစ်သွားသည့်အတွက် အနည်းငယ် ပိုကျယ်ပေးထားပါသည်
+      width: 36,
       height: 48,
       margin: const EdgeInsets.symmetric(horizontal: 3),
       alignment: Alignment.center,
@@ -299,20 +312,81 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
       ),
     );
   }
+// Loading ပြရန် State တစ်ခု ထပ်ထည့်နိုင်ပါသည် (သို့မဟုတ် SnackBar ဖြင့် ပြီးပြတ်မှုကို ပြပါ)
+  bool _isTransferring = false;
 
-  void _executeFinalTransfer(int amount, String recipient) {
-    widget.onTransferCompleted(amount, recipient);
+  void _executeFinalTransfer(int amount, String recipient) async {
+    // recipient ထံမှ ဖုန်းနံပါတ်ကို သီးသန့်ခွဲထုတ်ယူရန် (ဥပမာ: "Wa Thon (09600000000)" မှ "09600000000" ကို ဖြတ်ထုတ်ရန်)
+    String phone = "";
+    if (_selectedRecipient != null) {
+      phone = _selectedRecipient!.phone;
+    } else {
+      // Manual ရိုက်ထည့်ခဲ့ပါက ဖုန်းနံပါတ် သို့မဟုတ် အမည်
+      phone = recipient;
+    }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          "$recipient ထံသို့ ${NumberFormat('#,###').format(amount)} ပွိုင့် လွှဲပြောင်းပေးပြီးပါပြီ!",
+    final pin = _pinController.text.trim();
+
+    setState(() {
+      _isTransferring = true;
+    });
+
+    try {
+      // API ကို ခေါ်ဆိုခြင်း
+      final result = await _apiService.transferPoints(
+        recipientPhone: phone,
+        amount: amount,
+        walletPin: pin,
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _isTransferring = false;
+      });
+
+      if (result != null && result['success'] == true) {
+        final data = result['data'];
+        final message = result['message'] ?? "Point များ လွှဲပြောင်းမှု အောင်မြင်ပါသည်။";
+
+        // အောင်မြင်ကြောင်း အသိပေးခြင်း
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: primaryColor,
+          ),
+        );
+
+        // Parent widget သို့ အောင်မြင်ကြောင်း အကြောင်းကြားရန် (လက်ကျန်ပွိုင့် update ဖြစ်စေရန်)
+        widget.onTransferCompleted(amount, recipient);
+
+        // Screen မှ ထွက်ခြင်း (သို့မဟုတ် Success Screen သို့ သွားခြင်း)
+        if (context.canPop()) {
+          context.pop();
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result?['message'] ?? "ပွိုင့်လွှဲပြောင်းမှု မအောင်မြင်ပါ။"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isTransferring = false;
+      });
+
+      // API Error များကို ပြသရန်
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
         ),
-        backgroundColor: primaryColor,
-      ),
-    );
+      );
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -340,14 +414,13 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                         color: Colors.white,
                         size: 18,
                       ),
-                      // onPressed: () => context.pop(),
                       onPressed: () {
-    if (context.canPop()) {
-      context.pop();
-    } else {
-      context.go('/wallet'); // Fallback to your home path if no route exists to pop
-    }
-  },
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          context.go('/wallet');
+                        }
+                      },
                     ),
                   ),
                   const Expanded(
@@ -393,9 +466,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                           textBaseline: TextBaseline.alphabetic,
                           children: [
                             Text(
-                              NumberFormat(
-                                '#,###',
-                              ).format(widget.currentBalance),
+                              NumberFormat('#,###').format(widget.currentBalance),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -470,10 +541,10 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                           ),
                           child: Row(
                             children: [
-                              CircleAvatar(
+                              const CircleAvatar(
                                 radius: 20,
-                                backgroundColor: const Color(0xff64B5F6),
-                                child: const Icon(
+                                backgroundColor: Color(0xff64B5F6),
+                                child: Icon(
                                   Icons.person,
                                   color: Colors.white,
                                   size: 24,
@@ -512,8 +583,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                           controller: _recipientController,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
-                            hintText:
-                                "ပေးပို့လိုသော ဖုန်းနံပါတ်အား ရိုက်ထည့်ပါ",
+                            hintText: "ပေးပို့လိုသော ဖုန်းနံပါတ် (သို့) အမည် ရိုက်ထည့်ပါ",
                             hintStyle: TextStyle(
                               color: Colors.grey.shade400,
                               fontSize: 14,
@@ -523,14 +593,26 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                               color: primaryColor,
                               size: 20,
                             ),
-                            suffixIcon: _recipientController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear, size: 18),
-                                    onPressed: () {
-                                      _recipientController.clear();
-                                    },
+                            suffixIcon: _isLoading
+                                ? const Padding(
+                                    padding: EdgeInsets.all(12.0),
+                                    child: SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: primaryColor,
+                                      ),
+                                    ),
                                   )
-                                : null,
+                                : (_recipientController.text.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear, size: 18),
+                                        onPressed: () {
+                                          _recipientController.clear();
+                                        },
+                                      )
+                                    : null),
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(
@@ -603,7 +685,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                                     ),
                                   ),
                                   subtitle: Text(
-                                    item.phone,
+                                    "${item.phone}  (${item.role ?? 'user'})",
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey,
@@ -739,8 +821,8 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                                     child: InkWell(
                                       onTap: () {
                                         setState(() {
-                                          _amountController.text = preset
-                                              .toString();
+                                          _amountController.text =
+                                              preset.toString();
                                         });
                                       },
                                       borderRadius: BorderRadius.circular(10),

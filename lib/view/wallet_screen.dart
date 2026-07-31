@@ -330,7 +330,7 @@ class _WalletScreenState extends State<WalletScreen> {
           _buildActionButton(
             icon: Icons.qr_code_2_rounded,
             label: "ပွိုင့်လက်ခံမည်",
-            onTap: () => _showReceiveQRModal(context),
+            onTap: () => context.go('user_qr'),
           ),
           _buildActionButton(
             icon: Icons.qr_code_scanner_rounded,

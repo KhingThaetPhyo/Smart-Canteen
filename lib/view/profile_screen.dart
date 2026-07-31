@@ -1,11 +1,15 @@
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/user_model.dart';
+import 'package:smartcanteen/service/api_service.dart';
+import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
 import 'package:smartcanteen/view/change_password_screen.dart';
 import 'package:smartcanteen/view/change_phone_screen.dart';
 import 'package:smartcanteen/view/change_pin_screen.dart';
 import 'package:smartcanteen/view/enter_email_screen.dart';
+import 'package:smartcanteen/view/loginscreen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -150,6 +154,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+final ApiService _apiService = ApiService();
+
+  Future<void> _handleLogout() async {
+    // Show a loading indicator or confirmation dialog if desired
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: Color(0xFF007A87)),
+      ),
+    );
+
+    try {
+      // 1. Call logout API
+      await _apiService.logoutUser();
+    } catch (e) {
+      print("Logout API error: $e");
+    }
+
+    // 2. Clear local storage / user session data
+    await SecureStorageService.clearAll();
+    await SharedPreferencesService.clearAll();
+
+    if (mounted) {
+      // // Dismiss the loading indicator
+      // Navigator.pop(context);
+
+    context.go('/login');
+    }
+  }
+
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('အကောင့်ထွက်ရန်'),
+          content: const Text('အကောင့်မှ သေချာပေါက် ထွက်မည်မှာ မှန်ပါသလား?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('မလုပ်ပါ။', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                _handleLogout();        // Proceed with logout
+              },
+              child: const Text('ထွက်မည်', style: TextStyle(color: Color(0xFF007A87))),
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     const primaryTeal = Color(0xFF007A87);
@@ -166,6 +225,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded, color: Colors.white),
+            onPressed: () {
+              // Optional: Show a confirmation dialog before logging out
+              _showLogoutConfirmationDialog();
+            },
+          ),
+        ],
+        backgroundColor: primaryTeal,
+        elevation: 0,
+      ),
       body: Container(
         color: Colors.white,
         child: SingleChildScrollView(

@@ -495,6 +495,84 @@ Future<List<OrderModel>> getUserOrders() async {
       throw e.response?.data['message'] ?? 'Failed to load orders.';
     }
   }
+
+
+  /// Search users for point transfer
+Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+  try {
+    final token = await SecureStorageService.getToken();
+
+    final response = await _dio.get(
+      "/transfer/search-users/$query",
+      options: Options(
+        headers: {
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      final List list = response.data['data'] ?? [];
+      return List<Map<String, dynamic>>.from(list);
+    }
+    return [];
+  } on DioException catch (e) {
+    print("========== SEARCH USERS DIO ERROR ==========");
+    print("Type: ${e.type}");
+    print("Message: ${e.message}");
+    print("Response: ${e.response?.data}");
+    print("===========================================");
+    return [];
+  }
+}
+
+
+/// Point များ လွှဲပြောင်းခြင်း API
+  Future<Map<String, dynamic>?> transferPoints({
+    required String recipientPhone,
+    required int amount,
+    required String walletPin,
+  }) async {
+    try {
+      final token = await SecureStorageService.getToken();
+
+      final response = await _dio.post(
+        "/transfer-points",
+        data: {
+          "recipient_phone": recipientPhone,
+          "amount": amount,
+          "wallet_pin": walletPin,
+        },
+        options: Options(
+          headers: {
+            if (token != null) "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print("Transfer Response: ${response.data}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data as Map<String, dynamic>;
+      }
+      return null;
+    } on DioException catch (e) {
+      print("========== TRANSFER POINTS DIO ERROR ==========");
+      print("Type: ${e.type}");
+      print("Message: ${e.message}");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+      print("===============================================");
+
+      if (e.response != null && e.response?.data != null) {
+        final data = e.response!.data;
+        throw data['message'] ?? 'ပွိုင့်လွှဲပြောင်းမှု မအောင်မြင်ပါ။';
+      }
+      throw 'ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ။';
+    }
+  }
+
+
   // ===== UPDATE Phone USER =====
   Future<bool> updatePhone({required String phone}) async {
     try {
@@ -758,4 +836,50 @@ Future<Map<String, dynamic>> sendOtp(String email) async {
     };
   }
 }
+
+// ===== LOGOUT USER =====
+  Future<Map<String, dynamic>> logoutUser() async {
+    try {
+      final String? token = await SecureStorageService.getToken();
+
+      final response = await _dio.post(
+        '/logout',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (token != null && token.isNotEmpty)
+              'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'message': response.data['message'] ?? 'အကောင့်မှ အောင်မြင်စွာ ထွက်ပြီးပါပြီ။',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': response.data['message'] ?? 'Logout failed.',
+      };
+    } on DioException catch (e) {
+      print("========== LOGOUT DIO ERROR ==========");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+
+      if (e.response != null) {
+        final data = e.response!.data;
+        if (data != null && data is Map<String, dynamic>) {
+          return {
+            'success': false,
+            'message': data['message'] ?? 'Failed to logout.',
+          };
+        }
+      }
+      return {'success': false, 'message': 'Unable to connect to server.'};
+    }
+  }
 }
