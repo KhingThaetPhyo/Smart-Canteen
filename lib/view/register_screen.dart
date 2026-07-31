@@ -593,37 +593,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  // --- မြန်မာလို ပြင်ဆင်ထားသော Validation Messages ---
   String? validateName(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return "Full name is required";
+      return "အမည် အပြည့်အစုံ ထည့်ပါ";
     }
     return null;
   }
 
   String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return "Email is required";
+      return "အီးမေးလ် ထည့်ပါ";
     }
     if (!value.contains("@")) {
-      return "Edu mail must contain @";
+      return "@ သင်္ကေတ ပါဝင်ရပါမည်";
     }
     if (!RegExp(r'^[a-z][a-z0-9._%+-]*@ucstt\.edu\.mm$').hasMatch(value)) {
-      return "Use username@ucstt.edu.mm ";
+      return "username@ucstt.edu.mm ပုံစံဖြင့် ထည့်ပါ";
     }
     return null;
   }
 
   String? validatePhone(String? value) {
     if (value == null || value.isEmpty) {
-      return "Phone number is required";
+      return "ဖုန်းနံပါတ် ထည့်ပါ";
     }
 
     String firstDigit = value[0];
     if (['9', '6', '7'].contains(firstDigit) && value.length != 9) {
-      return "Enter 9 digits after 09";
+      return "09 နောက်တွင် ဂဏန်း ၉ လုံး ရှိရပါမည်";
     }
     if (firstDigit == '4' && value.length != 8) {
-      return "Enter 8 digits after 09";
+      return "09 နောက်တွင် ဂဏန်း ၈ လုံး ရှိရပါမည်";
     }
 
     return null;
@@ -631,32 +632,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return "Password is required";
+      return "စကားဝှက် ထည့်ပါ";
     }
     if (value.length != 8) {
-      return "Password must be exactly 8 characters";
+      return "စကားဝှက်သည် ၈ လုံး ကွက်တိ ရှိရပါမည်";
     }
     if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return "Need one uppercase letter";
+      return "စာလုံးကြီး (A-Z) အနည်းဆုံး ၁ လုံး ပါဝင်ရပါမည်";
     }
     if (!RegExp(r'[a-z]').hasMatch(value)) {
-      return "Need one lowercase letter";
+      return "စာလုံးသေး (a-z) အနည်းဆုံး ၁ လုံး ပါဝင်ရပါမည်";
     }
     if (!RegExp(r'\d').hasMatch(value)) {
-      return "Need one digit";
+      return "ဂဏန်း အနည်းဆုံး ၁ လုံး ပါဝင်ရပါမည်";
     }
     if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(value)) {
-      return "Need one special character";
+      return "အထူးသင်္ကေတ အနည်းဆုံး ၁ ခု ပါဝင်ရပါမည်";
     }
     return null;
   }
 
   String? validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return "Confirm your password";
+      return "စကားဝှက်ကို ပြန်လည်အတည်ပြုပါ";
     }
     if (value != passwordController.text) {
-      return "Passwords do not match";
+      return "စကားဝှက် မတူညီပါ";
     }
     return null;
   }
@@ -711,10 +712,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       SizedBox(height: height * .025),
                       Text(
-                        "Create Account",
+                        "အကောင့်သစ်ဖွင့်ရန်",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: width * .07,
+                          fontSize: width * .065,
                           color: const Color(0xff0D47A1),
                         ),
                       ),
@@ -749,7 +750,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   AutovalidateMode.onUserInteraction,
                               validator: validateName,
                               decoration: decoration(
-                                "Full Name",
+                                "အမည် အပြည့်အစုံ",
                                 Icons.person_outline,
                                 "Thaet Thaet",
                               ),
@@ -757,7 +758,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                             SizedBox(height: height * .018),
 
-                            // Email Field (စစချင်း ဂဏန်း/သင်္ကေတ ရိုက်မရပါ)
+                            // Email Field
                             TextFormField(
                               controller: emailController,
                               style: fieldTextStyle,
@@ -767,7 +768,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   AutovalidateMode.onUserInteraction,
                               validator: validateEmail,
                               decoration: decoration(
-                                "Email Address",
+                                "အီးမေးလ် လိပ်စာ",
                                 Icons.email_outlined,
                                 "you@ucstt.edu.mm",
                               ),
@@ -789,7 +790,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               validator: validatePhone,
                               decoration:
                                   decoration(
-                                    "Phone Number",
+                                    "ဖုန်းနံပါတ်",
                                     Icons.phone_outlined,
                                     "9XXXXXXXX",
                                   ).copyWith(
@@ -819,6 +820,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                             SizedBox(height: height * .018),
 
+                            // Password Field
                             TextFormField(
                               controller: passwordController,
                               style: fieldTextStyle,
@@ -828,7 +830,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               validator: validatePassword,
                               decoration:
                                   decoration(
-                                    "Password",
+                                    "စကားဝှက်",
                                     Icons.lock_outline,
                                     "********",
                                   ).copyWith(
@@ -850,6 +852,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                             SizedBox(height: height * .018),
 
+                            // Confirm Password Field
                             TextFormField(
                               controller: confirmPasswordController,
                               style: fieldTextStyle,
@@ -859,7 +862,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               validator: validateConfirmPassword,
                               decoration:
                                   decoration(
-                                    "Confirm Password",
+                                    "စကားဝှက် အတည်ပြုပါ",
                                     Icons.lock_outline,
                                     "********",
                                   ).copyWith(
@@ -885,9 +888,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                "Select Role",
+                                "အမျိုးအစား ရွေးချယ်ပါ",
                                 style: TextStyle(
-                                  fontSize: width * .04,
+                                  fontSize: width * .038,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -901,7 +904,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     groupValue: isStudent,
                                     dense: true,
                                     contentPadding: EdgeInsets.zero,
-                                    title: const Text("Student"),
+                                    title: const Text("ကျောင်းသား/သူ"),
                                     onChanged: (value) {
                                       setState(() {
                                         isStudent = value!;
@@ -915,7 +918,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     groupValue: isStudent,
                                     dense: true,
                                     contentPadding: EdgeInsets.zero,
-                                    title: const Text("Teacher"),
+                                    title: const Text("ဆရာ/ဆရာမ"),
                                     onChanged: (value) {
                                       setState(() {
                                         isStudent = value!;
@@ -969,12 +972,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     }
                                   }
                                 },
-                                child: Text(
-                                  "Continue",
-                                  style: TextStyle(
-                                    fontSize: width * .043,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "ရှေ့ဆက်မည်",
+                                      style: TextStyle(
+                                        fontSize: width * .043,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Icon(
+                                      Icons.forward,
+                                      color: Color.fromARGB(255, 248, 249, 250),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -988,23 +1001,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Already have an account? ",
+                            "အကောင့်ရှိပြီးသားလား? ",
                             style: TextStyle(
                               color: Colors.black54,
-                              fontSize: width * .04,
+                              fontSize: width * .038,
                             ),
                           ),
                           GestureDetector(
                             onTap: () {
                               context.go('/login');
                             },
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                color: const Color(0xff1E5ED8),
-                                fontWeight: FontWeight.bold,
-                                fontSize: width * .04,
-                              ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "ဝင်ရောက်မည်",
+                                  style: TextStyle(
+                                    color: const Color(0xff1E5ED8),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: width * .038,
+                                  ),
+                                ),
+                                SizedBox(width: 6),
+                                Icon(
+                                  Icons.login,
+                                  color: Color(0xff1E5ED8),
+                                  size: 22,
+                                ),
+                              ],
                             ),
                           ),
                         ],
