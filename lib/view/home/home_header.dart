@@ -380,7 +380,7 @@ Future<void> _loadUserData() async {
                   icon: Icons.send_rounded,
                   title: "ပွိုင့်လွှဲ",
                   onTap: () => _handleProtectedAction(() {
-                    context.push('/transfer');
+                    context.push('/transfer_point');
                   }),
                 ),
                 _QuickAction(

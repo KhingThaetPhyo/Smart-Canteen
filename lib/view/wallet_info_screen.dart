@@ -657,11 +657,13 @@ if (result != null && result.success) {
 //   extra: qrData,
 // );
 // Create QR data with username and student ID
-var qrData = jsonEncode({
-  'user_id' : result.user?.userId ?? '',
-  'user_name': result.user?.userName ?? '',
-  'student_id': result.user?.student?.studentId ?? '',
-});
+// 2. Create QR data
+        // 2. Create QR data as plain text
+        final userName = result.user?.userName ?? '';
+        final studentId = result.user?.student?.studentId ?? '';
+        
+        // Combine them with a space (or format them however you need)
+        final qrData = '$userName $studentId'.trim();
 print("User QR Data -------  {$qrData}");
 await SecureStorageService.saveQrData(qrData);
  final savedQr =

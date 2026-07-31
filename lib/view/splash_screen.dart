@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 
@@ -50,32 +48,29 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 2),
     )..repeat();
 
-     // Your animation setup...
+    _contentController.forward();
 
-  _contentController.forward();
-
-  _navigate();
+    // Animation စတင်ပြီးမှ Navigation ကို လုပ်ဆောင်ရန်
+    _navigate();
   }
-Future<void> _navigate() async {
-  await Future.delayed(const Duration(seconds: 3));
 
-  if (!mounted) return;
+  Future<void> _navigate() async {
+    await Future.delayed(const Duration(seconds: 3));
 
-  // // Show system UI again
-  // SystemChrome.setEnabledSystemUIMode(
-  //   SystemUiMode.edgeToEdge,
-  // );
+    if (!mounted) return;
 
-  final token = await SecureStorageService.getToken();
+    final token = await SecureStorageService.getToken();
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  if (token != null && token.isNotEmpty) {
-    context.go('/navigation');
-  } else {
-    context.go('/navigation');
+    // ⚠️ Token ရှိမရှိ စစ်ဆေးပြီး မှန်ကန်သော Screen သို့ ပို့ပေးခြင်း
+    if (token != null && token.isNotEmpty) {
+      context.go('/navigation'); // Login ဝင်ထားပြီးသားဆိုလျှင်
+    } else {
+      context.go('/login'); // Login မဝင်ရသေးလျှင် Login Screen သို့
+    }
   }
-}
+
   @override
   void dispose() {
     _contentController.dispose();
@@ -92,10 +87,6 @@ Future<void> _navigate() async {
       backgroundColor: primaryContainer,
       body: Stack(
         children: [
-          // ===========================
-          // Student Splash Background
-          // ===========================
-
           Positioned.fill(
             child: Opacity(
               opacity: 0.1,
@@ -104,7 +95,6 @@ Future<void> _navigate() async {
               ),
             ),
           ),
-
           Positioned(
             top: -80,
             right: -80,
@@ -117,7 +107,6 @@ Future<void> _navigate() async {
               ),
             ),
           ),
-
           Positioned(
             bottom: -80,
             left: -80,
@@ -130,11 +119,6 @@ Future<void> _navigate() async {
               ),
             ),
           ),
-
-          // ===========================
-          // Main Content
-          // ===========================
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -145,7 +129,6 @@ Future<void> _navigate() async {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const SizedBox(height: 16),
-
                   SlideTransition(
                     position: _slideAnimation,
                     child: FadeTransition(
@@ -153,42 +136,40 @@ Future<void> _navigate() async {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Logo Card
                           Container(
-  width: 230,
-  height: 230,
-  padding: const EdgeInsets.all(20),
-  decoration: BoxDecoration(
-    shape: BoxShape.circle,
-    color: textWhite.withOpacity(0.1),
-    border: Border.all(
-      color: textWhite.withOpacity(0.2),
-      width: 2,
-    ),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.25),
-        blurRadius: 25,
-        offset: const Offset(0, 10),
-      ),
-    ],
-  ),
-  child: ClipOval(
-    child: Image.asset(
-      'assets/image/user_logo.jpg',
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return const Icon(
-          Icons.storefront,
-          size: 80,
-          color: Colors.white,
-        );
-      },
-    ),
-  ),
-),
+                            width: 230,
+                            height: 230,
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: textWhite.withOpacity(0.1),
+                              border: Border.all(
+                                color: textWhite.withOpacity(0.2),
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 25,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/image/user_logo.jpg',
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.storefront,
+                                    size: 80,
+                                    color: Colors.white,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 24),
-
                           const Text(
                             'SMARTCANTEEN',
                             textAlign: TextAlign.center,
@@ -197,12 +178,9 @@ Future<void> _navigate() async {
                               fontSize: 32,
                               fontWeight: FontWeight.w800,
                               letterSpacing: -0.5,
-                              
                             ),
                           ),
-
                           const SizedBox(height: 8),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -220,7 +198,6 @@ Future<void> _navigate() async {
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                     letterSpacing: 2,
-                                    
                                   ),
                                 ),
                               ),
@@ -231,13 +208,11 @@ Future<void> _navigate() async {
                               ),
                             ],
                           ),
-                                                    const SizedBox(height: 40),
+                          const SizedBox(height: 40),
                         ],
                       ),
                     ),
                   ),
-
-                  // Bottom Loader
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -250,7 +225,6 @@ Future<void> _navigate() async {
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.5,
-                          
                         ),
                       ),
                     ],
@@ -264,10 +238,6 @@ Future<void> _navigate() async {
     );
   }
 }
-
-// ==========================
-// Animated Loading Dots
-// ==========================
 
 class AnimatedPulsingDots extends StatelessWidget {
   final AnimationController controller;
@@ -323,10 +293,6 @@ class AnimatedPulsingDots extends StatelessWidget {
     );
   }
 }
-
-// ==========================
-// Student Splash Background
-// ==========================
 
 class DotPatternPainter extends CustomPainter {
   @override

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // intl package အား import လုပ်ပါ
+import 'package:intl/intl.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:smartcanteen/view/order_screen.dart';
 import 'package:smartcanteen/view/pickup_qr_screen.dart';
 
@@ -13,45 +14,125 @@ class OrderDetailScreen extends StatelessWidget {
   static final Color lightTeal = Colors.teal.shade50;
   static final Color darkTeal = const Color(0xff117992);
 
-  // ရက်စွဲကို 5/12/2026 15:55:00 Format ဖြင့် ပြောင်းလဲပေးသည့် Helper Function
+  // ရက်စွဲကို Formatted လုပ်ရန်
   String _formatEnglishDateTime(dynamic dateInput) {
     if (dateInput == null) return '';
-
-    if (dateInput is DateTime) {
-      return DateFormat('d/M/yyyy HH:mm:ss').format(dateInput);
-    } else if (dateInput is String) {
+    if (dateInput is String) {
       final parsedDate = DateTime.tryParse(dateInput);
       if (parsedDate != null) {
         return DateFormat('d/M/yyyy HH:mm:ss').format(parsedDate);
       }
-      return dateInput; // Parse လုပ်မရပါက မူရင်းအတိုင်း ပြသမည်
+      return dateInput; 
     }
     return '';
   }
 
+  // QR ကုဒ်ပြမည့် Dialog (order_id နှင့် qr_code_token နှစ်ခုစလုံးကို ပေါင်းစပ်ထားသည်)
+  void _showPickUpCodeDialog(BuildContext context, dynamic orderId, String qrCodeToken) {
+    final String qrData = "Order ID: $orderId\nToken: $qrCodeToken";
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text(
+            "ပစ္စည်းထုတ်ယူရန် QR ကုဒ်",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xff117992),
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.teal.shade100),
+                  ),
+                  child: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: QrImageView(
+                      data: qrData, // order_id နှင့် qr_code_token ပေါင်းစပ်ထားသော ဒေတာ
+                      version: QrVersions.auto,
+                      size: 200.0,
+                      backgroundColor: Colors.white,
+                      gapless: true,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "အော်ဒါနံပါတ်: $orderId",
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "ကုဒ်: $qrCodeToken",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            Center(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xff117992),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text("ပိတ်မည်"),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final String shopName = order['shopName'] ?? 'အန်တီမွန် စားသောက်ဆိုင်';
-    final String customerName = order['customerName'] ?? 'Aung Aung';
-
-    // dateTime (သို့မဟုတ်) orderDate ကို English Date Format ပြောင်းလဲခြင်း
-    final String orderDate = _formatEnglishDateTime(
-      order['dateTime'] ?? order['orderDate'],
-    );
-
-    final String phone = order['phone'] ?? '09 790182418';
-    final String code = order['pickupCode'] ?? 'MBK-1000';
+    // API မှ JSON Key များနှင့် ကိုက်ညီအောင် ပြင်ဆင်ထားခြင်း
+    final String shopName = order['shop_name'] ?? 'အန်တီမွန် စားသောက်ဆိုင်';
+    final String customerName = order['customer_name'] ?? 'Aung Aung';
+    final String orderDate = order['order_time'] ?? '';
+    final String phone = order['customer_phone'] ?? '09 790182418';
+    final String code = order['qr_code_token'] ?? 'MBK-1000';
+    
+    // order_id ကို ထည့်သွင်းထုတ်ယူခြင်း
+    final dynamic orderId = order['order_id'] ?? order['id'] ?? '';
+    
     final List items = order['items'] ?? [];
 
-    // Status စစ်ဆေးရန် (Ready ဖြစ်မဖြစ်)
-    final OrderStatus? status = order['status'];
-    final bool isReady = status == OrderStatus.ready;
+    // can_pickup (စမ်းသပ်ရန် အမြဲပေါ်နေစေရန် true ပေးထားပါသည်)
+    final bool canPickup = order['can_pickup'] ?? true;
 
-    // Total ကျသင့်ငွေ တွက်ချက်ခြင်း
+    // စုစုပေါင်း ကျသင့်ပွိုင့် တွက်ချက်ခြင်း
     int totalAmount = 0;
     for (var itemData in items) {
-      final int qty = itemData['item']['quantity'] ?? 1;
-      final int price = itemData['unitPoints'] ?? 0;
+      final int qty = itemData['quantity'] ?? 1;
+      final int price = itemData['unit_price'] ?? 0;
       totalAmount += price * qty;
     }
 
@@ -77,11 +158,6 @@ class OrderDetailScreen extends StatelessWidget {
                     blurRadius: 12,
                     spreadRadius: 1,
                     offset: const Offset(0, 5),
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: const Offset(-2, -2),
                   ),
                 ],
               ),
@@ -123,7 +199,6 @@ class OrderDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           children: [
-            /// 1. RECEIPT SLIP CARD
             ClipPath(
               clipper: ReceiptClipper(),
               child: Container(
@@ -143,7 +218,6 @@ class OrderDetailScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    /// 2. HEADER - SHOP NAME & INFO
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
                       child: Column(
@@ -177,10 +251,7 @@ class OrderDetailScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 8),
-
-                    /// 3. ITEMS LIST
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
@@ -238,15 +309,12 @@ class OrderDetailScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-
                           const SizedBox(height: 6),
-
                           ...List.generate(items.length, (index) {
                             final itemData = items[index];
-                            final item = itemData['item'];
-                            final int qty = item['quantity'] ?? 1;
-                            final int price = itemData['unitPoints'] ?? 0;
-                            final int subtotal = price * qty;
+                            final int qty = itemData['quantity'] ?? 1;
+                            final int price = itemData['unit_price'] ?? 0;
+                            final int subtotal = itemData['total_price'] ?? (price * qty);
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
@@ -266,7 +334,7 @@ class OrderDetailScreen extends StatelessWidget {
                                   Expanded(
                                     flex: 3,
                                     child: Text(
-                                      item['name'] ?? '',
+                                      itemData['name'] ?? '',
                                       style: _cellStyle,
                                     ),
                                   ),
@@ -298,9 +366,7 @@ class OrderDetailScreen extends StatelessWidget {
                               ),
                             );
                           }),
-
                           const SizedBox(height: 8),
-
                           Container(
                             decoration: BoxDecoration(
                               color: lightTeal,
@@ -335,11 +401,8 @@ class OrderDetailScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 28),
-
-                    /// 4. SCAN PICK UP CODE BUTTON
-                    if (isReady)
+                    if (canPickup)
                       Padding(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 36),
                         child: Center(
@@ -357,8 +420,8 @@ class OrderDetailScreen extends StatelessWidget {
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () =>
-                                    showPickUpCodeDialog(context, code),
+                                // orderId နှင့် code ကို Dialog ထဲသို့ ထည့်သွင်းပေးခြင်း
+                                onTap: () => _showPickUpCodeDialog(context, orderId, code),
                                 borderRadius: BorderRadius.circular(16),
                                 child: Ink(
                                   padding: const EdgeInsets.symmetric(
@@ -414,7 +477,6 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  /// Info Text Row Helper
   Widget _buildInfoRow(String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,7 +505,6 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  // Text Styles
   static TextStyle _headerStyle(Color color) =>
       TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color);
 
@@ -459,7 +520,6 @@ class OrderDetailScreen extends StatelessWidget {
   );
 }
 
-/// RECEIPT ZIG-ZAG CUT CLIPPER
 class ReceiptClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

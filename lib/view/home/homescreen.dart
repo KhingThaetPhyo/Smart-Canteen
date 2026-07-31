@@ -69,7 +69,7 @@ class _HomescreenState extends State<Homescreen> {
             const SliverToBoxAdapter(child: SizedBox(height: 35)),
 
             /// POPULAR MENU
-            const SliverToBoxAdapter(child: MenuSection()),
+            SliverToBoxAdapter(child: MenuSection()),
 
             /// POPULAR SHOPS TITLE
             const SliverToBoxAdapter(

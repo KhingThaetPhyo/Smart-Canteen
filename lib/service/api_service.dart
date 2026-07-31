@@ -5,6 +5,7 @@ import 'package:http/http.dart' as _dio;
 import 'package:http/http.dart' as http;
 import 'package:smartcanteen/model/category_model.dart';
 import 'package:smartcanteen/model/login_model.dart';
+import 'package:smartcanteen/model/order_model.dart';
 import 'package:smartcanteen/model/register_model.dart';
 import 'package:smartcanteen/model/shop_model.dart';
 import 'package:smartcanteen/model/view_menu_model.dart';
@@ -26,7 +27,7 @@ class ApiService {
       },
     ),
   );
-  
+ 
 
   Future<RegisterModel?> registerUser({
   required String name,
@@ -426,6 +427,335 @@ Future<List<Map<String, dynamic>>> getShopTables(int shopId) async {
     print("Response: ${e.response?.data}");
     print("===========================================");
     return [];
+  }
+}
+
+/// Fetch User Orders directly as a List<OrderModel>
+  // Future<List<OrderModel>> getUserOrders() async {
+  //   try {
+  //     final token = await SecureStorageService.getToken();
+
+  //     final response = await _dio.get(
+  //       "/user/orders",
+  //       options: Options(
+  //         headers: {
+  //           if (token != null) "Authorization": "Bearer $token",
+  //         },
+  //       ),
+  //     );
+
+  //     print("API Response: ${response.data}");
+
+  //     if (response.statusCode == 200 && response.data['success'] == true) {
+  //       // API response ၏ nested ဖြစ်နေသော data -> original -> data ကို ဝင်ယူခြင်း
+  //       final originalData = response.data['data']['original'];
+        
+  //       if (originalData != null && originalData['success'] == true) {
+  //         final List listData = originalData['data'] ?? [];
+  //         return listData.map((json) => OrderModel.fromJson(json)).toList();
+  //       }
+  //     }
+  //     return [];
+  //   } on DioException catch (e) {
+  //     print("========== FETCH ORDERS ERROR ==========");
+  //     print("Type: ${e.type}");
+  //     print("Message: ${e.message}");
+  //     print("Response: ${e.response?.data}");
+  //     print("========================================");
+  //     throw e.response?.data['message'] ?? 'Failed to load orders.';
+  //   }
+  // }
+Future<List<OrderModel>> getUserOrders() async {
+    try {
+      final token = await SecureStorageService.getToken();
+
+      final response = await _dio.get(
+        "/user/orders",
+        options: Options(
+          headers: {
+            if (token != null) "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      print("API Response: ${response.data}");
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        // API response ၏ data သည် ဤနေရာတွင် List တိုက်ရိုက်ဖြစ်နေပါသည်
+        final List listData = response.data['data'] ?? [];
+        return listData.map((json) => OrderModel.fromJson(json)).toList();
+      }
+      return [];
+    } on DioException catch (e) {
+      print("========== FETCH ORDERS ERROR ==========");
+      print("Type: ${e.type}");
+      print("Message: ${e.message}");
+      print("Response: ${e.response?.data}");
+      print("========================================");
+      throw e.response?.data['message'] ?? 'Failed to load orders.';
+    }
+  }
+  // ===== UPDATE Phone USER =====
+  Future<bool> updatePhone({required String phone}) async {
+    try {
+      final token = await SecureStorageService.getToken();
+
+      final response = await _dio.put(
+        '/user/update-profile',
+        data: {'user_phone': phone},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Profile Updated Successfully: ${response.data}");
+        return true;
+      }
+      return false;
+    } on DioException catch (e) {
+      print("========== UPDATE PROFILE DIO ERROR ==========");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+
+      if (e.response != null) {
+        final responseData = e.response!.data;
+
+        if (responseData is Map<String, dynamic> &&
+            responseData["errors"] != null) {
+          String errorMessage = "";
+          (responseData["errors"] as Map<String, dynamic>).forEach((
+            key,
+            value,
+          ) {
+            if (value is List && value.isNotEmpty) {
+              errorMessage += "${value.first}\n";
+            }
+          });
+          throw errorMessage.trim();
+        }
+        throw responseData["message"] ?? "Failed to update profile.";
+      }
+      throw "Unable to connect to server.";
+    }
+  }
+
+  // ===== FORGOT WALLET PIN (Send OTP) =====
+  Future<bool> forgotPin(String email) async {
+    try {
+      final token = await SecureStorageService.getToken();
+
+      final response = await _dio.post(
+        '/forgot-pin',
+        data: {'user_email': email, 'email': email},
+        options: Options(
+          headers: {
+            if (token != null && token.isNotEmpty)
+              'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data['success'] ?? true;
+      }
+      return false;
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data != null) {
+        final data = e.response!.data;
+        if (data is Map<String, dynamic>) {
+          throw data['message'] ?? 'Failed to send OTP.';
+        }
+      }
+      throw 'Unable to connect to server.';
+    }
+  }
+
+  // ===== RESET WALLET PIN =====
+  Future<Map<String, dynamic>> resetPin({
+    required String email,
+    required String otp,
+    required String newPin,
+  }) async {
+    try {
+      final token = await SecureStorageService.getToken();
+
+      final response = await _dio.post(
+        '/reset-pin',
+        data: {'email': email, 'otp': otp, 'new_pin': newPin},
+        options: Options(
+          headers: {
+            if (token != null && token.isNotEmpty)
+              'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      return {
+        'success':
+            (response.statusCode == 200 || response.statusCode == 201) &&
+            (response.data['success'] ?? true),
+        'message': response.data['message'] ?? 'PIN reset successfully.',
+      };
+    } on DioException catch (e) {
+      if (e.response != null && e.response!.data != null) {
+        final data = e.response!.data;
+        if (data is Map<String, dynamic>) {
+          return {
+            'success': false,
+            'message': data['message'] ?? 'Failed to reset PIN.',
+          };
+        }
+      }
+      return {'success': false, 'message': 'Unable to connect to server.'};
+    }
+  }
+
+  // ===== CHANGE WALLET PIN =====
+  Future<bool> changePin({
+    required String oldPin,
+    required String newPin,
+  }) async {
+    try {
+      final String? token = await SecureStorageService.getToken();
+
+      final response = await _dio.post(
+        '/wallet/update-pin',
+        data: {
+          'current_pin': oldPin, // Backend မျှော်လင့်ထားသော Key Name
+          'new_pin': newPin,
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (token != null && token.isNotEmpty)
+              'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      }
+      return false;
+    } on DioException catch (e) {
+      print("========== CHANGE PIN DIO ERROR ==========");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+
+      if (e.response != null) {
+        if (e.response!.statusCode == 401) {
+          //await SecureStorageService.clearStorage();
+          //await SharedPreferencesService.clearAll();
+          throw 'Unauthenticated. Please login again.';
+        }
+
+        final data = e.response!.data;
+        if (data != null && data is Map<String, dynamic>) {
+          if (data["errors"] != null && data["errors"] is Map) {
+            String errorMessage = "";
+            (data["errors"] as Map).forEach((key, value) {
+              if (value is List && value.isNotEmpty) {
+                errorMessage += "${value.first}\n";
+              }
+            });
+            throw errorMessage.trim();
+          }
+          throw data['message'] ?? 'Failed to change PIN.';
+        }
+      }
+      throw 'Unable to connect to server.';
+    }
+  }
+
+  // ===== CHANGE PASSWORD =====
+  Future<Map<String, dynamic>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    try {
+      final String? token = await SecureStorageService.getToken();
+
+      final response = await _dio.post(
+        '/change-password',
+        data: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+          'new_password_confirmation': confirmPassword,
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (token != null && token.isNotEmpty)
+              'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'message':
+              response.data['message'] ?? 'Password changed successfully.',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': response.data['message'] ?? 'Failed to change password.',
+      };
+    } on DioException catch (e) {
+      print("========== CHANGE PASSWORD DIO ERROR ==========");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+
+      if (e.response != null) {
+        // Token သက်တမ်းကုန်သွားပါက Logout လုပ်ပေးခြင်း
+        if (e.response!.statusCode == 401) {
+          //await SecureStorageService.clearStorage();
+         // await SharedPreferencesService.clearAll();
+          return {
+            'success': false,
+            'unauthenticated': true,
+            'message': 'Session expired. Please login again.',
+          };
+        }
+
+        final data = e.response!.data;
+        if (data != null && data is Map<String, dynamic>) {
+          if (data["errors"] != null && data["errors"] is Map) {
+            String errorMessage = "";
+            (data["errors"] as Map).forEach((key, value) {
+              if (value is List && value.isNotEmpty) {
+                errorMessage += "${value.first}\n";
+              }
+            });
+            return {'success': false, 'message': errorMessage.trim()};
+          }
+          return {
+            'success': false,
+            'message': data['message'] ?? 'Failed to change password.',
+          };
+        }
+      }
+      return {'success': false, 'message': 'Unable to connect to server.'};
+    }
+  }
+Future<Map<String, dynamic>> sendOtp(String email) async {
+  try {
+    // Call forgotPin directly instead of through _apiService
+    bool isSuccess = await forgotPin(email); 
+    return {
+      'success': isSuccess,
+      'message': isSuccess ? 'OTP ပို့ပြီးပါပြီ။' : 'Failed to send OTP.',
+    };
+  } catch (e) {
+    print("Send OTP Error: $e");
+    return {
+      'success': false,
+      'message': e.toString(),
+    };
   }
 }
 }

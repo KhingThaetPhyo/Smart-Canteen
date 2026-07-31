@@ -1,27 +1,24 @@
 import 'package:flutter/material.dart';
-
-enum TransactionType { received, spent }
-
-class TransactionModel {
-  final String id;
-  final String title;
-  final String subtitle;
-  final String amount;
-  final String time;
-  final TransactionType type;
-
-  TransactionModel({
-    required this.id,
-    required this.title,
-    required this.subtitle,
-    required this.amount,
-    required this.time,
-    required this.type,
-  });
-}
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:smartcanteen/model/transaction_model.dart';
+import 'package:smartcanteen/provider/user_provider.dart';
+import 'package:smartcanteen/service/shared_preferences_service.dart';
 
 class WalletScreen extends StatefulWidget {
-  const WalletScreen({super.key});
+  final String userName;
+  final String studentId;
+
+  // Callback used to switch MainNavigation to Scanner tab
+  final VoidCallback? onOpenScanner;
+
+  const WalletScreen({
+    super.key,
+    this.userName = "Wa Thon",
+    this.studentId = "UCSTT(22-23)-000",
+    this.onOpenScanner,
+  });
 
   @override
   State<WalletScreen> createState() => _WalletScreenState();
@@ -30,90 +27,143 @@ class WalletScreen extends StatefulWidget {
 class _WalletScreenState extends State<WalletScreen> {
   static const Color primaryColor = Color(0xff117992);
 
-  int selectedTab = 0; // 0: All, 1: Received, 2: Spent
-  int currentBalance = 12450;
+  // Kpay style date formatter (e.g., 4/12/2026 15:36:12)
+  final DateFormat _kpayDateFormat = DateFormat('M/d/yyyy HH:mm:ss');
 
-  final List<TransactionModel> transactions = [
-    TransactionModel(
-      id: "1",
-      title: "Points Received",
-      subtitle: "From Mg Mg",
-      amount: "+500 pts",
-      time: "Today • 10:30 AM",
-      type: TransactionType.received,
-    ),
-    TransactionModel(
-      id: "2",
-      title: "Coffee Corner",
-      subtitle: "Milk Tea Payment",
-      amount: "-1,500 pts",
-      time: "Today • 08:15 AM",
-      type: TransactionType.spent,
-    ),
-    TransactionModel(
-      id: "3",
-      title: "Shan Noodle Shop",
-      subtitle: "Food Order #1042",
-      amount: "-2,800 pts",
-      time: "Yesterday",
-      type: TransactionType.spent,
-    ),
-    TransactionModel(
-      id: "4",
-      title: "Top-Up Reward",
-      subtitle: "Weekly Canteen Promo",
-      amount: "+200 pts",
-      time: "18 Jul 2026",
-      type: TransactionType.received,
-    ),
-  ];
+  late List<TransactionModel> transactions;
 
-  List<TransactionModel> get filteredTransactions {
-    if (selectedTab == 1) {
-      return transactions
-          .where((t) => t.type == TransactionType.received)
-          .toList();
-    } else if (selectedTab == 2) {
-      return transactions
-          .where((t) => t.type == TransactionType.spent)
-          .toList();
+  @override
+  void initState() {
+    super.initState();
+    _loadLocalWalletBalance();
+
+    // Initial Transactions setup
+    transactions = [
+      TransactionModel(
+        id: "0",
+        title: "ငွေလွှဲမည် သို့",
+        subtitle: "Myint Myat",
+        amount: "-1,000 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "1",
+        title: "ပေးပို့သူ",
+        subtitle: "Mg Mg",
+        amount: "+500 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
+        type: TransactionType.received,
+      ),
+      TransactionModel(
+        id: "2",
+        title: "Coffee Corner",
+        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
+        amount: "-1,500 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "3",
+        title: "ရှမ်းခေါက်ဆွဲဆိုင်",
+        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
+        amount: "-2,800 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 27, 18, 30, 0)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "4",
+        title: "ပေးပို့သူ",
+        subtitle: "ကျောင်းသားရေးရာ",
+        amount: "+200 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 18, 9, 15, 20)),
+        type: TransactionType.received,
+      ),
+      TransactionModel(
+        id: "5",
+        title: "Snack Station",
+        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
+        amount: "-600 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 17, 14, 45, 10)),
+        type: TransactionType.spent,
+      ),
+      TransactionModel(
+        id: "6",
+        title: "ပေးပို့သူ",
+        subtitle: "ကျောင်းသားရေးရာ",
+        amount: "+1,000 ပွိုင့်",
+        time: _kpayDateFormat.format(DateTime(2026, 7, 15, 10, 0, 0)),
+        type: TransactionType.received,
+      ),
+    ];
+  }
+
+  /// Loads cached wallet points and updates UserProvider
+  Future<void> _loadLocalWalletBalance() async {
+    try {
+      final wallet = await SharedPreferencesService.getUserWallet();
+      if (wallet != null && mounted) {
+        context.read<UserProvider>().setBalance(wallet.balance);
+      }
+    } catch (e) {
+      debugPrint("Error loading local wallet balance: $e");
     }
-    return transactions;
+  }
+
+  // Limit to only the 5 most recent transactions
+  List<TransactionModel> get recentTransactions {
+    return transactions.take(5).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final list = filteredTransactions;
+    // Watch dynamic balance from UserProvider
+    final int currentBalance = context.watch<UserProvider>().balancePoints;
+    final list = recentTransactions;
 
     return Scaffold(
-      backgroundColor: const Color(0xffF6F8FC),
+      backgroundColor: const Color(0xFFE3F2FD),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE3F2FD),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xff1E293B)),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/navigation');
+            }
+          },
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            /// FLOATING BRANDED GRADIENT HEADER
-            _buildHeader(),
-
-            const SizedBox(height: 14),
-
-            /// REDESIGNED TRANSFER BANNER CARD
-            _buildTransferCard(),
+            /// 1. WALLET INFORMATION CARD
+            _buildWalletInfoCard(currentBalance),
 
             const SizedBox(height: 16),
 
-            /// FILTER TABS
-            _buildFilterTabs(),
+            /// 2. QUICK ACTIONS (Transfer, Receive, Scanner, History)
+            _buildActionButtons(currentBalance),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 20),
 
-            /// TRANSACTIONS LIST
+            /// 3. RECENT HISTORY SECTION HEADER
+            _buildHistoryHeader(),
+
+            const SizedBox(height: 12),
+
+            /// 4. RECENT TRANSACTIONS LIST (Limited to 5)
             Expanded(
               child: list.isEmpty
                   ? _buildEmptyState()
                   : ListView.builder(
                       padding: const EdgeInsets.only(
-                        left: 20,
-                        right: 20,
-                        bottom: 100, // Space for floating bottom nav
+                        left: 16,
+                        right: 16,
+                        bottom: 30,
                       ),
                       itemCount: list.length,
                       itemBuilder: (context, index) {
@@ -127,11 +177,11 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  /// HEADER WITH BALANCE & TITLE
-  Widget _buildHeader() {
+  /// 1. WALLET INFO HEADER CARD
+  Widget _buildWalletInfoCard(int balance) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xff0D6B80), Color(0xff117992)],
@@ -153,18 +203,47 @@ class _WalletScreenState extends State<WalletScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "My Canteen Wallet",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "သုံးစွဲနိုင်သော လက်ကျန်ပွိုင့်",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        NumberFormat('#,###').format(balance),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Text(
+                        "ပွိုင့်",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 5,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
@@ -173,13 +252,13 @@ class _WalletScreenState extends State<WalletScreen> {
                 child: const Row(
                   children: [
                     Icon(
-                      Icons.stars_rounded,
-                      color: Colors.amberAccent,
+                      Icons.account_balance_wallet_rounded,
+                      color: Colors.white,
                       size: 16,
                     ),
                     SizedBox(width: 4),
                     Text(
-                      "Points",
+                      "ပိုက်ဆံအိတ်",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -191,34 +270,16 @@ class _WalletScreenState extends State<WalletScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          Text(
-            "Current Balance",
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "${currentBalance.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')} pts",
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
         ],
       ),
     );
   }
 
-  /// REDESIGNED SINGLE TRANSFER CARD
-  Widget _buildTransferCard() {
+  /// 2. ACTIONS: TRANSFER, RECEIVE, SCANNER, HISTORY
+  Widget _buildActionButtons(int currentBalance) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -226,63 +287,96 @@ class _WalletScreenState extends State<WalletScreen> {
         boxShadow: [
           BoxShadow(
             color: primaryColor.withOpacity(0.05),
-            blurRadius: 12,
+            blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildActionButton(
+            icon: Icons.send_rounded,
+            label: "ပွိုင့်လွှဲမည်",
+            onTap: () {
+              context.go(
+                '/transfer_point',
+                extra: {
+                  'currentBalance': currentBalance,
+                  'onTransferCompleted': (int amount, String recipient) {
+                    final newBalance = currentBalance - amount;
+
+                    // Dynamically update user balance in Provider
+                    context.read<UserProvider>().setBalance(newBalance);
+
+                    setState(() {
+                      transactions.insert(
+                        0,
+                        TransactionModel(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          title: "ငွေလွှဲမည် သို့",
+                          subtitle: recipient,
+                          amount: "-$amount ပွိုင့်",
+                          time: _kpayDateFormat.format(DateTime.now()),
+                          type: TransactionType.spent,
+                        ),
+                      );
+                    });
+                  },
+                },
+              );
+            },
+          ),
+          _buildActionButton(
+            icon: Icons.qr_code_2_rounded,
+            label: "ပွိုင့်လက်ခံမည်",
+            onTap: () => _showReceiveQRModal(context),
+          ),
+          _buildActionButton(
+            icon: Icons.qr_code_scanner_rounded,
+            label: "QR စကင်ဖတ်မည်",
+            onTap: () {
+              widget.onOpenScanner?.call();
+            },
+          ),
+          _buildActionButton(
+            icon: Icons.history_rounded,
+            label: "ပွိုင့်လွှဲမှတ်တမ်း",
+            onTap: () {
+              context.push('/transaction_history', extra: transactions);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+            decoration: const BoxDecoration(
+              color: Color(0xffEAF7F9),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.swap_horiz_rounded,
-              color: primaryColor,
-              size: 24,
-            ),
+            child: Icon(icon, color: primaryColor, size: 22),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Peer Transfer",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xff1E293B),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  "Send points to friends instantly",
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _showTransferDialog,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-            child: const Text(
-              "Transfer",
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Color(0xff334155),
             ),
           ),
         ],
@@ -290,59 +384,21 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  /// FILTER TAB BAR
-  Widget _buildFilterTabs() {
-    final tabs = ["All", "Received", "Spent"];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+  /// 3. HISTORY HEADER
+  Widget _buildHistoryHeader() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
       child: Row(
-        children: List.generate(tabs.length, (index) {
-          final isSelected = selectedTab == index;
-          return Expanded(
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  selectedTab = index;
-                });
-              },
-              child: Container(
-                margin: EdgeInsets.only(right: index == 2 ? 0 : 8),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected ? primaryColor : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected ? primaryColor : Colors.grey.shade200,
-                  ),
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: primaryColor.withOpacity(0.25),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Center(
-                  child: Text(
-                    tabs[index],
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.w500,
-                      color: isSelected
-                          ? Colors.white
-                          : const Color(0xff64748B),
-                    ),
-                  ),
-                ),
-              ),
+        children: [
+          Text(
+            "မကြာသေးမီက ပွိုင့်လွှဲထားသည်များ",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xff1E293B),
             ),
-          );
-        }),
+          ),
+        ],
       ),
     );
   }
@@ -351,83 +407,85 @@ class _WalletScreenState extends State<WalletScreen> {
   Widget _buildTransactionCard(TransactionModel item) {
     final isReceived = item.type == TransactionType.received;
     final accentColor = isReceived
-        ? const Color(0xff10B981) // Emerald
-        : const Color(0xffF59E0B); // Amber
+        ? const Color(0xff10B981)
+        : const Color(0xffF59E0B);
+
+    final String displayTitle = item.subtitle.isNotEmpty
+        ? "${item.title} ${item.subtitle}"
+        : item.title;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isReceived
-                    ? Icons.add_card_rounded
-                    : Icons.shopping_bag_outlined,
-                color: accentColor,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xff1E293B),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    item.subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            context.push('/transaction_history', extra: transactions);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
               children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isReceived
+                        ? Icons.add_card_rounded
+                        : Icons.shopping_bag_outlined,
+                    color: accentColor,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xff1E293B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        item.time,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Text(
                   item.amount,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: isReceived
                         ? const Color(0xff059669)
                         : const Color(0xffE11D48),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  item.time,
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
-                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -445,7 +503,7 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
           const SizedBox(height: 10),
           Text(
-            "No transactions found",
+            "ပွိုင့်လွှဲမှတ်တမ်း မရှိသေးပါ",
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey.shade600,
@@ -457,368 +515,105 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  /// REDESIGNED TRANSFER POINTS BOTTOM SHEET (ALT DESIGN)
-  void _showTransferDialog() {
-    final recipientController = TextEditingController();
-    final amountController = TextEditingController();
-
+  /// MODAL BOTTOM SHEET TO SHOW RECEIVE QR CODE
+  void _showReceiveQRModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
-      elevation: 20,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 12,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "ပွိုင့်လက်ခံမည်",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xff1E293B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Point လက်ခံရန် ဤ QR Code ကို ပေးပို့သူအား ပြပါ",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xffF8FAFC),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xffE2E8F0)),
               ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  /// TOP DRAG HANDLE
-                  Center(
-                    child: Container(
-                      width: 36,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+                  const Icon(
+                    Icons.qr_code_2_rounded,
+                    size: 200,
+                    color: primaryColor,
                   ),
-
-                  /// MINI HEADER & BALANCE CARD
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          primaryColor.withOpacity(0.08),
-                          primaryColor.withOpacity(0.02),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: primaryColor.withOpacity(0.15)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(
-                              Icons.send_rounded,
-                              color: primaryColor,
-                              size: 20,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Send Points",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff1E293B),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            "Balance: $currentBalance pts",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  /// RECIPIENT INPUT
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xffF8FAFC),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: TextField(
-                      controller: recipientController,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: "Recipient Username or ID",
-                        hintStyle: TextStyle(
-                          color: Color(0xff94A3B8),
-                          fontSize: 13,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.alternate_email_rounded,
-                          color: primaryColor,
-                          size: 20,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-
                   const SizedBox(height: 12),
-
-                  /// AMOUNT INPUT
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xffF8FAFC),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: Colors.grey.shade200),
-                    ),
-                    child: TextField(
-                      controller: amountController,
-                      keyboardType: TextInputType.number,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xff1E293B),
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: "0.00",
-                        hintStyle: TextStyle(
-                          color: Color(0xff94A3B8),
-                          fontSize: 18,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.generating_tokens_rounded,
-                          color: primaryColor,
-                          size: 22,
-                        ),
-                        suffixText: "PTS",
-                        suffixStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                          fontSize: 12,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                      ),
+                  Text(
+                    widget.userName,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
                     ),
                   ),
-
-                  const SizedBox(height: 14),
-
-                  /// QUICK SELECTOR CHIPS
-                  Row(
-                    children: [
-                      _buildPillChip("+100", () {
-                        amountController.text = "100";
-                      }),
-                      const SizedBox(width: 8),
-                      _buildPillChip("+500", () {
-                        amountController.text = "500";
-                      }),
-                      const SizedBox(width: 8),
-                      _buildPillChip("+1,000", () {
-                        amountController.text = "1000";
-                      }),
-                      const SizedBox(width: 8),
-                      _buildPillChip("MAX", () {
-                        amountController.text = currentBalance.toString();
-                      }),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  /// SUBMIT BUTTON WITH GRADIENT
-                  Container(
-                    height: 54,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xff0D6B80), Color(0xff117992)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withOpacity(0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-                      onPressed: () {
-                        final int? amount = int.tryParse(amountController.text);
-                        final String recipient = recipientController.text
-                            .trim();
-
-                        if (amount == null ||
-                            amount <= 0 ||
-                            recipient.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Please enter a valid recipient and amount",
-                              ),
-                            ),
-                          );
-                          return;
-                        }
-
-                        if (amount > currentBalance) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Insufficient points balance!"),
-                            ),
-                          );
-                          return;
-                        }
-
-                        setState(() {
-                          currentBalance -= amount;
-                          transactions.insert(
-                            0,
-                            TransactionModel(
-                              id: DateTime.now().millisecondsSinceEpoch
-                                  .toString(),
-                              title: "Points Transferred",
-                              subtitle: "To $recipient",
-                              amount: "-$amount pts",
-                              time: "Just now",
-                              type: TransactionType.spent,
-                            ),
-                          );
-                        });
-
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              "Successfully sent $amount pts to $recipient!",
-                            ),
-                            backgroundColor: primaryColor,
-                          ),
-                        );
-                      },
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Transfer Now",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ],
-                      ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "အိုင်ဒီ - ${widget.studentId}",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  /// HELPER FOR PILL CHIPS
-  Widget _buildPillChip(String label, VoidCallback onTap) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 9),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Color(0xff475569),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () => context.pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Text(
+                  "ပြီးပြီ",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// HELPER FOR PRESET CHIPS
-  Widget _buildPresetChip(String label, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: primaryColor,
-          ),
+            const SizedBox(height: 12),
+          ],
         ),
       ),
     );

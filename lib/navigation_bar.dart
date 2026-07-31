@@ -210,6 +210,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
+import 'package:smartcanteen/view/favourite_screen.dart';
 // import 'package:smartcanteen/view/home/home_screen.dart';
 import 'package:smartcanteen/view/home/homescreen.dart';
 // import 'package:smartcanteen/view/orders/orders_screen.dart';
@@ -217,7 +218,7 @@ import 'package:smartcanteen/view/order_screen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
 // import 'package:smartcanteen/view/scanner/scanner_screen.dart';
 // import 'package:smartcanteen/view/wallet/wallet_screen.dart'; // Updated import
-import 'package:smartcanteen/view/profilescreen.dart';
+import 'package:smartcanteen/view/profile_screen.dart';
 import 'package:smartcanteen/view/user_qr_screen.dart';
 import 'package:smartcanteen/view/wallet_screen.dart';
 
@@ -286,20 +287,58 @@ Future<void> _loadQrData() async {
     OrdersScreen(), // Index 1
     //QrScannerScreen(), // Index 2
     SizedBox.shrink(),
-    WalletScreen(), // Index 3
+    FavouriteScreen(), // Index 3
     ProfileScreen(), // Index 4
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false, // <-- PREVENTS NAV BAR FROM RISING WITH KEYBOARD
-      backgroundColor: Color(0xff117992),
-      extendBody: true,
-      body: Stack(
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     resizeToAvoidBottomInset: false, // <-- PREVENTS NAV BAR FROM RISING WITH KEYBOARD
+  //     backgroundColor: Color(0xff117992),
+  //     extendBody: true,
+  //     body: Stack(
+  //       children: [
+  //         /// PAGES
+  //         IndexedStack(index: currentIndex, children: screens),
+
+  //         /// FROSTED GLASS NAV BAR
+  //         Positioned(
+  //           left: 16,
+  //           right: 16,
+  //           bottom: 20,
+  //           child: _buildGlassNavigationBar(),
+  //         ),
+
+  //         /// CENTER FLOATING SCANNER BUTTON
+  //         Positioned(
+  //           bottom: 38,
+  //           left: 0,
+  //           right: 0,
+  //           child: Center(child: _buildCenterScannerButton()),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+// Inside navigation_bar.dart -> build method
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    resizeToAvoidBottomInset: false,
+    backgroundColor: const Color(0xff117992),
+    extendBody: true,
+    body: SafeArea(
+      bottom: false,
+      child: Stack(
         children: [
-          /// PAGES
-          IndexedStack(index: currentIndex, children: screens),
+          /// RENDER ONLY THE CURRENT ACTIVE SCREEN SAFELY
+          Positioned.fill(
+            child: KeyedSubtree(
+              key: ValueKey<int>(currentIndex),
+              child: screens[currentIndex > 4 ? 0 : currentIndex],
+            ),
+          ),
 
           /// FROSTED GLASS NAV BAR
           Positioned(
@@ -318,9 +357,9 @@ Future<void> _loadQrData() async {
           ),
         ],
       ),
-    );
-  }
-
+    ),
+  );
+}
   /// FROSTED GLASS NAVIGATION BAR
   Widget _buildGlassNavigationBar() {
     return ClipRRect(

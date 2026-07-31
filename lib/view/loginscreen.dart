@@ -77,6 +77,7 @@ class _LoginscreenState extends State<Loginscreen> {
     final logoSize = width * .25;
 
     return Scaffold(
+      backgroundColor: Colors.white, // or your background colo
       resizeToAvoidBottomInset: true,
       body: Container(
         decoration: const BoxDecoration(
@@ -251,7 +252,90 @@ class _LoginscreenState extends State<Loginscreen> {
                               width: double.infinity,
                               height: 55,
                               child: ElevatedButton(
-                              onPressed: () async {
+//                               onPressed: () async {
+//   print("Login button clicked");
+
+//   if (_formKey.currentState!.validate()) {
+//     print("Form validation passed");
+
+//     try {
+//       print("Calling loginUser API...");
+
+//       final result = await ApiService().loginUser(
+//         email: _emailController.text.trim(),
+//         password: _passwordController.text.trim(),
+//       );
+
+
+//       print("API Result: $result");
+// if (result != null && result.success == true) {
+
+      
+//   print("Login successful");
+//   // Save user object
+//   await SharedPreferencesService.saveUser(result.user!);
+
+//   // Save token if available
+//   if (result.token != null) {
+//     await SharedPreferencesService.saveToken(result.token!);
+//   }
+
+//   // Save auth token
+//   if (result.token != null) {
+//     await SecureStorageService.saveToken(result.token!);
+//   }
+
+
+//   // Save FCM token
+//   if (result.user?.fcmToken != null) {
+//     await SecureStorageService.saveFcmToken(
+//       result.user!.fcmToken!,
+//     );
+//   }
+
+
+//   // Create QR data
+//   final qrData = jsonEncode({
+//     'user_id' : result.user?.userId ?? '',
+//     'user_name': result.user?.userName ?? '',
+//     'student_id': result.user?.student?.studentId ?? '',
+//   });
+
+
+//   // Save QR permanently
+//   await SecureStorageService.saveQrData(qrData);
+
+
+//   print("LOGIN QR DATA:");
+//   print(qrData);
+
+
+//   if (!mounted) return;
+
+
+//   context.go(
+//     '/navigation',
+//     extra: qrData,
+//   );
+// } else {
+//         print("Login failed: ${result?.message}");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(
+//             content: Text(
+//               result?.message ?? "Invalid email or password",
+//             ),
+//           ),
+//         );
+//       }
+//     } catch (e) {
+//       print("Login Error: $e");
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text(e.toString())),
+//       );
+//     }
+//   }
+// },
+onPressed: () async {
   print("Login button clicked");
 
   if (_formKey.currentState!.validate()) {
@@ -265,58 +349,42 @@ class _LoginscreenState extends State<Loginscreen> {
         password: _passwordController.text.trim(),
       );
 
-
       print("API Result: $result");
-if (result != null && result.success == true) {
-
       
-  print("Login successful");
-  // Save user object
-  await SharedPreferencesService.saveUser(result.user!);
+      if (result != null && result.success == true) {
+        print("Login successful");
 
-  // Save token if available
-  if (result.token != null) {
-    await SharedPreferencesService.saveToken(result.token!);
-  }
+        // 1. Perform storage operations in microtasks/background to avoid frame skips
+        await Future.wait([
+          SharedPreferencesService.saveUser(result.user!),
+          if (result.token != null) ...[
+            SharedPreferencesService.saveToken(result.token!),
+            SecureStorageService.saveToken(result.token!),
+          ],
+          if (result.user?.fcmToken != null)
+            SecureStorageService.saveFcmToken(result.user!.fcmToken!),
+        ]);
 
-  // Save auth token
-  if (result.token != null) {
-    await SecureStorageService.saveToken(result.token!);
-  }
+        // 2. Create QR data
+        // 2. Create QR data as plain text
+        final userName = result.user?.userName ?? '';
+        final studentId = result.user?.student?.studentId ?? '';
+        
+        // Combine them with a space (or format them however you need)
+        final qrData = '$userName $studentId'.trim();
 
+        await SecureStorageService.saveQrData(qrData);
 
-  // Save FCM token
-  if (result.user?.fcmToken != null) {
-    await SecureStorageService.saveFcmToken(
-      result.user!.fcmToken!,
-    );
-  }
+        await SecureStorageService.saveQrData(qrData);
 
+        if (!mounted) return;
 
-  // Create QR data
-  final qrData = jsonEncode({
-    'user_id' : result.user?.userId ?? '',
-    'user_name': result.user?.userName ?? '',
-    'student_id': result.user?.student?.studentId ?? '',
-  });
-
-
-  // Save QR permanently
-  await SecureStorageService.saveQrData(qrData);
-
-
-  print("LOGIN QR DATA:");
-  print(qrData);
-
-
-  if (!mounted) return;
-
-
-  context.go(
-    '/navigation',
-    extra: qrData,
-  );
-} else {
+        // 3. Smooth transition to navigation screen
+        context.go(
+          '/navigation',
+          extra: qrData,
+        );
+      } else {
         print("Login failed: ${result?.message}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -326,8 +394,9 @@ if (result != null && result.success == true) {
           ),
         );
       }
-    } catch (e) {
+  } catch (e, stackTrace) {
       print("Login Error: $e");
+      print("Stack trace: $stackTrace"); // 👈 This will reveal the exact line causing the loop
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );

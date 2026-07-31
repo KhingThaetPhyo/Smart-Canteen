@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/model/shop_model.dart';
+import 'package:smartcanteen/model/transaction_model.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/navigation_bar.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
+import 'package:smartcanteen/view/favourite_screen.dart';
+import 'package:smartcanteen/view/home/home_header.dart';
 import 'package:smartcanteen/view/home/homescreen.dart';
+import 'package:smartcanteen/view/home/menu_section.dart';
+import 'package:smartcanteen/view/home/shop.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/notification_screen.dart';
 import 'package:smartcanteen/view/order_screen.dart';
-import 'package:smartcanteen/view/profilescreen.dart';
+import 'package:smartcanteen/view/profile_screen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
 import 'package:smartcanteen/view/register_screen.dart';
 import 'package:smartcanteen/view/search_screen.dart';
 import 'package:smartcanteen/view/shop_detail_screen.dart';
 import 'package:smartcanteen/view/splash_screen.dart';
 import 'package:smartcanteen/view/student_info_screen.dart';
+import 'package:smartcanteen/view/transaction_detail_screen.dart';
+import 'package:smartcanteen/view/transactoin_history_screen.dart';
+import 'package:smartcanteen/view/transfer_point_screen.dart';
 import 'package:smartcanteen/view/user_qr_screen.dart';
 import 'package:smartcanteen/view/wallet_info_screen.dart';
 import 'package:smartcanteen/view/wallet_screen.dart';
@@ -60,6 +68,45 @@ final router = GoRouter(
     GoRoute(
       path: '/home',
       builder: (context, state) => const Homescreen(),
+    ),
+    GoRoute(
+      path: '/home_header',
+      builder: (context, state) => const Scaffold(
+        body: SafeArea(child: HomeHeader()),
+      ),
+    ),
+    // GoRoute(
+    //   path: '/recent_order',
+    //   builder: (context, state) => Scaffold(
+    //     appBar: AppBar(title: const Text("Recent Orders")),
+    //     body: const Center(child: Text("Recent Order Screen")),
+    //   ),
+    // ),
+    // GoRoute(
+    //   path: '/menu_section',
+    //   builder: (context, state) => Scaffold(
+    //     body: SafeArea(child: SingleChildScrollView(child: PopularMenuCard())),
+    //   ),
+    // ),
+    GoRoute(
+      path: '/shop',
+      builder: (context, state) {
+        final shopModel = state.extra as ShopModel?;
+        if (shopModel == null) {
+          return const Scaffold(
+            body: Center(child: Text('Shop data not found')),
+          );
+        }
+        return Scaffold(
+          appBar: AppBar(title: Text(shopModel.shopName)),
+          body: ShopCard(
+            shopName: shopModel.shopName,
+            category: shopModel.shopPhone ?? '',
+            isOpen: shopModel.isOpen == 1,
+            estimatedTime: "10-15 min",
+          ),
+        );
+      },
     ),
     GoRoute(
       path: '/student_info',
@@ -150,8 +197,46 @@ GoRoute(
       builder: (context, state) => const WalletScreen(),
     ),
     GoRoute(
+      path: '/transfer_point',
+      builder: (context, state) {
+        final args = state.extra as Map<String, dynamic>?;
+        if (args == null) {
+          return const Scaffold(
+            body: Center(child: Text('Transfer parameters not provided')),
+          );
+        }
+        return TransferPointScreen(
+          currentBalance: args['currentBalance'] as int,
+          onTransferCompleted: args['onTransferCompleted'] as Function(int, String),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/transaction_history',
+      builder: (context, state) {
+        final transactions = state.extra as List<TransactionModel>? ?? [];
+        return TransactionHistoryScreen(transactions: transactions);
+      },
+    ),
+    GoRoute(
+      path: '/transaction_detail',
+      builder: (context, state) {
+        final transaction = state.extra as TransactionModel?;
+        if (transaction == null) {
+          return const Scaffold(
+            body: Center(child: Text('Transaction data not found')),
+          );
+        }
+        return TransactionDetailScreen(transaction: transaction);
+      },
+    ),
+    GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: '/favourite',
+      builder: (context, state) => const FavouriteScreen(),
     ),
   ],
 );
