@@ -71,7 +71,7 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryTeal = Color(0xFF007A87);
+    const primaryTeal = Color(0xff117992);
 
     return Scaffold(
       backgroundColor: primaryTeal,

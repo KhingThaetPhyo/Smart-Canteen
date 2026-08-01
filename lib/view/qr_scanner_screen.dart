@@ -489,181 +489,183 @@ Future<void> pickImage() async {
       ),
 
 
-      body: Column(
-
-        children: [
-
-
-          Expanded(
-
-            child: Stack(
-
-              alignment: Alignment.center,
-
-              children: [
-
-
-                // Show picked image
-                if(pickedImage != null)
-
-                  Image.file(
-
-                    pickedImage!,
-
-                    width: double.infinity,
-
-                    fit: BoxFit.contain,
-
-                  )
-
-
-                else
-
-
-                  MobileScanner(
-
-                    controller: controller,
-
-                    onDetect: onDetect,
-
-                  ),
-
-
-
-                // QR Scanner border
-
-                Container(
-
-                  width: 230,
-
-                  height: 230,
-
-                  decoration: BoxDecoration(
-
-                    border: Border.all(
-
-                      color: Colors.white,
-
-                      width: 3,
-
+      body: SafeArea(
+        child: Column(
+        
+          children: [
+        
+        
+            Expanded(
+        
+              child: Stack(
+        
+                alignment: Alignment.center,
+        
+                children: [
+        
+        
+                  // Show picked image
+                  if(pickedImage != null)
+        
+                    Image.file(
+        
+                      pickedImage!,
+        
+                      width: double.infinity,
+        
+                      fit: BoxFit.contain,
+        
+                    )
+        
+        
+                  else
+        
+        
+                    MobileScanner(
+        
+                      controller: controller,
+        
+                      onDetect: onDetect,
+        
                     ),
-
-                    borderRadius:
-                    BorderRadius.circular(20),
-
+        
+        
+        
+                  // QR Scanner border
+        
+                  Container(
+        
+                    width: 230,
+        
+                    height: 230,
+        
+                    decoration: BoxDecoration(
+        
+                      border: Border.all(
+        
+                        color: Colors.white,
+        
+                        width: 3,
+        
+                      ),
+        
+                      borderRadius:
+                      BorderRadius.circular(20),
+        
+                    ),
+        
                   ),
-
-                ),
-
-
-              ],
-
-            ),
-
-          ),
-
-
-
-          if(qrResult.isNotEmpty)
-
-            Padding(
-
-              padding: const EdgeInsets.all(10),
-
-              child: Text(
-
-                "Result: $qrResult",
-
-                style: const TextStyle(
-
-                  fontSize: 16,
-
-                  fontWeight: FontWeight.bold,
-
-                ),
-
+        
+        
+                ],
+        
               ),
-
+        
             ),
-
-
-
-          // Bottom buttons
-
-          Container(
-
-            height: 90,
-
-            padding: const EdgeInsets.all(15),
-
-            child: Row(
-
-              mainAxisAlignment:
-              MainAxisAlignment.spaceEvenly,
-
-              children: [
-
-
-                // Flash
-
-                ElevatedButton.icon(
-
-                  onPressed: toggleFlash,
-
-                  icon: Icon(
-
-                    isFlashOn
-
-                        ? Icons.flash_on
-
-                        : Icons.flash_off,
-
+        
+        
+        
+            if(qrResult.isNotEmpty)
+        
+              Padding(
+        
+                padding: const EdgeInsets.all(10),
+        
+                child: Text(
+        
+                  "Result: $qrResult",
+        
+                  style: const TextStyle(
+        
+                    fontSize: 16,
+        
+                    fontWeight: FontWeight.bold,
+        
                   ),
-
-                  label: Text(
-
-                    isFlashOn
-
-                        ? "Light On"
-
-                        : "Light",
-
-                  ),
-
+        
                 ),
-
-
-
-                // Album
-
-                ElevatedButton.icon(
-
-                  onPressed: pickImage,
-
-                  icon: const Icon(
-
-                    Icons.photo,
-
+        
+              ),
+        
+        
+        
+            // Bottom buttons
+        
+            Container(
+        
+              height: 90,
+        
+              padding: const EdgeInsets.all(15),
+        
+              child: Row(
+        
+                mainAxisAlignment:
+                MainAxisAlignment.spaceEvenly,
+        
+                children: [
+        
+        
+                  // Flash
+        
+                  ElevatedButton.icon(
+        
+                    onPressed: toggleFlash,
+        
+                    icon: Icon(
+        
+                      isFlashOn
+        
+                          ? Icons.flash_on
+        
+                          : Icons.flash_off,
+        
+                    ),
+        
+                    label: Text(
+        
+                      isFlashOn
+        
+                          ? "Light On"
+        
+                          : "Light",
+        
+                    ),
+        
                   ),
-
-                  label: const Text(
-
-                    "Album",
-
+        
+        
+        
+                  // Album
+        
+                  ElevatedButton.icon(
+        
+                    onPressed: pickImage,
+        
+                    icon: const Icon(
+        
+                      Icons.photo,
+        
+                    ),
+        
+                    label: const Text(
+        
+                      "Album",
+        
+                    ),
+        
                   ),
-
-                ),
-
-
-              ],
-
+        
+        
+                ],
+        
+              ),
+        
             ),
-
-          ),
-
-
-        ],
-
+        
+        
+          ],
+        
+        ),
       ),
 
     );

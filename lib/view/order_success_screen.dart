@@ -689,7 +689,7 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -733,7 +733,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   bool get isDineIn => widget.orderType == 'dine-in';
 
   String get orderReference =>
-      widget.orderId.isNotEmpty ? 'ORD-${widget.orderId}' : 'ORD-SUCCESS';
+      widget.orderId.isNotEmpty ? 'ORD-${widget.orderId}' : '';
 
   String get orderQrData =>
       widget.qrCodeToken.isNotEmpty ? widget.qrCodeToken : orderReference;
@@ -758,32 +758,34 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF6F8FC),
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-                  _buildSuccessHero(),
-                  const SizedBox(height: 22),
-                  _buildPreparationCard(),
-                  const SizedBox(height: 14),
-                  _buildOrderDetailsCard(),
-                  const SizedBox(height: 14),
-                  _buildFulfilmentCard(),
-                  const SizedBox(height: 14),
-                  _buildOrderQrCard(),
-                  const SizedBox(height: 24),
-                  _buildActionButtons(context),
-                ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(20, 22, 20, 28),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    _buildSuccessHero(),
+                    const SizedBox(height: 22),
+                    _buildPreparationCard(),
+                    const SizedBox(height: 14),
+                    _buildOrderDetailsCard(),
+                    const SizedBox(height: 14),
+                    _buildFulfilmentCard(),
+                    const SizedBox(height: 14),
+                    _buildOrderQrCard(),
+                    const SizedBox(height: 24),
+                    _buildActionButtons(context),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1307,7 +1309,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
           height: 50,
           child: OutlinedButton.icon(
             onPressed: () =>
-                Navigator.of(context).popUntil((route) => route.isFirst),
+                context.go('/navigation'),
             icon: Icon(
               Icons.home_outlined,
               color: Colors.grey.shade700,

@@ -417,7 +417,7 @@ import 'package:smartcanteen/service/api_service.dart';
 class ResetPinScreen extends StatefulWidget {
   final String email;
 
-  const ResetPinScreen({Key? key, required this.email}) : super(key: key);
+  const ResetPinScreen({super.key, required this.email});
 
   @override
   State<ResetPinScreen> createState() => _ResetPinScreenState();

@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartcanteen/model/menu_model.dart';
+import 'package:smartcanteen/service/secure_storage_service.dart';
 
 /// ==========================================
 /// 1. FAVORITES MANAGER (Persistent State Handler)
@@ -92,7 +92,6 @@ class FavoritesManager extends ChangeNotifier {
     notifyListeners();
   }
 }
-
 /// ==========================================
 /// 2. FAVOURITE SCREEN UI
 /// ==========================================
@@ -107,6 +106,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   static const Color primaryColor = Color(0xff117992);
   final FavoritesManager _favoritesManager = FavoritesManager();
   bool _isLoading = true;
+  bool _isLoggedIn = false; // Track login state
 
   @override
   void initState() {
@@ -116,8 +116,15 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
   }
 
   Future<void> _refreshData() async {
-    // Explicitly pull fresh favorite data when navigating to screen / logging back in
-    await _favoritesManager.loadFavorites();
+    // Check if user has an auth token stored
+    final token = await SecureStorageService.getToken();
+    _isLoggedIn = token != null && token.isNotEmpty;
+
+    if (_isLoggedIn) {
+      // Explicitly pull fresh favorite data if logged in
+      await _favoritesManager.loadFavorites();
+    }
+    
     if (mounted) {
       setState(() {
         _isLoading = false;
@@ -150,56 +157,73 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
             fontSize: 18,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xff117992),
         elevation: 0.5,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: primaryColor))
-          : favoriteItems.isEmpty
-              ? const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.favorite_border, size: 64, color: Colors.grey),
-                      SizedBox(height: 12),
-                      Text(
-                        "အကြိုက်ဆုံး မီနူးများ မရှိသေးပါ။",
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator(color: primaryColor))
+            : !_isLoggedIn
+                // Show text when user is not logged in
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: Text(
+                        "အကြိုက်ဆုံးမီနူးများကိုကြည့်ရှုရန် ကျေးဇူးပြု၍ အကောင့်ဝင်ပါ။",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.grey,
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ],
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: GridView.builder(
-                    itemCount: favoriteItems.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 0.85,
                     ),
-                    itemBuilder: (context, index) {
-                      final item = favoriteItems[index];
-                      return _FavoriteMenuCard(
-                        shopName: item.shopName,
-                        menu: item.menu,
-                        onRemove: () {
-                          _favoritesManager.toggleFavorite(item.shopName, item.menu);
-                        },
-                      );
-                    },
-                  ),
-                ),
+                  )
+                : favoriteItems.isEmpty
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.favorite_border, size: 64, color: Colors.grey),
+                            SizedBox(height: 12),
+                            Text(
+                              "အကြိုက်ဆုံး မီနူးများ မရှိသေးပါ။",
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: GridView.builder(
+                          itemCount: favoriteItems.length,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 14,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.85,
+                          ),
+                          itemBuilder: (context, index) {
+                            final item = favoriteItems[index];
+                            return _FavoriteMenuCard(
+                              shopName: item.shopName,
+                              menu: item.menu,
+                              onRemove: () {
+                                _favoritesManager.toggleFavorite(item.shopName, item.menu);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+      ),
     );
   }
 }
-
 /// ==========================================
 /// 3. FAVORITE MENU CARD WIDGET
 /// ==========================================

@@ -1,21 +1,40 @@
 {
   "project_info": {
-    "project_number": "344438064119",
-    "project_id": "smart-canteen-b9e53",
-    "storage_bucket": "smart-canteen-b9e53.firebasestorage.app"
+    "project_number": "744172179776",
+    "project_id": "smart-canteen-73a77",
+    "storage_bucket": "smart-canteen-73a77.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:344438064119:android:9b8d612b80ef17702b24f2",
+        "mobilesdk_app_id": "1:744172179776:android:842862ed27a106b7d6aaa5",
         "android_client_info": {
-          "package_name": "com.example.smartcanteen"
+          "package_name": "com.example.smart_canteen_noti"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDGNdz4Dqia3tpAKFXJSiSkSaPYzeBpVeM"
+          "current_key": "AIzaSyBW_dDNeOHg5iyvKXF4OSW_ToMjFWY7oHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744172179776:android:ba346cd85d8d217cd6aaa5",
+        "android_client_info": {
+          "package_name": "com.ucstt.smartcanteenuser"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBW_dDNeOHg5iyvKXF4OSW_ToMjFWY7oHo"
         }
       ],
       "services": {

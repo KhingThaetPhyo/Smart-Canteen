@@ -2213,9 +2213,9 @@ class _MenuSectionState extends State<MenuSection> {
               ),
               TextButton(
                 onPressed: () {
-                  _handleProtectedAction(context, () {
-                    context.push('/all_menus');
-                  });
+                  // _handleProtectedAction(context, () {
+                  //   context.push('/all_menus');
+                  // });
                 },
                 child: const Text(
                   "အားလုံးကြည့်ရန်",

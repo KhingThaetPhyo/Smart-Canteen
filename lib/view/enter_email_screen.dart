@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/view/reset_pin_screen.dart';
 class EnterEmailScreen extends StatefulWidget {
-  const EnterEmailScreen({Key? key}) : super(key: key);
+  const EnterEmailScreen({super.key});
 
   @override
   State<EnterEmailScreen> createState() => _EnterEmailScreenState();
@@ -32,7 +32,7 @@ class _EnterEmailScreenState extends State<EnterEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('OTP နံပါတ်ကို အီးမေးလ်သို့ ပို့လိုက်ပါပြီ။'),
-          backgroundColor: Color(0xFF007A87),
+          backgroundColor: Color(0xff117992),
         ),
       );
       Navigator.push(

@@ -1,4 +1,4 @@
-package com.example.smartcanteen
+package com.ucstt.smartcanteenuser
 
 import io.flutter.embedding.android.FlutterActivity
 

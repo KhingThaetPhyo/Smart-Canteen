@@ -23,7 +23,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
 
-  static const primaryTeal = Color(0xFF007A87);
+  static const primaryTeal = Color(0xff117992);
   static const backgroundColor = Color(0xFFF8FAFC);
 
   @override
@@ -179,205 +179,207 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Column(
-        children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    shape: BoxShape.circle,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Section
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.lock_reset_rounded,
+                      size: 48,
+                      color: Colors.white,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.lock_reset_rounded,
-                    size: 48,
-                    color: Colors.white,
+                  const SizedBox(height: 10),
+                  const Text(
+                    'လျှို့ဝှက်နံပါတ် ပြောင်းလဲရန်',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'လျှို့ဝှက်နံပါတ် ပြောင်းလဲရန်',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Form Container
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
-                ),
-              ),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  // Form Level တွင် autovalidateMode မသုံးပါ
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-
-                      // Current Password Field
-                      TextFormField(
-                        controller: _currentPasswordController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        obscureText: !_isCurrentPasswordVisible,
-                        validator: (val) => val == null || val.isEmpty
-                            ? 'လက်ရှိ လျှို့ဝှက်နံပါတ် ရိုက်ထည့်ပါ'
-                            : null,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        decoration: _buildFloatingInputDecoration(
-                          labelText: 'လက်ရှိ လျှို့ဝှက်နံပါတ်',
-                          hintText: 'လက်ရှိ လျှို့ဝှက်နံပါတ် ရိုက်ထည့်ပါ',
-                          prefixIcon: Icons.lock_clock_outlined,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isCurrentPasswordVisible
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isCurrentPasswordVisible =
-                                    !_isCurrentPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-
-                      // New Password Field
-                      TextFormField(
-                        controller: _newPasswordController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        obscureText: !_isNewPasswordVisible,
-                        validator: _validatePasswordWithSuggestions,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        decoration: _buildFloatingInputDecoration(
-                          labelText: 'လျှို့ဝှက်နံပါတ်အသစ်',
-                          hintText: 'ဥပမာ - Khing12@',
-                          prefixIcon: Icons.lock_outline_rounded,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isNewPasswordVisible
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isNewPasswordVisible = !_isNewPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 25),
-
-                      // Confirm Password Field
-                      TextFormField(
-                        controller: _confirmPasswordController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        obscureText: !_isConfirmPasswordVisible,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) {
-                            return 'လျှို့ဝှက်နံပါတ်အသစ် အတည်ပြုပေးပါ';
-                          }
-                          if (val != _newPasswordController.text) {
-                            return 'လျှို့ဝှက်နံပါတ်များ ကိုက်ညီမှု မရှိပါ';
-                          }
-                          return null;
-                        },
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        decoration: _buildFloatingInputDecoration(
-                          labelText: 'လျှို့ဝှက်နံပါတ်အသစ် အတည်ပြုရန်',
-                          hintText: 'လျှို့ဝှက်နံပါတ်အသစ် ပြန်ရိုက်ထည့်ပါ',
-                          prefixIcon: Icons.check_circle_outline_rounded,
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isConfirmPasswordVisible
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.grey,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isConfirmPasswordVisible =
-                                    !_isConfirmPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 35),
-
-                      // Save Changes Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryTeal,
-                            elevation: 3,
-                            shadowColor: primaryTeal.withOpacity(0.3),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          onPressed: _isLoading ? null : _handleChangePassword,
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
-                                )
-                              : const Text(
-                                  'အတည်ပြုမည်',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ),
-          ),
-        ],
+        
+            // Form Container
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(24.0),
+                  child: Form(
+                    key: _formKey,
+                    // Form Level တွင် autovalidateMode မသုံးပါ
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 10),
+        
+                        // Current Password Field
+                        TextFormField(
+                          controller: _currentPasswordController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          obscureText: !_isCurrentPasswordVisible,
+                          validator: (val) => val == null || val.isEmpty
+                              ? 'လက်ရှိ လျှို့ဝှက်နံပါတ် ရိုက်ထည့်ပါ'
+                              : null,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          decoration: _buildFloatingInputDecoration(
+                            labelText: 'လက်ရှိ လျှို့ဝှက်နံပါတ်',
+                            hintText: 'လက်ရှိ လျှို့ဝှက်နံပါတ် ရိုက်ထည့်ပါ',
+                            prefixIcon: Icons.lock_clock_outlined,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isCurrentPasswordVisible
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isCurrentPasswordVisible =
+                                      !_isCurrentPasswordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+        
+                        // New Password Field
+                        TextFormField(
+                          controller: _newPasswordController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          obscureText: !_isNewPasswordVisible,
+                          validator: _validatePasswordWithSuggestions,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          decoration: _buildFloatingInputDecoration(
+                            labelText: 'လျှို့ဝှက်နံပါတ်အသစ်',
+                            hintText: 'ဥပမာ - Khing12@',
+                            prefixIcon: Icons.lock_outline_rounded,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isNewPasswordVisible
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isNewPasswordVisible = !_isNewPasswordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+        
+                        // Confirm Password Field
+                        TextFormField(
+                          controller: _confirmPasswordController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          obscureText: !_isConfirmPasswordVisible,
+                          validator: (val) {
+                            if (val == null || val.isEmpty) {
+                              return 'လျှို့ဝှက်နံပါတ်အသစ် အတည်ပြုပေးပါ';
+                            }
+                            if (val != _newPasswordController.text) {
+                              return 'လျှို့ဝှက်နံပါတ်များ ကိုက်ညီမှု မရှိပါ';
+                            }
+                            return null;
+                          },
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          decoration: _buildFloatingInputDecoration(
+                            labelText: 'လျှို့ဝှက်နံပါတ်အသစ် အတည်ပြုရန်',
+                            hintText: 'လျှို့ဝှက်နံပါတ်အသစ် ပြန်ရိုက်ထည့်ပါ',
+                            prefixIcon: Icons.check_circle_outline_rounded,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isConfirmPasswordVisible
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isConfirmPasswordVisible =
+                                      !_isConfirmPasswordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 35),
+        
+                        // Save Changes Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryTeal,
+                              elevation: 3,
+                              shadowColor: primaryTeal.withOpacity(0.3),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: _isLoading ? null : _handleChangePassword,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : const Text(
+                                    'အတည်ပြုမည်',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

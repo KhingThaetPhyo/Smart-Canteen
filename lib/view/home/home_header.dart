@@ -103,13 +103,29 @@ Future<void> _loadUserData() async {
     const double halfCardHeight = 48;
     final bool hasNotification = false;
 
-    final String userName = currentUser?.userName ?? "Guest";
-    final String major = currentUser?.student != null
-        ? "${currentUser!.student!.yearLevel ?? 'Student'}"
-        : "သင့်အကောင့်သို့";
-    final String studentId = currentUser?.student?.studentId ?? "လော့ဂ်အင် ၀င်ပါ...";
-   // final int points = currentUserWallet?.balance ?? 0;
+  //   final String userName = currentUser?.userName ?? "Guest";
+  //   final String major = currentUser?.student != null
+  //       ? currentUser!.student!.yearLevel ?? 'Student'
+  //       : "သင့်အကောင့်သို့";
+  //   final String studentId = currentUser?.student?.studentId ?? "လော့ဂ်အင် ၀င်ပါ...";
+  //  // final int points = currentUserWallet?.balance ?? 0;
 
+final String userName = currentUser?.userName ?? "Guest";
+    
+    // Check if user is logged in and if they have a student profile
+    final bool isLoggedIn = currentUser != null;
+    final bool isStudent = currentUser?.student != null;
+
+    // If it's a teacher (logged in, but no student profile), show nothing ("")
+    // If not logged in, show the login text prompt
+    final String major = !isLoggedIn 
+        ? "သင့်အကောင့်သို့" 
+        : (isStudent ? (currentUser!.student!.yearLevel ?? 'Student') : "");
+        
+    final String studentId = !isLoggedIn 
+        ? "လော့ဂ်အင် ၀င်ပါ..." 
+        : (isStudent ? (currentUser!.student!.studentId ?? "") : "");
+        
    final int points = context.watch<UserProvider>().balancePoints;
     return Stack(
       clipBehavior: Clip.none,
@@ -182,7 +198,7 @@ Future<void> _loadUserData() async {
                           isLoading ? "..." : userName,
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:smartcanteen/model/transaction_model.dart';
 import 'package:smartcanteen/provider/user_provider.dart';
+import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -23,79 +24,19 @@ class WalletScreen extends StatefulWidget {
   @override
   State<WalletScreen> createState() => _WalletScreenState();
 }
-
 class _WalletScreenState extends State<WalletScreen> {
   static const Color primaryColor = Color(0xff117992);
+  final ApiService _apiService = ApiService(); // Add ApiService
 
-  // Kpay style date formatter (e.g., 4/12/2026 15:36:12)
-  final DateFormat _kpayDateFormat = DateFormat('M/d/yyyy HH:mm:ss');
-
-  late List<TransactionModel> transactions;
+  // 1. Initialize with an empty list to prevent LateInitializationError
+  List<TransactionModel> transactions = [];
+  bool isLoadingTransactions = true;
 
   @override
   void initState() {
     super.initState();
     _loadLocalWalletBalance();
-
-    // Initial Transactions setup
-    transactions = [
-      TransactionModel(
-        id: "0",
-        title: "ငွေလွှဲမည် သို့",
-        subtitle: "Myint Myat",
-        amount: "-1,000 ပွိုင့်",
-        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
-        type: TransactionType.spent,
-      ),
-      TransactionModel(
-        id: "1",
-        title: "ပေးပို့သူ",
-        subtitle: "Mg Mg",
-        amount: "+500 ပွိုင့်",
-        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
-        type: TransactionType.received,
-      ),
-      TransactionModel(
-        id: "2",
-        title: "Coffee Corner",
-        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
-        amount: "-1,500 ပွိုင့်",
-        time: _kpayDateFormat.format(DateTime(2026, 7, 28, 12, 15, 0)),
-        type: TransactionType.spent,
-      ),
-      TransactionModel(
-        id: "3",
-        title: "ရှမ်းခေါက်ဆွဲဆိုင်",
-        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
-        amount: "-2,800 ပွိုင့်",
-        time: _kpayDateFormat.format(DateTime(2026, 7, 27, 18, 30, 0)),
-        type: TransactionType.spent,
-      ),
-      TransactionModel(
-        id: "4",
-        title: "ပေးပို့သူ",
-        subtitle: "ကျောင်းသားရေးရာ",
-        amount: "+200 ပွိုင့်",
-        time: _kpayDateFormat.format(DateTime(2026, 7, 18, 9, 15, 20)),
-        type: TransactionType.received,
-      ),
-      TransactionModel(
-        id: "5",
-        title: "Snack Station",
-        subtitle: "(ကျသင့်ပွိုင့်ပေးချေမှု)",
-        amount: "-600 ပွိုင့်",
-        time: _kpayDateFormat.format(DateTime(2026, 7, 17, 14, 45, 10)),
-        type: TransactionType.spent,
-      ),
-      TransactionModel(
-        id: "6",
-        title: "ပေးပို့သူ",
-        subtitle: "ကျောင်းသားရေးရာ",
-        amount: "+1,000 ပွိုင့်",
-        time: _kpayDateFormat.format(DateTime(2026, 7, 15, 10, 0, 0)),
-        type: TransactionType.received,
-      ),
-    ];
+    _fetchUserTransactions(); // Fetch actual data
   }
 
   /// Loads cached wallet points and updates UserProvider
@@ -110,8 +51,29 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-  // Limit to only the 5 most recent transactions
+  /// Fetch transactions from backend API
+  Future<void> _fetchUserTransactions() async {
+    try {
+      final responseData = await _apiService.getTransactions();
+      if (responseData != null && mounted) {
+        setState(() {
+          transactions = responseData
+              .map((json) => TransactionModel.fromJson(json))
+              .toList();
+          isLoadingTransactions = false;
+        });
+      } else {
+        setState(() => isLoadingTransactions = false);
+      }
+    } catch (e) {
+      debugPrint("Error fetching wallet transactions: $e");
+      if (mounted) setState(() => isLoadingTransactions = false);
+    }
+  }
+
+  // Limit to only the 5 most recent transactions safely
   List<TransactionModel> get recentTransactions {
+    if (transactions.isEmpty) return [];
     return transactions.take(5).toList();
   }
 
@@ -310,18 +272,19 @@ class _WalletScreenState extends State<WalletScreen> {
                     context.read<UserProvider>().setBalance(newBalance);
 
                     setState(() {
-                      transactions.insert(
-                        0,
-                        TransactionModel(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          title: "ငွေလွှဲမည် သို့",
-                          subtitle: recipient,
-                          amount: "-$amount ပွိုင့်",
-                          time: _kpayDateFormat.format(DateTime.now()),
-                          type: TransactionType.spent,
-                        ),
-                      );
-                    });
+  transactions.insert(
+    0,
+    TransactionModel(
+      transactionId: DateTime.now().millisecondsSinceEpoch,
+      amount: amount..toString(),
+      transactionType: 'TRANSFER',
+      status: 'success',
+      createdAt: DateTime.now().toIso8601String(),
+      updatedAt: DateTime.now().toIso8601String(),
+      remark: recipient,
+    ),
+  );
+});
                   },
                 },
               );
@@ -474,7 +437,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  item.amount,
+                  item.amount.toString(),
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,

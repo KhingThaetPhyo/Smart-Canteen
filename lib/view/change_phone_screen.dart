@@ -24,7 +24,7 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
   late TextEditingController _phoneController;
 
   // Theme Colors
-  static const primaryTeal = Color(0xFF00838F);
+  static const primaryTeal = Color(0xff117992);
   static const backgroundColor = Color(0xFFF8FAFC);
 
   @override
@@ -145,149 +145,151 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    _getInitials(_nameController.text),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Section
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      _getInitials(_nameController.text),
+                      style: const TextStyle(
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                        color: primaryTeal,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    _nameController.text.isEmpty
+                        ? 'Khing Thaet Thaet Phyo'
+                        : _nameController.text,
                     style: const TextStyle(
-                      fontSize: 35,
+                      color: Colors.white,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: primaryTeal,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+        
+            // Form Container
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                ),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.all(24.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'အချက်အလက်များ ပြင်ဆင်ရန်',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                            letterSpacing: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+        
+                        // Phone Field
+                        _buildInputLabel('ဖုန်းနံပါတ်'),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _phoneController,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            MyanmarPhoneInputFormatter(),
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'ဖုန်းနံပါတ် ရိုက်ထည့်ပါ';
+                            }
+                            String firstChar = value[0];
+                            if (['9', '7', '6'].contains(firstChar) &&
+                                value.length != 9) {
+                              return '09 နောက်တွင် ဂဏန်း ၉ လုံး ရှိရပါမည်';
+                            }
+                            if (firstChar == '4' && value.length != 8) {
+                              return '09 နောက်တွင် ဂဏန်း ၈ လုံး ရှိရပါမည်';
+                            }
+                            return null;
+                          },
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          decoration: _buildInputDecoration(
+                            hintText: '778123456',
+                            prefixIcon: Icons.phone_outlined,
+                            prefixText: '09 ',
+                          ),
+                        ),
+        
+                        const SizedBox(height: 32),
+        
+                        // Save Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 52,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryTeal,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            onPressed: _isLoading ? null : _saveProfile,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : const Text(
+                                    'သိမ်းဆည်းမည်',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  _nameController.text.isEmpty
-                      ? 'Khing Thaet Thaet Phyo'
-                      : _nameController.text,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-
-          // Form Container
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
-                ),
-              ),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(24.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'အချက်အလက်များ ပြင်ဆင်ရန်',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey,
-                          letterSpacing: 1.1,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-
-                      // Phone Field
-                      _buildInputLabel('ဖုန်းနံပါတ်'),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: _phoneController,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          MyanmarPhoneInputFormatter(),
-                        ],
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'ဖုန်းနံပါတ် ရိုက်ထည့်ပါ';
-                          }
-                          String firstChar = value[0];
-                          if (['9', '7', '6'].contains(firstChar) &&
-                              value.length != 9) {
-                            return '09 နောက်တွင် ဂဏန်း ၉ လုံး ရှိရပါမည်';
-                          }
-                          if (firstChar == '4' && value.length != 8) {
-                            return '09 နောက်တွင် ဂဏန်း ၈ လုံး ရှိရပါမည်';
-                          }
-                          return null;
-                        },
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        decoration: _buildInputDecoration(
-                          hintText: '778123456',
-                          prefixIcon: Icons.phone_outlined,
-                          prefixText: '09 ',
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Save Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryTeal,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          onPressed: _isLoading ? null : _saveProfile,
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
-                                )
-                              : const Text(
-                                  'သိမ်းဆည်းမည်',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

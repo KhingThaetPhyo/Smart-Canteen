@@ -14,115 +14,117 @@ void showPickUpCodeDialog(BuildContext context, String code) {
           primaryColor.withOpacity(0.05),
           const Color(0xffF8FAFC),
         ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /// HEADER SECTION
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                /// HEADER SECTION
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.grid_view_rounded,
+                            size: 18,
+                            color: primaryColor,
+                          ),
                         ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          "Customer's pickup QR",
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff1E293B),
+                          ),
+                        ),
+                      ],
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
                         child: const Icon(
-                          Icons.grid_view_rounded,
-                          size: 18,
-                          color: primaryColor,
+                          Icons.close_rounded,
+                          size: 22,
+                          color: Color(0xff64748B),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        "Customer's pickup QR",
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff1E293B),
+                    ),
+                  ],
+                ),
+          
+                const SizedBox(height: 16),
+                const Divider(height: 1, color: Color(0xffE2E8F0), thickness: 1),
+                const SizedBox(height: 20),
+          
+                /// QR CODE CARD CONTAINER
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 28,
+                    horizontal: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xff0F172A).withOpacity(0.05),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: CustomPaint(
+                          painter: _MockQrCodePainter(themeColor: primaryColor),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+          
+                      /// PICKUP CODE BADGE
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 9,
+                        ),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: primaryColor.withOpacity(0.25),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          code,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: primaryColor,
+                            letterSpacing: 0.6,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      child: const Icon(
-                        Icons.close_rounded,
-                        size: 22,
-                        color: Color(0xff64748B),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-              const Divider(height: 1, color: Color(0xffE2E8F0), thickness: 1),
-              const SizedBox(height: 20),
-
-              /// QR CODE CARD CONTAINER
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 28,
-                  horizontal: 20,
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xff0F172A).withOpacity(0.05),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: CustomPaint(
-                        painter: _MockQrCodePainter(themeColor: primaryColor),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    /// PICKUP CODE BADGE
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 22,
-                        vertical: 9,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: primaryColor.withOpacity(0.25),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        code,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: primaryColor,
-                          letterSpacing: 0.6,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );

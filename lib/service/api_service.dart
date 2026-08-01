@@ -1,7 +1,7 @@
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as _dio;
+import 'package:http/http.dart' as dio;
 import 'package:http/http.dart' as http;
 import 'package:smartcanteen/model/category_model.dart';
 import 'package:smartcanteen/model/login_model.dart';
@@ -14,7 +14,7 @@ import 'package:smartcanteen/service/secure_storage_service.dart'; // Make sure 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
   //static const String baseUrl = "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
-  static const String baseUrl = "http://192.168.1.12:8000/api";
+  static const String baseUrl = "http://192.168.1.3:8000/api";
 //https://0c087b6d8fabd90f-202-165-86-143.serveousercontent.com/api/login
   final Dio _dio = Dio(
     BaseOptions(
@@ -465,12 +465,16 @@ Future<List<Map<String, dynamic>>> getShopTables(int shopId) async {
   //     throw e.response?.data['message'] ?? 'Failed to load orders.';
   //   }
   // }
-Future<List<OrderModel>> getUserOrders() async {
+Future<List<OrderModel>> getUserOrders({String? dateFilter}) async {
     try {
       final token = await SecureStorageService.getToken();
-
+        // Example endpoint call passing the filter query if provided
+  final endpoint = dateFilter != null && dateFilter.isNotEmpty 
+      ? '/user/orders?filter=$dateFilter' 
+      : '/user/orders';
       final response = await _dio.get(
-        "/user/orders",
+        //"/user/orders",
+        endpoint,
         options: Options(
           headers: {
             if (token != null) "Authorization": "Bearer $token",
@@ -571,6 +575,36 @@ Future<List<Map<String, dynamic>>> searchUsers(String query) async {
       throw 'ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ။';
     }
   }
+
+
+/// Fetch User Transactions
+Future<List<dynamic>?> getTransactions() async {
+  try {
+    final token = await SecureStorageService.getToken();
+
+    final response = await _dio.get(
+      "/transactions",
+      options: Options(
+        headers: {
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      final List listData = response.data['data'] ?? [];
+      return listData;
+    }
+    return [];
+  } on DioException catch (e) {
+    print("========== FETCH TRANSACTIONS ERROR ==========");
+    print("Type: ${e.type}");
+    print("Message: ${e.message}");
+    print("Response: ${e.response?.data}");
+    print("==============================================");
+    throw e.response?.data['message'] ?? 'Failed to load transactions.';
+  }
+}
 
 
   // ===== UPDATE Phone USER =====

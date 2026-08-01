@@ -89,18 +89,33 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:smartcanteen/fcm_helper.dart';
 import 'package:smartcanteen/provider/user_provider.dart';
 import 'package:smartcanteen/router/user_router.dart';
 
+// Background တွင် Notification လက်ခံရန် Handler
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint("Background message received: ${message.messageId}");
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+ 
+  // // Firebase initialization
+  // await Firebase.initializeApp();
 
-  // Firebase initialization
+  // // Notification permission
+  // await FirebaseMessaging.instance.requestPermission();
+// Firebase စတင်ခြင်း[cite: 1]
   await Firebase.initializeApp();
 
-  // Notification permission
-  await FirebaseMessaging.instance.requestPermission();
+  // Background Message Handler ချိတ်ဆက်ခြင်း
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  // FCM Token နှင့် Notification Permission တောင်းခံခြင်း
+  await FcmHelper.getToken();
   // Hide ONLY top status bar (removes clock, battery, notifications)
   await SystemChrome.setEnabledSystemUIMode(
     SystemUiMode.manual,

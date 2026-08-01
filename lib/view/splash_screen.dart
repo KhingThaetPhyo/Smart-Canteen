@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (token != null && token.isNotEmpty) {
       context.go('/navigation'); // Login ဝင်ထားပြီးသားဆိုလျှင်
     } else {
-      context.go('/login'); // Login မဝင်ရသေးလျှင် Login Screen သို့
+      context.go('/navigation'); // Login မဝင်ရသေးလျှင် Login Screen သို့
     }
   }
 
@@ -85,155 +85,157 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       backgroundColor: primaryContainer,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.1,
-              child: CustomPaint(
-                painter: DotPatternPainter(),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.1,
+                child: CustomPaint(
+                  painter: DotPatternPainter(),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            top: -80,
-            right: -80,
-            child: Container(
-              width: 256,
-              height: 256,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: textWhite.withOpacity(0.05),
+            Positioned(
+              top: -80,
+              right: -80,
+              child: Container(
+                width: 256,
+                height: 256,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: textWhite.withOpacity(0.05),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: -80,
-            left: -80,
-            child: Container(
-              width: 256,
-              height: 256,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: textWhite.withOpacity(0.05),
+            Positioned(
+              bottom: -80,
+              left: -80,
+              child: Container(
+                width: 256,
+                height: 256,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: textWhite.withOpacity(0.05),
+                ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 40,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const SizedBox(height: 16),
-                  SlideTransition(
-                    position: _slideAnimation,
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 230,
-                            height: 230,
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: textWhite.withOpacity(0.1),
-                              border: Border.all(
-                                color: textWhite.withOpacity(0.2),
-                                width: 2,
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 40,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(height: 16),
+                    SlideTransition(
+                      position: _slideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 230,
+                              height: 230,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: textWhite.withOpacity(0.1),
+                                border: Border.all(
+                                  color: textWhite.withOpacity(0.2),
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.25),
+                                    blurRadius: 25,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.25),
-                                  blurRadius: 25,
-                                  offset: const Offset(0, 10),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  'assets/image/user_logo.jpg',
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.storefront,
+                                      size: 80,
+                                      color: Colors.white,
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              'SMARTCANTEEN',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: textWhite,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 32,
+                                  height: 1,
+                                  color: textWhite.withOpacity(0.4),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  child: Text(
+                                    'USER EDITION',
+                                    style: TextStyle(
+                                      color: Colors.white60,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 2,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  width: 32,
+                                  height: 1,
+                                  color: textWhite.withOpacity(0.4),
                                 ),
                               ],
                             ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                'assets/image/user_logo.jpg',
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Icon(
-                                    Icons.storefront,
-                                    size: 80,
-                                    color: Colors.white,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          const Text(
-                            'SMARTCANTEEN',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: textWhite,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 32,
-                                height: 1,
-                                color: textWhite.withOpacity(0.4),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  'USER EDITION',
-                                  style: TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: 2,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: 32,
-                                height: 1,
-                                color: textWhite.withOpacity(0.4),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 40),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AnimatedPulsingDots(controller: _pulseController),
-                      const SizedBox(height: 16),
-                      Text(
-                        'LOADING CAMPUS MENUS...',
-                        style: TextStyle(
-                          color: textWhite.withOpacity(0.5),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
+                            const SizedBox(height: 40),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedPulsingDots(controller: _pulseController),
+                        const SizedBox(height: 16),
+                        Text(
+                          'LOADING CAMPUS MENUS...',
+                          style: TextStyle(
+                            color: textWhite.withOpacity(0.5),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

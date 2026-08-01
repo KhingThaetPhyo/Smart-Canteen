@@ -8,7 +8,6 @@ import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/view/favourite_screen.dart';
 import 'package:smartcanteen/view/home/home_header.dart';
 import 'package:smartcanteen/view/home/homescreen.dart';
-import 'package:smartcanteen/view/home/menu_section.dart';
 import 'package:smartcanteen/view/home/shop.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/notification_screen.dart';
@@ -30,26 +29,52 @@ import 'package:smartcanteen/view/wallet_screen.dart';
 final router = GoRouter(
   initialLocation: '/splash',
 
-  // Check token when app opens
+  // Check token and redirect appropriately
   redirect: (context, state) async {
     final token = await SecureStorageService.getToken();
-
     final isLoggedIn = token != null && token.isNotEmpty;
-    final isAuthPage = state.matchedLocation == '/login' ||
-        state.matchedLocation == '/register';
+    
+    final matchedLocation = state.matchedLocation;
+    const splashPath = '/splash';
+    const loginPath = '/login';
+    const registerPath = '/register';
+    const navPath = '/navigation';
 
-    // If logged in, don't allow login/register page
-    if (isLoggedIn && isAuthPage) {
-      return '/navigation';
+    // 1. Let the splash screen render and run its internal timer/logic
+    if (matchedLocation == splashPath) {
+      return null;
     }
 
-    // If not logged in, don't allow home page
-    if (!isLoggedIn && state.matchedLocation == '/navigation') {
-      return '/navigation';
+    // 2. Prevent logged-in users from going back to login/register pages
+    if (isLoggedIn && (matchedLocation == loginPath || matchedLocation == registerPath)) {
+      return navPath;
     }
 
     return null;
   },
+// final router = GoRouter(
+//   initialLocation: '/splash',
+
+//   // Check token when app opens
+//   redirect: (context, state) async {
+//     final token = await SecureStorageService.getToken();
+
+//     final isLoggedIn = token != null && token.isNotEmpty;
+//     final isAuthPage = state.matchedLocation == '/login' ||
+//         state.matchedLocation == '/register';
+
+//     // If logged in, don't allow login/register page
+//     if (isLoggedIn && isAuthPage) {
+//       return '/navigation';
+//     }
+
+//     // If not logged in, don't allow home page
+//     if (!isLoggedIn && state.matchedLocation == '/navigation') {
+//       return '/navigation';
+//     }
+
+//     return null;
+//   },
 
   routes: [
     GoRoute(
@@ -214,10 +239,22 @@ GoRoute(
     GoRoute(
       path: '/transaction_history',
       builder: (context, state) {
-        final transactions = state.extra as List<TransactionModel>? ?? [];
-        return TransactionHistoryScreen(transactions: transactions);
+        //final transactions = state.extra as List<TransactionModel>? ?? [];
+        return TransactionHistoryScreen();
       },
     ),
+    // GoRoute(
+    //   path: '/transaction_detail',
+    //   builder: (context, state) {
+    //     final transaction = state.extra as TransactionModel?;
+    //     if (transaction == null) {
+    //       return const Scaffold(
+    //         body: Center(child: Text('Transaction data not found')),
+    //       );
+    //     }
+    //     return TransactionDetailScreen(transaction: transaction, currentWalletId: transaction.w,);
+    //   },
+    // ),
     GoRoute(
       path: '/transaction_detail',
       builder: (context, state) {
@@ -227,7 +264,14 @@ GoRoute(
             body: Center(child: Text('Transaction data not found')),
           );
         }
-        return TransactionDetailScreen(transaction: transaction);
+        
+        // ဥပမာ - fromWalletId ကို လက်ရှိ user အဖြစ် သတ်မှတ်ခြင်း သို့မဟုတ် app state မှ ယူသုံးခြင်း
+        final int currentWalletId = transaction.fromWalletId ?? 0; 
+
+        return TransactionDetailScreen(
+          transaction: transaction, 
+          //currentWalletId: currentWalletId,
+        );
       },
     ),
     GoRoute(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/view/order_detail_screen.dart';
 
 // Helper model for individual items within an order
 class OrderItem {
@@ -7,12 +9,14 @@ class OrderItem {
 
   const OrderItem({required this.name, required this.quantity});
 }
-
 class RecentOrderCard extends StatelessWidget {
   final String shopName;
   final String orderDate;
   final String totalPrice;
   final List<OrderItem> items;
+  
+  // 1. Add the order object or data map required by OrderDetailScreen
+  final Map<String, dynamic> orderData; 
 
   const RecentOrderCard({
     super.key,
@@ -20,10 +24,10 @@ class RecentOrderCard extends StatelessWidget {
     required this.orderDate,
     required this.totalPrice,
     required this.items,
+    required this.orderData, // 2. Require it in the constructor
   });
 
   static const Color primaryColor = Color(0xff117992);
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -171,32 +175,59 @@ class RecentOrderCard extends StatelessWidget {
                 ],
               ),
 
-              /// REORDER BUTTON
-ElevatedButton(
-  onPressed: () {
+//               /// REORDER BUTTON
+// ElevatedButton(
+//   onPressed: () {
     
-  },
+//   },
 
-  child: const Text(
-    "အသေးစိတ်",
-    style: TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 12,
-    ),
-  ),
+//   style: ElevatedButton.styleFrom(
+//     backgroundColor: primaryColor,
+//     foregroundColor: Colors.white,
+//     elevation: 0,
+//     padding: const EdgeInsets.symmetric(
+//       horizontal: 14,
+//     ),
+//     shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.circular(10),
+//     ),
+//   ),
 
-  style: ElevatedButton.styleFrom(
-    backgroundColor: primaryColor,
-    foregroundColor: Colors.white,
-    elevation: 0,
-    padding: const EdgeInsets.symmetric(
-      horizontal: 14,
-    ),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
-  ),
-),
+//   child: const Text(
+//     "အသေးစိတ်",
+//     style: TextStyle(
+//       fontWeight: FontWeight.bold,
+//       fontSize: 12,
+//     ),
+//   ),
+// ),
+InkWell(
+                onTap: () {
+                  // 3. Now 'orderData' is defined and accessible here!
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OrderDetailScreen(order: orderData),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    "အသေးစိတ်",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ],

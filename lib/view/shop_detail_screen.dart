@@ -793,7 +793,9 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/api_service.dart';
+import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
 import 'package:smartcanteen/view/add_to_cart_screen.dart';
 
@@ -973,7 +975,40 @@ Future<void> _loadUserData() async {
     }
   }
 
-  void _addToCart(Map<String, dynamic> item) {
+  // void _addToCart(Map<String, dynamic> item) {
+  //   setState(() {
+  //     final bool isCountable = item["isCountable"] ?? false;
+
+  //     if (isCountable) {
+  //       if ((item["stockCount"] ?? 0) > 0) {
+  //         item["stockCount"] -= 1;
+  //         item["cartQuantity"] = (item["cartQuantity"] ?? 0) + 1;
+  //       }
+  //     } else {
+  //       item["cartQuantity"] = (item["cartQuantity"] ?? 0) + 1;
+  //     }
+  //   });
+  // }
+// 1. Make _addToCart async to check login status
+  Future<void> _addToCart(Map<String, dynamic> item) async {
+    // Check if user is logged in (e.g., checking if a token or user ID exists)
+    //final token = await SharedPreferencesService.getUser(); // Or your specific method to check login token
+ final token = await SecureStorageService.getToken();
+    if (token == null || token.isEmpty) {
+      if (!mounted) return;
+      
+      // Navigate directly to your Login screen if not logged in
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const LoginScreen(), // Replace with your actual Login Screen widget name
+      //   ),
+      // );
+      context.go('/login');
+      return; // Stop execution so item is not added to cart
+    }
+
+    // If logged in, proceed with adding to cart normally
     setState(() {
       final bool isCountable = item["isCountable"] ?? false;
 
@@ -987,7 +1022,6 @@ Future<void> _loadUserData() async {
       }
     });
   }
-
   void _removeFromCart(Map<String, dynamic> item) {
     setState(() {
       final bool isCountable = item["isCountable"] ?? false;
@@ -1096,25 +1130,25 @@ Future<void> _loadUserData() async {
               ),
             )
           : null,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 110,
-            pinned: true,
-            backgroundColor: primaryColor,
-            elevation: 0,
-            automaticallyImplyLeading: false,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xff117992), Color(0xff0D5B6E)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 110,
+              pinned: true,
+              backgroundColor: primaryColor,
+              elevation: 0,
+              automaticallyImplyLeading: false,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xff117992), Color(0xff0D5B6E)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                   ),
-                ),
-                child: SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(8, 20, 20, 16),
                     child: Column(
@@ -1192,520 +1226,520 @@ Future<void> _loadUserData() async {
                 ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.access_time_filled_rounded,
-                    color: primaryColor,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "မနက်စာ: $breakfastTime",
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(width: 1, height: 12, color: Colors.grey.shade300),
-                  const Spacer(),
-                  const Icon(
-                    Icons.lunch_dining_rounded,
-                    color: Colors.orange,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "နေ့လည်စာ: $lunchTime",
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            SliverToBoxAdapter(
               child: Container(
-                height: 48,
+                margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: Colors.grey.shade200),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.access_time_filled_rounded,
+                      color: primaryColor,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "မနက်စာ: $breakfastTime",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(width: 1, height: 12, color: Colors.grey.shade300),
+                    const Spacer(),
+                    const Icon(
+                      Icons.lunch_dining_rounded,
+                      color: Colors.orange,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "နေ့လည်စာ: $lunchTime",
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
                     ),
                   ],
                 ),
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      searchQuery = value;
-                    });
-                  },
-                  style: const TextStyle(fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: "ရှာဖွေပါ...",
-                    hintStyle:
-                        TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                    prefixIcon:
-                        const Icon(Icons.search_rounded, color: Colors.grey),
-                    border: InputBorder.none,
-                    suffixIcon: searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded,
-                                color: Colors.grey, size: 20),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {
-                                searchQuery = "";
-                              });
-                            },
-                          )
-                        : null,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: mealTypes.map((type) {
-                    final isSelected = selectedMealType == type;
-
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => selectedMealType = type),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Colors.white
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
-                                      blurRadius: 4,
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                          child: Center(
-                            child: Text(
-                              type,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w500,
-                                color: isSelected
-                                    ? primaryColor
-                                    : Colors.grey.shade600,
-                              ),
-                            ),
-                          ),
-                        ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Container(
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.02),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 4,
+                    ],
                   ),
-                  child: Text(
-                    "အမျိုးအစားများ",
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade600,
-                      letterSpacing: 0.2,
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                    style: const TextStyle(fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: "ရှာဖွေပါ...",
+                      hintStyle:
+                          TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                      prefixIcon:
+                          const Icon(Icons.search_rounded, color: Colors.grey),
+                      border: InputBorder.none,
+                      suffixIcon: searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded,
+                                  color: Colors.grey, size: 20),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  searchQuery = "";
+                                });
+                              },
+                            )
+                          : null,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                SizedBox(
-                  height: 42,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: categories.length,
-                    itemBuilder: (context, index) {
-                      final category = categories[index];
-                      final isSelected = selectedCategory == category;
-
-                      return GestureDetector(
-                        onTap: () =>
-                            setState(() => selectedCategory = category),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.only(right: 10),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected ? primaryColor : Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: mealTypes.map((type) {
+                      final isSelected = selectedMealType == type;
+        
+                      return Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => selectedMealType = type),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            decoration: BoxDecoration(
                               color: isSelected
-                                  ? primaryColor
-                                  : Colors.grey.shade200,
-                              width: 1,
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 4,
+                                      ),
+                                    ]
+                                  : null,
                             ),
-                            boxShadow: isSelected
-                                ? [
-                                    BoxShadow(
-                                      color: primaryColor.withOpacity(0.25),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ]
-                                : [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.02),
-                                      blurRadius: 4,
-                                    ),
-                                  ],
-                          ),
-                          child: Center(
-                            child: Text(
-                              category,
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.grey.shade700,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.w600,
-                                fontSize: 13,
+                            child: Center(
+                              child: Text(
+                                type,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? primaryColor
+                                      : Colors.grey.shade600,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       );
-                    },
+                    }).toList(),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
-          if (isLoading)
-            const SliverFillRemaining(
-              child: Center(
-                child: CircularProgressIndicator(color: primaryColor),
-              ),
-            )
-          else if (errorMessage != null)
-            SliverFillRemaining(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline_rounded,
-                        color: Colors.red.shade300, size: 48),
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        errorMessage!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey.shade600),
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
+                    child: Text(
+                      "အမျိုးအစားများ",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey.shade600,
+                        letterSpacing: 0.2,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: _fetchShopMenus,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                      ),
-                      child: const Text("ထပ်မံကြိုးစားမည်",
-                          style: TextStyle(color: Colors.white)),
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    height: 42,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final category = categories[index];
+                        final isSelected = selectedCategory == category;
+        
+                        return GestureDetector(
+                          onTap: () =>
+                              setState(() => selectedCategory = category),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.only(right: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected ? primaryColor : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? primaryColor
+                                    : Colors.grey.shade200,
+                                width: 1,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: primaryColor.withOpacity(0.25),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ]
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.02),
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                category,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.grey.shade700,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            )
-          else if (filteredItems.isEmpty)
-            SliverFillRemaining(
-              child: Center(
-                child: Text(
-                  "မည်သည့် Menu မှ မရှိပါ",
-                  style: TextStyle(color: Colors.grey.shade500),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+            if (isLoading)
+              const SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(color: primaryColor),
                 ),
-              ),
-            )
-          else
-            SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final item = filteredItems[index];
-                final bool isAvailable = item["isAvailable"] ?? true;
-                final String? mealType = item["mealType"];
-                final int qty = (item["cartQuantity"] as int?) ?? 0;
-
-                return Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
+              )
+            else if (errorMessage != null)
+              SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.error_outline_rounded,
+                          color: Colors.red.shade300, size: 48),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Text(
+                          errorMessage!,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: _fetchShopMenus,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                        ),
+                        child: const Text("ထပ်မံကြိုးစားမည်",
+                            style: TextStyle(color: Colors.white)),
                       ),
                     ],
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: Container(
-                          width: 82,
-                          height: 82,
-                          color: Colors.grey.shade100,
-                          child: item["imageUrl"] != null &&
-                                  (item["imageUrl"] as String).isNotEmpty
-                              ? Image.network(
-                                  item["imageUrl"],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Center(
+                ),
+              )
+            else if (filteredItems.isEmpty)
+              SliverFillRemaining(
+                child: Center(
+                  child: Text(
+                    "မည်သည့် Menu မှ မရှိပါ",
+                    style: TextStyle(color: Colors.grey.shade500),
+                  ),
+                ),
+              )
+            else
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final item = filteredItems[index];
+                  final bool isAvailable = item["isAvailable"] ?? true;
+                  final String? mealType = item["mealType"];
+                  final int qty = (item["cartQuantity"] as int?) ?? 0;
+        
+                  return Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            width: 82,
+                            height: 82,
+                            color: Colors.grey.shade100,
+                            child: item["imageUrl"] != null &&
+                                    (item["imageUrl"] as String).isNotEmpty
+                                ? Image.network(
+                                    item["imageUrl"],
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        Center(
+                                      child: Icon(
+                                        Icons.fastfood_rounded,
+                                        color: Colors.grey.shade400,
+                                        size: 30,
+                                      ),
+                                    ),
+                                  )
+                                : Center(
                                     child: Icon(
                                       Icons.fastfood_rounded,
                                       color: Colors.grey.shade400,
                                       size: 30,
                                     ),
                                   ),
-                                )
-                              : Center(
-                                  child: Icon(
-                                    Icons.fastfood_rounded,
-                                    color: Colors.grey.shade400,
-                                    size: 30,
-                                  ),
-                                ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item["name"],
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: isAvailable
-                                    ? const Color(0xff1E293B)
-                                    : Colors.grey.shade400,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              item["description"],
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.grey.shade500,
-                                fontSize: 11,
-                                height: 1.3,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Text(
-                                  item["price"],
-                                  style: TextStyle(
-                                    color: isAvailable
-                                        ? primaryColor
-                                        : Colors.grey,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 14,
-                                  ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item["name"],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: isAvailable
+                                      ? const Color(0xff1E293B)
+                                      : Colors.grey.shade400,
                                 ),
-                                const SizedBox(width: 8),
-                                if (mealType != null)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 7,
-                                      vertical: 2,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                item["description"],
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.grey.shade500,
+                                  fontSize: 11,
+                                  height: 1.3,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Text(
+                                    item["price"],
+                                    style: TextStyle(
+                                      color: isAvailable
+                                          ? primaryColor
+                                          : Colors.grey,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 14,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: mealType == "မနက်စာ"
-                                          ? const Color(0xffFEF3C7)
-                                          : const Color(0xffFFEDD5),
-                                      borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  if (mealType != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 7,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: mealType == "မနက်စာ"
+                                            ? const Color(0xffFEF3C7)
+                                            : const Color(0xffFFEDD5),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        mealType,
+                                        style: TextStyle(
+                                          color: mealType == "မနက်စာ"
+                                              ? const Color(0xffD97706)
+                                              : const Color(0xffEA580C),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: !isAvailable
+                              ? SizedBox(
+                                  height: 36,
+                                  child: ElevatedButton(
+                                    onPressed: null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey.shade100,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14),
                                     ),
                                     child: Text(
-                                      mealType,
+                                      "ကုန်သွားပြီ",
                                       style: TextStyle(
-                                        color: mealType == "မနက်စာ"
-                                            ? const Color(0xffD97706)
-                                            : const Color(0xffEA580C),
+                                        color: Colors.grey.shade400,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 10,
+                                        fontSize: 12,
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: !isAvailable
-                            ? SizedBox(
-                                height: 36,
-                                child: ElevatedButton(
-                                  onPressed: null,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey.shade100,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 14),
-                                  ),
-                                  child: Text(
-                                    "ကုန်သွားပြီ",
-                                    style: TextStyle(
-                                      color: Colors.grey.shade400,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : qty == 0
-                                ? SizedBox(
-                                    height: 36,
-                                    child: ElevatedButton(
-                                      onPressed: () => _addToCart(item),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: primaryColor,
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 14),
-                                      ),
-                                      child: const Text(
-                                        "+ ဝယ်ရန်",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                          color: Colors.grey.shade300),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        IconButton(
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(
-                                            minWidth: 28,
+                                )
+                              : qty == 0
+                                  ? SizedBox(
+                                      height: 36,
+                                      child: ElevatedButton(
+                                        onPressed: () => _addToCart(item),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: primaryColor,
+                                          elevation: 0,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                           ),
-                                          icon: const Icon(
-                                            Icons.remove,
-                                            size: 14,
-                                            color: Colors.redAccent,
-                                          ),
-                                          onPressed: () => _removeFromCart(item),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 14),
                                         ),
-                                        Text(
-                                          '$qty',
-                                          style: const TextStyle(
+                                        child: const Text(
+                                          "+ ဝယ်ရန်",
+                                          style: TextStyle(
+                                            color: Colors.white,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 12,
                                           ),
                                         ),
-                                        IconButton(
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(
-                                            minWidth: 28,
+                                      ),
+                                    )
+                                  : Container(
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                            color: Colors.grey.shade300),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(
+                                              minWidth: 28,
+                                            ),
+                                            icon: const Icon(
+                                              Icons.remove,
+                                              size: 14,
+                                              color: Colors.redAccent,
+                                            ),
+                                            onPressed: () => _removeFromCart(item),
                                           ),
-                                          icon: const Icon(
-                                            Icons.add,
-                                            size: 14,
-                                            color: primaryColor,
+                                          Text(
+                                            '$qty',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
                                           ),
-                                          onPressed: () => _addToCart(item),
-                                        ),
-                                      ],
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            constraints: const BoxConstraints(
+                                              minWidth: 28,
+                                            ),
+                                            icon: const Icon(
+                                              Icons.add,
+                                              size: 14,
+                                              color: primaryColor,
+                                            ),
+                                            onPressed: () => _addToCart(item),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                      ),
-                    ],
-                  ),
-                );
-              }, childCount: filteredItems.length),
-            ),
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
-        ],
+                        ),
+                      ],
+                    ),
+                  );
+                }, childCount: filteredItems.length),
+              ),
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
       ),
     );
   }

@@ -36,7 +36,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
   final TextEditingController _pinController = TextEditingController();
   final ApiService _apiService = ApiService();
 
-  final List<int> _presetAmounts = [100, 500, 1000, 5000];
+  final List<int> _presetAmounts = [500, 1000, 5000, 10000];
 
   List<RecipientModel> _filteredRecipients = [];
   RecipientModel? _selectedRecipient;
@@ -118,10 +118,20 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
         ? "${_selectedRecipient!.name} (${_selectedRecipient!.phone})"
         : _recipientController.text.trim();
 
-    if (amount == null || amount <= 0 || recipient.isEmpty) {
+    if (amount == null || recipient.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("အချက်အလက်များကို မှန်ကန်စွာ ဖြည့်သွင်းပါ"),
+        ),
+      );
+      return;
+    }
+
+    // Add validation for minimum amount of 500
+    if (amount < 500) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("အနည်းဆုံး ၅၀၀ ပွိုင့်မှစ၍ လွှဲပြောင်းနိုင်ပါသည်။"),
         ),
       );
       return;
@@ -137,14 +147,159 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
     _showPinBottomSheet(amount, recipient);
   }
 
-  void _showPinBottomSheet(int amount, String recipient) {
+  // void _showPinBottomSheet(int amount, String recipient) {
+  //   _pinController.clear();
+
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setModalState) {
+  //           return Container(
+  //             padding: EdgeInsets.fromLTRB(
+  //               24,
+  //               24,
+  //               24,
+  //               MediaQuery.of(context).viewInsets.bottom + 24,
+  //             ),
+  //             decoration: const BoxDecoration(
+  //               color: Colors.white,
+  //               borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+  //             ),
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 Container(
+  //                   width: 36,
+  //                   height: 4,
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.grey.shade300,
+  //                     borderRadius: BorderRadius.circular(2),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 22),
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                   children: [
+  //                     const Column(
+  //                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                       children: [
+  //                         Text(
+  //                           "PIN နံပါတ် ရိုက်ထည့်ပါ",
+  //                           style: TextStyle(
+  //                             fontSize: 18,
+  //                             fontWeight: FontWeight.bold,
+  //                             color: Color(0xff0F172A),
+  //                           ),
+  //                         ),
+  //                         SizedBox(height: 2),
+  //                         Text(
+  //                           "ဂဏန်း ၆ လုံးပါ လျှို့ဝှက်နံပါတ်ဖြင့် အတည်ပြုပါ",
+  //                           style: TextStyle(
+  //                             fontSize: 12,
+  //                             color: Color(0xff64748B),
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     Container(
+  //                       padding: const EdgeInsets.symmetric(
+  //                         horizontal: 10,
+  //                         vertical: 6,
+  //                       ),
+  //                       decoration: BoxDecoration(
+  //                         color: const Color(0xffF1F5F9),
+  //                         borderRadius: BorderRadius.circular(10),
+  //                       ),
+  //                       child: Text(
+  //                         "${NumberFormat('#,###').format(amount)} ပွိုင့်",
+  //                         style: const TextStyle(
+  //                           fontSize: 12,
+  //                           fontWeight: FontWeight.bold,
+  //                           color: primaryColor,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 const SizedBox(height: 24),
+  //                 TextField(
+  //                   controller: _pinController,
+  //                   keyboardType: TextInputType.number,
+  //                   maxLength: 6,
+  //                   autofocus: true,
+  //                   style: const TextStyle(color: Colors.transparent),
+  //                   cursorColor: Colors.transparent,
+  //                   decoration: const InputDecoration(
+  //                     counterText: "",
+  //                     border: InputBorder.none,
+  //                   ),
+  //                   onChanged: (value) => setModalState(() {}),
+  //                 ),
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Row(
+  //                       children: List.generate(3, (index) {
+  //                         return _buildPinBoxCell(index);
+  //                       }),
+  //                     ),
+  //                     Row(
+  //                       children: List.generate(3, (index) {
+  //                         return _buildPinBoxCell(index + 3);
+  //                       }),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 const SizedBox(height: 28),
+  //                 SizedBox(
+  //                   width: double.infinity,
+  //                   height: 50,
+  //                   child: ElevatedButton(
+  //                     onPressed: _pinController.text.length == 6
+  //                         ? () {
+  //                             Navigator.of(context).pop();
+  //                             _executeFinalTransfer(amount, recipient);
+  //                           }
+  //                         : null,
+  //                     style: ElevatedButton.styleFrom(
+  //                       backgroundColor: primaryColor,
+  //                       disabledBackgroundColor: const Color(0xffF1F5F9),
+  //                       elevation: 0,
+  //                       shape: RoundedRectangleBorder(
+  //                         borderRadius: BorderRadius.circular(14),
+  //                       ),
+  //                     ),
+  //                     child: Text(
+  //                       "ပွိုင့်လွှဲမှု အတည်ပြုမည်",
+  //                       style: TextStyle(
+  //                         color: _pinController.text.length == 6
+  //                             ? Colors.white
+  //                             : Colors.grey.shade400,
+  //                         fontWeight: FontWeight.bold,
+  //                         fontSize: 15,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+void _showPinBottomSheet(int amount, String recipient) {
     _pinController.clear();
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      builder: (sheetContext) { // sheetContext ကို သီးသန့်သုံးပါ
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
@@ -250,7 +405,8 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                     child: ElevatedButton(
                       onPressed: _pinController.text.length == 6
                           ? () {
-                              Navigator.of(context).pop();
+                              // Bottom Sheet ကို ပိတ်ရန် sheetContext ကို သုံးပါ
+                              Navigator.of(sheetContext).pop(); 
                               _executeFinalTransfer(amount, recipient);
                             }
                           : null,
@@ -282,7 +438,6 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
       },
     );
   }
-
   Widget _buildPinBoxCell(int index) {
     final text = _pinController.text;
     final isFilled = index < text.length;
@@ -314,14 +469,11 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
   }
 // Loading ပြရန် State တစ်ခု ထပ်ထည့်နိုင်ပါသည် (သို့မဟုတ် SnackBar ဖြင့် ပြီးပြတ်မှုကို ပြပါ)
   bool _isTransferring = false;
-
-  void _executeFinalTransfer(int amount, String recipient) async {
-    // recipient ထံမှ ဖုန်းနံပါတ်ကို သီးသန့်ခွဲထုတ်ယူရန် (ဥပမာ: "Wa Thon (09600000000)" မှ "09600000000" ကို ဖြတ်ထုတ်ရန်)
+void _executeFinalTransfer(int amount, String recipient) async {
     String phone = "";
     if (_selectedRecipient != null) {
       phone = _selectedRecipient!.phone;
     } else {
-      // Manual ရိုက်ထည့်ခဲ့ပါက ဖုန်းနံပါတ် သို့မဟုတ် အမည်
       phone = recipient;
     }
 
@@ -332,13 +484,14 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
     });
 
     try {
-      // API ကို ခေါ်ဆိုခြင်း
+      // API call
       final result = await _apiService.transferPoints(
         recipientPhone: phone,
         amount: amount,
         walletPin: pin,
       );
 
+      // Check if widget is still in the tree after the async gap
       if (!mounted) return;
 
       setState(() {
@@ -346,31 +499,18 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
       });
 
       if (result != null && result['success'] == true) {
-        final data = result['data'];
         final message = result['message'] ?? "Point များ လွှဲပြောင်းမှု အောင်မြင်ပါသည်။";
 
-        // အောင်မြင်ကြောင်း အသိပေးခြင်း
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: primaryColor,
-          ),
-        );
-
-        // Parent widget သို့ အောင်မြင်ကြောင်း အကြောင်းကြားရန် (လက်ကျန်ပွိုင့် update ဖြစ်စေရန်)
         widget.onTransferCompleted(amount, recipient);
 
-        // Screen မှ ထွက်ခြင်း (သို့မဟုတ် Success Screen သို့ သွားခြင်း)
-        if (context.canPop()) {
-          context.pop();
-        }
+        // Check mounted again before showing dialog with context
+        if (!mounted) return;
+        _showSuccessDialog(message);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result?['message'] ?? "ပွိုင့်လွှဲပြောင်းမှု မအောင်မြင်ပါ။"),
-            backgroundColor: Colors.red,
-          ),
-        );
+        final errorMessage = result?['message'] ?? "ပွိုင့်လွှဲပြောင်းမှု မအောင်မြင်ပါ။";
+        
+        if (!mounted) return;
+        _showErrorDialog(errorMessage);
       }
     } catch (e) {
       if (!mounted) return;
@@ -378,15 +518,154 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
         _isTransferring = false;
       });
 
-      // API Error များကို ပြသရန်
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (!mounted) return;
+      _showErrorDialog(e.toString());
     }
   }
+// Success Dialog (matches image_613521.png style)
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.check_circle_outline_rounded,
+                  color: Colors.green,
+                  size: 64,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Congratulations!",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff0F172A),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xff64748B),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 45,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close dialog
+                      if (context.canPop()) {
+                        context.pop(); // Return from transfer screen
+                      }
+                    },
+                    child: const Text(
+                      "Continue",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Error Dialog (matches image_6131b9.png style)
+  void _showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.cancel_outlined,
+                  color: Colors.deepOrange,
+                  size: 64,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Error occured!",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xff0F172A),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  errorMessage,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xff64748B),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 45,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.deepOrange,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close dialog
+                    },
+                    child: const Text(
+                      "Ok",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -583,7 +862,7 @@ class _TransferPointScreenState extends State<TransferPointScreen> {
                           controller: _recipientController,
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
-                            hintText: "ပေးပို့လိုသော ဖုန်းနံပါတ် (သို့) အမည် ရိုက်ထည့်ပါ",
+                            hintText: "ပေးပို့လိုသော ဖုန်းနံပါတ် ရိုက်ထည့်ပါ",
                             hintStyle: TextStyle(
                               color: Colors.grey.shade400,
                               fontSize: 14,

@@ -41,46 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBDDjLo5FB6-AJmdqh_FSgJk-n1sX965H4',
-    appId: '1:344438064119:web:7413348c73e1eedc2b24f2',
-    messagingSenderId: '344438064119',
-    projectId: 'smart-canteen-b9e53',
-    authDomain: 'smart-canteen-b9e53.firebaseapp.com',
-    storageBucket: 'smart-canteen-b9e53.firebasestorage.app',
-    measurementId: 'G-TMWGTBVNDC',
+    apiKey: 'AIzaSyDSrKciSyw6at5gfBF_E2bn8EsJRj58vp0',
+    appId: '1:744172179776:web:35854407f3ba6321d6aaa5',
+    messagingSenderId: '744172179776',
+    projectId: 'smart-canteen-73a77',
+    authDomain: 'smart-canteen-73a77.firebaseapp.com',
+    storageBucket: 'smart-canteen-73a77.firebasestorage.app',
+    measurementId: 'G-NCEEBGK3M9',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDGNdz4Dqia3tpAKFXJSiSkSaPYzeBpVeM',
-    appId: '1:344438064119:android:9b8d612b80ef17702b24f2',
-    messagingSenderId: '344438064119',
-    projectId: 'smart-canteen-b9e53',
-    storageBucket: 'smart-canteen-b9e53.firebasestorage.app',
+    apiKey: 'AIzaSyBW_dDNeOHg5iyvKXF4OSW_ToMjFWY7oHo',
+    appId: '1:744172179776:android:ba346cd85d8d217cd6aaa5',
+    messagingSenderId: '744172179776',
+    projectId: 'smart-canteen-73a77',
+    storageBucket: 'smart-canteen-73a77.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDy6rXviL3u4oisMSxvkJ-w8b_oTkfT8Wc',
-    appId: '1:344438064119:ios:dd34080d20f575942b24f2',
-    messagingSenderId: '344438064119',
-    projectId: 'smart-canteen-b9e53',
-    storageBucket: 'smart-canteen-b9e53.firebasestorage.app',
-    iosBundleId: 'com.example.smartcanteen',
+    apiKey: 'AIzaSyCuxvUBxkKp2vsnaoLNSf4cAk0VqrRKvZs',
+    appId: '1:744172179776:ios:8c9bc50d619b6b21d6aaa5',
+    messagingSenderId: '744172179776',
+    projectId: 'smart-canteen-73a77',
+    storageBucket: 'smart-canteen-73a77.firebasestorage.app',
+    iosBundleId: 'com.ucstt.smartcanteenuser',
   );
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDy6rXviL3u4oisMSxvkJ-w8b_oTkfT8Wc',
-    appId: '1:344438064119:ios:dd34080d20f575942b24f2',
-    messagingSenderId: '344438064119',
-    projectId: 'smart-canteen-b9e53',
-    storageBucket: 'smart-canteen-b9e53.firebasestorage.app',
+    apiKey: 'AIzaSyCuxvUBxkKp2vsnaoLNSf4cAk0VqrRKvZs',
+    appId: '1:744172179776:ios:71f23ad5fd7998ddd6aaa5',
+    messagingSenderId: '744172179776',
+    projectId: 'smart-canteen-73a77',
+    storageBucket: 'smart-canteen-73a77.firebasestorage.app',
     iosBundleId: 'com.example.smartcanteen',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBDDjLo5FB6-AJmdqh_FSgJk-n1sX965H4',
-    appId: '1:344438064119:web:84557aa1f74888c82b24f2',
-    messagingSenderId: '344438064119',
-    projectId: 'smart-canteen-b9e53',
-    authDomain: 'smart-canteen-b9e53.firebaseapp.com',
-    storageBucket: 'smart-canteen-b9e53.firebasestorage.app',
-    measurementId: 'G-CYQM5WKH6P',
+    apiKey: 'AIzaSyDSrKciSyw6at5gfBF_E2bn8EsJRj58vp0',
+    appId: '1:744172179776:web:8ad50ed80ee20c74d6aaa5',
+    messagingSenderId: '744172179776',
+    projectId: 'smart-canteen-73a77',
+    authDomain: 'smart-canteen-73a77.firebaseapp.com',
+    storageBucket: 'smart-canteen-73a77.firebasestorage.app',
+    measurementId: 'G-EPMVRBW197',
   );
 }
