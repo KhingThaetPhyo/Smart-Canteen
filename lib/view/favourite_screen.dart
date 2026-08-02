@@ -148,19 +148,39 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text(
-          "အကြိုက်ဆုံး မီနူးများ",
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+      // appBar: AppBar(
+      //   title: const Text(
+      //     "အကြိုက်ဆုံး မီနူးများ",
+      //     style: TextStyle(
+      //       color: Colors.black87,
+      //       fontWeight: FontWeight.bold,
+      //       fontSize: 18,
+      //     ),
+      //   ),
+      //   backgroundColor: const Color(0xff117992),
+      //   elevation: 0.5,
+      //   iconTheme: const IconThemeData(color: Colors.black87),
+      // ),
+      appBar: PreferredSize(
+  // Increase the height (e.g., kToolbarHeight + 30) to accommodate top spacing
+  preferredSize: const Size.fromHeight(kToolbarHeight + 30), 
+  child: AppBar(
+    title: Padding(
+      padding: const EdgeInsets.only(top: 30),
+      child: const Text(
+        "အကြိုက်ဆုံး မီနူးများ",
+        style: TextStyle(
+          color: Colors.black87,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
         ),
-        backgroundColor: const Color(0xff117992),
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: Colors.black87),
       ),
+    ),
+    backgroundColor: const Color(0xff117992),
+    elevation: 0.5,
+    iconTheme: const IconThemeData(color: Colors.black87),
+  ),
+),
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator(color: primaryColor))

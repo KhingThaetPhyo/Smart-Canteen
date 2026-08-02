@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:smartcanteen/model/shop_model.dart';
 import 'package:smartcanteen/model/transaction_model.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/navigation_bar.dart';
+import 'package:smartcanteen/provider/user_provider.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/view/favourite_screen.dart';
 import 'package:smartcanteen/view/home/home_header.dart';
@@ -11,6 +13,7 @@ import 'package:smartcanteen/view/home/homescreen.dart';
 import 'package:smartcanteen/view/home/shop.dart';
 import 'package:smartcanteen/view/loginscreen.dart';
 import 'package:smartcanteen/view/notification_screen.dart';
+import 'package:smartcanteen/view/onboard_screen.dart';
 import 'package:smartcanteen/view/order_screen.dart';
 import 'package:smartcanteen/view/profile_screen.dart';
 import 'package:smartcanteen/view/qr_scanner_screen.dart';
@@ -52,6 +55,7 @@ final router = GoRouter(
 
     return null;
   },
+  
 // final router = GoRouter(
 //   initialLocation: '/splash',
 
@@ -81,6 +85,10 @@ final router = GoRouter(
   path: '/splash',
   builder: (context, state) => const SplashScreen(),
 ),
+ GoRoute(
+      path: '/onboard',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
     GoRoute(
       path: '/login',
       builder: (context, state) => const Loginscreen(),
@@ -195,6 +203,11 @@ GoRoute(
   path: '/scan_qr',
   builder: (context, state) => const QrScannerScreen(),
 ),
+// GoRoute(
+//   path: '/noti',
+//   builder: (context, state) => const NotificationCard(),
+// ),
+// ✅ Correct
 GoRoute(
   path: '/noti',
   builder: (context, state) => const NotificationScreen(),
@@ -221,21 +234,77 @@ GoRoute(
       path: '/wallet',
       builder: (context, state) => const WalletScreen(),
     ),
-    GoRoute(
-      path: '/transfer_point',
-      builder: (context, state) {
-        final args = state.extra as Map<String, dynamic>?;
-        if (args == null) {
-          return const Scaffold(
-            body: Center(child: Text('Transfer parameters not provided')),
-          );
-        }
-        return TransferPointScreen(
-          currentBalance: args['currentBalance'] as int,
-          onTransferCompleted: args['onTransferCompleted'] as Function(int, String),
-        );
-      },
-    ),
+    // GoRoute(
+    //   path: '/transfer_point',
+    //   builder: (context, state) {
+    //     final args = state.extra as Map<String, dynamic>?;
+    //     if (args == null) {
+    //       return const Scaffold(
+    //         body: Center(child: Text('Transfer parameters not provided')),
+    //       );
+    //     }
+    //     return TransferPointScreen(
+    //       currentBalance: args['currentBalance'] as int,
+    //       onTransferCompleted: args['onTransferCompleted'] as Function(int, String),
+    //     );
+    //   },
+    // ),
+//     GoRoute(
+//   path: '/transfer-point',
+//   builder: (context, state) {
+//     // Retrieve recipient if passed via extra parameter
+//     final recipient = state.extra as RecipientModel?;
+
+//     return TransferPointScreen(
+//       currentBalance: 0, // Pass or obtain user balance here
+//       initialRecipient: recipient,
+//     );
+//   },
+// ),
+GoRoute(
+  path: '/transfer-point',
+  builder: (context, state) {
+    if (state.extra is RecipientModel) {
+      // QR Scan Flow မှ ခေါ်ယူသည့်အခါ
+      final recipient = state.extra as RecipientModel;
+      final currentBalance = context.read<UserProvider>().balancePoints;
+      return TransferPointScreen(
+        currentBalance: currentBalance,
+        initialRecipient: recipient,
+      );
+    } else if (state.extra is Map<String, dynamic>) {
+      // Home Header သို့မဟုတ် Wallet Screen မှ ခေါ်ယူသည့်အခါ
+      final args = state.extra as Map<String, dynamic>;
+      return TransferPointScreen(
+        currentBalance: args['currentBalance'] ?? 0,
+        initialRecipient: args['initialRecipient'] as RecipientModel?,
+        onTransferCompleted: args['onTransferCompleted'] as Function(int, String)?,
+      );
+    }
+
+    // Default Fallback
+    return TransferPointScreen(
+      currentBalance: context.read<UserProvider>().balancePoints,
+    );
+  },
+),
+// GoRoute(
+//   path: '/transfer-point',
+//   builder: (context, state) {
+//     // state.extra ကို Map အဖြစ် ယူပါ
+//     final extra = state.extra as Map<String, dynamic>?;
+
+//     final currentBalance = extra?['currentBalance'] as int? ?? 0;
+//     final initialRecipient = extra?['initialRecipient'] as RecipientModel?;
+//     final onTransferCompleted = extra?['onTransferCompleted'] as Function(int, String)?;
+
+//     return TransferPointScreen(
+//       currentBalance: currentBalance,
+//       initialRecipient: initialRecipient,
+//       onTransferCompleted: onTransferCompleted,
+//     );
+//   },
+// ),
     GoRoute(
       path: '/transaction_history',
       builder: (context, state) {

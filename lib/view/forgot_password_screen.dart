@@ -2,26 +2,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smartcanteen/service/api_service.dart';
+import 'package:smartcanteen/view/reset_password_screen.dart';
 import 'package:smartcanteen/view/reset_pin_screen.dart';
-class EnterEmailScreen extends StatefulWidget {
-  const EnterEmailScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<EnterEmailScreen> createState() => _EnterEmailScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _EnterEmailScreenState extends State<EnterEmailScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _service = ApiService();
   bool _isLoading = false;
+void _handleSendOtp() async {
+    // 1. Ensure the email input is not empty
+    if (_emailController.text.trim().isEmpty) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text('အီးမေးလ် လိပ်စာ ထည့်သွင်းပါ'),
+      //     backgroundColor: Colors.redAccent,
+      //   ),
+      // ); 
+      
+      return;
+    }
 
-  void _handleSendOtp() async {
+    // 2. Validate format using form key
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
     final email = _emailController.text.trim();
 
+    // Call API endpoint POST /api/forgot-password
     final result = await _service.sendOtp(email);
 
     setState(() => _isLoading = false);
@@ -30,63 +44,65 @@ class _EnterEmailScreenState extends State<EnterEmailScreen> {
 
     if (result['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('OTP နံပါတ်ကို အီးမေးလ်သို့ ပို့လိုက်ပါပြီ။'),
-          backgroundColor: Color(0xff117992),
+        SnackBar(
+          content: Text(result['message'] ?? 'OTP Code ကို အီးမေးလ်သို့ ပေးပို့လိုက်ပါပြီ။'),
+          backgroundColor: const Color(0xff117992),
         ),
       );
+      
+      // Navigate to Reset Pin Screen
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ResetPinScreen(email: email)),
+        MaterialPageRoute(builder: (context) => ResetPasswordScreen(email: email)),
       );
     } else {
+      // Display error message returned from API (e.g., "ဤအီးမေးလ်ဖြင့် အကောင့် ရှာမတွေ့ပါ။")
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message'] ?? 'အမှားတစ်ခု ဖြစ်ပေါ်နေပါသည်။'),
+          content: Text(result['message'] ?? 'ဤအီးမေးလ်ဖြင့် အကောင့် ရှာမတွေ့ပါ။'),
           backgroundColor: Colors.redAccent,
         ),
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(65.0),
-        child: Container(
-          margin: const EdgeInsets.only(top: 8, left: 12, right: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF007A87),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF007A87).withOpacity(0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: AppBar(
-            title: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: const Text(
-                'Wallet PIN မေ့နေပါသလား',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            centerTitle: true,
-            iconTheme:  IconThemeData(color: Colors.white),
+  preferredSize: const Size.fromHeight(65.0),
+  child: Container(
+    margin: const EdgeInsets.only(top: 8, left: 12, right: 12),
+    decoration: BoxDecoration(
+      color: const Color(0xFF007A87),
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF007A87).withOpacity(0.3),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: AppBar(
+      automaticallyImplyLeading: false, // 👈 Add this line to hide the arrow icon
+      title: const Padding(
+        padding: EdgeInsets.only(bottom: 10.0),
+        child: Text(
+          'Password မေ့နေပါသလား',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
       ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: true,
+    ),
+  ),
+),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),

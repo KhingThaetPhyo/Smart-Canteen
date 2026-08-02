@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smartcanteen/fcm_helper.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -54,30 +55,91 @@ class _SplashScreenState extends State<SplashScreen>
     _navigate();
   }
 
-  Future<void> _navigate() async {
+  // Future<void> _navigate() async {
+  //   await Future.delayed(const Duration(seconds: 3));
+
+  //   if (!mounted) return;
+
+  //   final token = await SecureStorageService.getToken();
+
+  //   if (!mounted) return;
+
+  //   // ⚠️ Token ရှိမရှိ စစ်ဆေးပြီး မှန်ကန်သော Screen သို့ ပို့ပေးခြင်း
+  //   if (token != null && token.isNotEmpty) {
+  //     context.go('/navigation'); // Login ဝင်ထားပြီးသားဆိုလျှင်
+  //   } else {
+  //     context.go('/navigation'); // Login မဝင်ရသေးလျှင် Login Screen သို့
+  //   }
+  // }
+// inside view/splash_screen.dart
+// //wathon
+// Future<void> _navigate() async {
+//   await Future.delayed(const Duration(seconds: 3));
+
+//   if (!mounted) return;
+
+//   final isFirstTime = await SecureStorageService.isFirstTime();
+
+//   if (!mounted) return;
+
+//   if (isFirstTime) {
+//     // 1st Time User: Go to Onboarding Screen
+//     context.go('/onboard');
+//   } else {
+//     // Returning User: Go straight to Navigation
+//     context.go('/navigation');
+//   }
+// }
+//   @override
+//   void dispose() {
+//     _contentController.dispose();
+//     _pulseController.dispose();
+//     super.dispose();
+//   }
+Future<void> _navigate() async {
+    // 3 စက္ကန့် စောင့်မည် (Splash Animation ပြရန်)
     await Future.delayed(const Duration(seconds: 3));
 
     if (!mounted) return;
 
-    final token = await SecureStorageService.getToken();
+    // 1. First Time Check လုပ်မည်
+    final isFirstTime = await SecureStorageService.isFirstTime();
 
     if (!mounted) return;
 
-    // ⚠️ Token ရှိမရှိ စစ်ဆေးပြီး မှန်ကန်သော Screen သို့ ပို့ပေးခြင်း
-    if (token != null && token.isNotEmpty) {
-      context.go('/navigation'); // Login ဝင်ထားပြီးသားဆိုလျှင်
+    if (isFirstTime) {
+      // First Time User: Onboarding သို့ သွားမည်
+      context.go('/onboard');
     } else {
-      context.go('/navigation'); // Login မဝင်ရသေးလျှင် Login Screen သို့
+      // 2. Returning User ဖြစ်ပါက User Token / Auth Status စစ်မည်
+      final userToken = await SecureStorageService.getToken();
+
+      // User Login ဝင်ထားပြီးသား ဖြစ်ပါက FCM Token ကို Backend သို့ Sync လုပ်မည်
+      if (userToken != null && userToken.isNotEmpty) {
+        _syncFcmToken(userToken);
+      }
+
+      if (!mounted) return;
+      // Main Navigation Screen သို့ သွားမည်
+      context.go('/navigation');
     }
   }
 
-  @override
-  void dispose() {
-    _contentController.dispose();
-    _pulseController.dispose();
-    super.dispose();
+  /// Background တွင် FCM Token ရယူပြီး Backend သို့ ပို့ပေးမည့် Helper
+  void _syncFcmToken(String userToken) async {
+    try {
+      String? fcmToken = await FcmHelper.getToken();
+      if (fcmToken != null) {
+        await FcmHelper.sendTokenToBackend(
+          fcmToken: fcmToken,
+          userAuthToken: userToken,
+          baseUrl: "https://192.168.1.6/api", // 👈 သင့်ရဲ့ API Base URL ထည့်ပါ
+        );
+      }
+    } catch (e) {
+      debugPrint("FCM Sync Error in Splash: $e");
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     const Color primaryContainer = Color(0xFF006D77);

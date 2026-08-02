@@ -120,4 +120,19 @@ class SecureStorageService {
       await clearAll();
     }
   }
+
+  // inside service/secure_storage_service.dart
+
+static const _keyIsFirstTime = 'is_first_time';
+
+// Check if first time (default to true if key is null)
+static Future<bool> isFirstTime() async {
+  final value = await _storage.read(key: _keyIsFirstTime);
+  return value == null ? true : value == 'true';
+}
+
+// Mark onboarding as completed
+static Future<void> setFirstTimeCompleted() async {
+  await _storage.write(key: _keyIsFirstTime, value: 'false');
+}
 }

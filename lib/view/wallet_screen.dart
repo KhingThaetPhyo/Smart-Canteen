@@ -258,38 +258,39 @@ class _WalletScreenState extends State<WalletScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildActionButton(
-            icon: Icons.send_rounded,
-            label: "ပွိုင့်လွှဲမည်",
-            onTap: () {
-              context.go(
-                '/transfer_point',
-                extra: {
-                  'currentBalance': currentBalance,
-                  'onTransferCompleted': (int amount, String recipient) {
-                    final newBalance = currentBalance - amount;
+  icon: Icons.send_rounded,
+  label: "ပွိုင့်လွှဲမည်",
+  onTap: () {
+    context.push(
+      '/transfer-point',
+      extra: {
+        'currentBalance': currentBalance,
+        'initialRecipient': null,
+        'onTransferCompleted': (int amount, String recipient) {
+          final newBalance = currentBalance - amount;
 
-                    // Dynamically update user balance in Provider
-                    context.read<UserProvider>().setBalance(newBalance);
+          // Dynamically update user balance in Provider
+          context.read<UserProvider>().setBalance(newBalance);
 
-                    setState(() {
-  transactions.insert(
-    0,
-    TransactionModel(
-      transactionId: DateTime.now().millisecondsSinceEpoch,
-      amount: amount..toString(),
-      transactionType: 'TRANSFER',
-      status: 'success',
-      createdAt: DateTime.now().toIso8601String(),
-      updatedAt: DateTime.now().toIso8601String(),
-      remark: recipient,
-    ),
-  );
-});
-                  },
-                },
-              );
-            },
-          ),
+          setState(() {
+            transactions.insert(
+              0,
+              TransactionModel(
+                transactionId: DateTime.now().millisecondsSinceEpoch,
+                amount: amount.toString(),
+                transactionType: 'TRANSFER',
+                status: 'success',
+                createdAt: DateTime.now().toIso8601String(),
+                updatedAt: DateTime.now().toIso8601String(),
+                remark: recipient,
+              ),
+            );
+          });
+        },
+      },
+    );
+  },
+),
           _buildActionButton(
             icon: Icons.qr_code_2_rounded,
             label: "ပွိုင့်လက်ခံမည်",

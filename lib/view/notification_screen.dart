@@ -1,24 +1,234 @@
+// import 'package:flutter/material.dart';
+
+// enum NotificationType { order, transaction }
+
+// class NotificationModel {
+//   final String id;
+//   final NotificationType type;
+//   final String title;
+//   final String message;
+//   final String time;
+//   bool isRead;
+
+//   NotificationModel({
+//     required this.id,
+//     required this.type,
+//     required this.title,
+//     required this.message,
+//     required this.time,
+//     this.isRead = false,
+//   });
+// }
+
+// class NotificationScreen extends StatefulWidget {
+//   const NotificationScreen({super.key});
+
+//   @override
+//   State<NotificationScreen> createState() => _NotificationScreenState();
+// }
+
+// class _NotificationScreenState extends State<NotificationScreen> {
+//   int selectedTab = 0;
+//   static const Color primaryColor = Color(0xff117992);
+
+//   final List<NotificationModel> notifications = [
+//     NotificationModel(
+//       id: '1',
+//       type: NotificationType.order,
+//       title: 'Order Ready',
+//       message: 'Your Milk Tea is ready for pickup at Coffee Corner.',
+//       time: '2 min ago',
+//       isRead: false,
+//     ),
+//     NotificationModel(
+//       id: '2',
+//       type: NotificationType.order,
+//       title: 'Order Completed',
+//       message: 'Your Shan Noodle order has been completed successfully.',
+//       time: '1 hour ago',
+//       isRead: true,
+//     ),
+//     NotificationModel(
+//       id: '3',
+//       type: NotificationType.transaction,
+//       title: 'Points Received',
+//       message: 'You received 500 pts from Mg Mg.',
+//       time: 'Today • 10:30 AM',
+//       isRead: false,
+//     ),
+//     NotificationModel(
+//       id: '4',
+//       type: NotificationType.transaction,
+//       title: 'Payment Successful',
+//       message: '1,500 pts paid to Coffee Corner.',
+//       time: 'Yesterday',
+//       isRead: true,
+//     ),
+//   ];
+
+//   List<NotificationModel> get filteredNotifications {
+//     switch (selectedTab) {
+//       case 1:
+//         return notifications
+//             .where((n) => n.type == NotificationType.order)
+//             .toList();
+//       case 2:
+//         return notifications
+//             .where((n) => n.type == NotificationType.transaction)
+//             .toList();
+//       default:
+//         return notifications;
+//     }
+//   }
+
+//   int get unreadCount => notifications.where((n) => !n.isRead).length;
+
+//   void _markAllAsRead() {
+//     setState(() {
+//       for (var item in notifications) {
+//         item.isRead = true;
+//       }
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final displayedList = filteredNotifications;
+
+//     return Scaffold(
+//       backgroundColor: const Color(0xffF6F8FC),
+//       body: SafeArea(
+//         child: Column(
+//           children: [
+//             Container(
+//               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+//               margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+//               decoration: BoxDecoration(
+//                 gradient: const LinearGradient(
+//                   colors: [Color(0xff0D6B80), Color(0xff117992)],
+//                   begin: Alignment.topLeft,
+//                   end: Alignment.bottomRight,
+//                 ),
+//                 borderRadius: BorderRadius.circular(22),
+//                 boxShadow: [
+//                   BoxShadow(
+//                     color: primaryColor.withOpacity(0.3),
+//                     blurRadius: 12,
+//                     offset: const Offset(0, 4),
+//                   ),
+//                 ],
+//               ),
+//               child: Row(
+//                 children: [
+//                   InkWell(
+//                     onTap: () => Navigator.pop(context),
+//                     borderRadius: BorderRadius.circular(12),
+//                     child: Container(
+//                       padding: const EdgeInsets.all(8),
+//                       decoration: BoxDecoration(
+//                         color: Colors.white.withOpacity(0.18),
+//                         borderRadius: BorderRadius.circular(12),
+//                       ),
+//                       child: const Icon(
+//                         Icons.arrow_back_ios_new_rounded,
+//                         color: Colors.white,
+//                         size: 18,
+//                       ),
+//                     ),
+//                   ),
+//                   const SizedBox(width: 14),
+//                   const Expanded(
+//                     child: Text(
+//                       'Notifications',
+//                       style: TextStyle(
+//                         color: Colors.white,
+//                         fontSize: 18,
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ),
+//                   if (unreadCount > 0)
+//                     GestureDetector(
+//                       onTap: _markAllAsRead,
+//                       child: Container(
+//                         padding: const EdgeInsets.symmetric(
+//                           horizontal: 12,
+//                           vertical: 6,
+//                         ),
+//                         decoration: BoxDecoration(
+//                           color: Colors.white.withOpacity(0.2),
+//                           borderRadius: BorderRadius.circular(12),
+//                           border: Border.all(
+//                             color: Colors.white.withOpacity(0.25),
+//                           ),
+//                         ),
+//                         child: Row(
+//                           children: [
+//                             Container(
+//                               width: 6,
+//                               height: 6,
+//                               decoration: const BoxDecoration(
+//                                 color: Color(0xff34D399),
+//                                 shape: BoxShape.circle,
+//                               ),
+//                             ),
+//                             const SizedBox(width: 6),
+//                             Text(
+//                               '$unreadCount New',
+//                               style: const TextStyle(
+//                                 color: Colors.white,
+//                                 fontWeight: FontWeight.bold,
+//                                 fontSize: 11,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                 ],
+//               ),
+//             ),
+//             NotificationTabBar(
+//               selectedIndex: selectedTab,
+//               onChanged: (index) {
+//                 setState(() {
+//                   selectedTab = index;
+//                 });
+//               },
+//             ),
+//             const SizedBox(height: 12),
+//             Expanded(
+//               child: displayedList.isEmpty
+//                   ? _buildEmptyState()
+//                   : ListView.builder(
+//                       padding: const EdgeInsets.symmetric(horizontal: 20),
+//                       itemCount: displayedList.length,
+//                       itemBuilder: (context, index) {
+//                         final item = displayedList[index];
+//                         return NotificationCard(
+//                           type: item.type,
+//                           title: item.title,
+//                           message: item.message,
+//                           time: item.time,
+//                           isRead: item.isRead,
+//                           onTap: () {
+//                             setState(() {
+//                               item.isRead = true;
+//                             });
+//                           },
+//                         );
+//                       },
+//                     ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 import 'package:flutter/material.dart';
-
-enum NotificationType { order, transaction }
-
-class NotificationModel {
-  final String id;
-  final NotificationType type;
-  final String title;
-  final String message;
-  final String time;
-  bool isRead;
-
-  NotificationModel({
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.message,
-    required this.time,
-    this.isRead = false,
-  });
-}
+import 'package:provider/provider.dart';
+import 'package:smartcanteen/model/notification_model.dart';
+import 'package:smartcanteen/provider/notification_provider.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -30,76 +240,44 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   int selectedTab = 0;
   static const Color primaryColor = Color(0xff117992);
+// notification_screen.dart
 
-  final List<NotificationModel> notifications = [
-    NotificationModel(
-      id: '1',
-      type: NotificationType.order,
-      title: 'Order Ready',
-      message: 'Your Milk Tea is ready for pickup at Coffee Corner.',
-      time: '2 min ago',
-      isRead: false,
-    ),
-    NotificationModel(
-      id: '2',
-      type: NotificationType.order,
-      title: 'Order Completed',
-      message: 'Your Shan Noodle order has been completed successfully.',
-      time: '1 hour ago',
-      isRead: true,
-    ),
-    NotificationModel(
-      id: '3',
-      type: NotificationType.transaction,
-      title: 'Points Received',
-      message: 'You received 500 pts from Mg Mg.',
-      time: 'Today • 10:30 AM',
-      isRead: false,
-    ),
-    NotificationModel(
-      id: '4',
-      type: NotificationType.transaction,
-      title: 'Payment Successful',
-      message: '1,500 pts paid to Coffee Corner.',
-      time: 'Yesterday',
-      isRead: true,
-    ),
-  ];
-
-  List<NotificationModel> get filteredNotifications {
-    switch (selectedTab) {
-      case 1:
-        return notifications
-            .where((n) => n.type == NotificationType.order)
-            .toList();
-      case 2:
-        return notifications
-            .where((n) => n.type == NotificationType.transaction)
-            .toList();
-      default:
-        return notifications;
-    }
-  }
-
-  int get unreadCount => notifications.where((n) => !n.isRead).length;
-
-  void _markAllAsRead() {
-    setState(() {
-      for (var item in notifications) {
-        item.isRead = true;
-      }
-    });
-  }
-
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Replace with your actual user token and backend API base URL
+    final provider = Provider.of<NotificationProvider>(context, listen: false);
+    // provider.fetchNotifications(userToken: 'YOUR_TOKEN', baseUrl: 'YOUR_BASE_URL');
+  });
+}
   @override
   Widget build(BuildContext context) {
-    final displayedList = filteredNotifications;
+    final provider = context.watch<NotificationProvider>();
+
+    // Filter notifications based on selected tab
+    List<NotificationModel> displayedList;
+    switch (selectedTab) {
+      case 1:
+        displayedList = provider.notifications
+            .where((n) => n.type == NotificationType.order)
+            .toList();
+        break;
+      case 2:
+        displayedList = provider.notifications
+            .where((n) => n.type == NotificationType.transaction)
+            .toList();
+        break;
+      default:
+        displayedList = provider.notifications;
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xffF6F8FC),
       body: SafeArea(
         child: Column(
           children: [
+            // Top Header Bar
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -147,9 +325,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       ),
                     ),
                   ),
-                  if (unreadCount > 0)
+                  if (provider.unreadCount > 0)
                     GestureDetector(
-                      onTap: _markAllAsRead,
+                      onTap: () => provider.markAllAsRead(),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
@@ -174,7 +352,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              '$unreadCount New',
+                              '${provider.unreadCount} New',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -188,6 +366,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ],
               ),
             ),
+
+            // Tab Bar Switcher
             NotificationTabBar(
               selectedIndex: selectedTab,
               onChanged: (index) {
@@ -197,28 +377,32 @@ class _NotificationScreenState extends State<NotificationScreen> {
               },
             ),
             const SizedBox(height: 12),
+
+            // Main Notification List View
             Expanded(
-              child: displayedList.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: displayedList.length,
-                      itemBuilder: (context, index) {
-                        final item = displayedList[index];
-                        return NotificationCard(
-                          type: item.type,
-                          title: item.title,
-                          message: item.message,
-                          time: item.time,
-                          isRead: item.isRead,
-                          onTap: () {
-                            setState(() {
-                              item.isRead = true;
-                            });
-                          },
-                        );
-                      },
-                    ),
+              child: provider.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : displayedList.isEmpty
+                      ? _buildEmptyState()
+                      : // notification_screen.dart
+
+ListView.builder(
+  padding: const EdgeInsets.symmetric(horizontal: 20),
+  itemCount: displayedList.length,
+  itemBuilder: (context, index) {
+    final item = displayedList[index];
+    return NotificationCard(
+      type: item.type,
+      title: item.title,
+      message: item.message,
+      time: item.time,
+      isRead: item.isRead,
+      onTap: () {
+        provider.markAsRead(item.id); // 👈 Pass item.id directly as int
+      },
+    );
+  },
+)
             ),
           ],
         ),
@@ -303,12 +487,8 @@ class NotificationTabBar extends StatelessWidget {
                   tabs[index],
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.w500,
-                    color: isSelected
-                        ? Colors.white
-                        : Colors.grey.shade600,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    color: isSelected ? Colors.white : Colors.grey.shade600,
                   ),
                 ),
               ),
@@ -344,13 +524,11 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isOrder = type == NotificationType.order;
 
-    final Color themeColor = isOrder
-        ? const Color(0xffD97706)
-        : const Color(0xff059669);
+    final Color themeColor =
+        isOrder ? const Color(0xffD97706) : const Color(0xff059669);
 
-    final Color chipBg = isOrder
-        ? const Color(0xffFFF7ED)
-        : const Color(0xffECFDF5);
+    final Color chipBg =
+        isOrder ? const Color(0xffFFF7ED) : const Color(0xffECFDF5);
 
     final IconData iconData = isOrder
         ? Icons.local_mall_outlined
@@ -431,9 +609,7 @@ class NotificationCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: isRead
-                              ? const Color(0xff1E293B)
-                              : primaryColor,
+                          color: isRead ? const Color(0xff1E293B) : primaryColor,
                         ),
                       ),
                       const SizedBox(height: 4),

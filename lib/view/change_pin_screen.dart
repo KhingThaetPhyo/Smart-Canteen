@@ -75,11 +75,17 @@ class _ChangePinScreenState extends State<ChangePinScreen> {
 
     return Scaffold(
       backgroundColor: primaryTeal,
+      // appBar: AppBar(
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   iconTheme: const IconThemeData(color: Colors.white),
+      // ),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
+  backgroundColor: Colors.transparent,
+  elevation: 0,
+  toolbarHeight: 80, // 👈 Adjust height (default is 56)
+  iconTheme: const IconThemeData(color: Colors.white),
+),
       // resizeToAvoidBottomInset ကို true ထားခြင်းဖြင့် ကီးဘုတ်ပေါ်လာပါက အလိုအလျောက် ညှိပေးမည်
       resizeToAvoidBottomInset: true,
       body: SafeArea(

@@ -3905,79 +3905,160 @@ class _TransferScreenState extends State<TransferScreen> {
     }
   }
 
-  Future<void> _submitOrderAndTransfer(int amount, String recipient) async {
-    final pin = _pinController.text.trim();
-    if (pin.length < 6) {
-      _showSnackBar('PIN နံပါတ် (၆) လုံး အပြည့်အစုံ ရိုက်ထည့်ပါ');
-      return;
-    }
+//   Future<void> _submitOrderAndTransfer(int amount, String recipient) async {
+//     final pin = _pinController.text.trim();
+//     if (pin.length < 6) {
+//       _showSnackBar('PIN နံပါတ် (၆) လုံး အပြည့်အစုံ ရိုက်ထည့်ပါ');
+//       return;
+//     }
 
-    setState(() => _isLoading = true);
+//     setState(() => _isLoading = true);
 
-    final List<Map<String, dynamic>> itemsPayload = widget.cartItems.map((item) {
-      final dynamic rawId = item["menu_id"] ?? item["menu_item_id"] ?? item["id"];
-      final dynamic rawQty = item["quantity"] ?? item["cartQuantity"];
+//     final List<Map<String, dynamic>> itemsPayload = widget.cartItems.map((item) {
+//       final dynamic rawId = item["menu_id"] ?? item["menu_item_id"] ?? item["id"];
+//       final dynamic rawQty = item["quantity"] ?? item["cartQuantity"];
 
-      return {
-        "menu_id": rawId != null ? int.parse(rawId.toString()) : 0,
-        "quantity": rawQty != null ? int.parse(rawQty.toString()) : 1,
-      };
-    }).toList();
+//       return {
+//         "menu_id": rawId != null ? int.parse(rawId.toString()) : 0,
+//         "quantity": rawQty != null ? int.parse(rawQty.toString()) : 1,
+//       };
+//     }).toList();
 
-    int? parsedTableId;
-    if (widget.selectedSeatId != null) {
-      parsedTableId = int.tryParse(widget.selectedSeatId.toString());
-    }
+//     int? parsedTableId;
+//     if (widget.selectedSeatId != null) {
+//       parsedTableId = int.tryParse(widget.selectedSeatId.toString());
+//     }
 
-    try {
-      final response = await ApiService().createOrder(
-        shopId: widget.shopId,
-        orderType: widget.orderType,
-        foodTableId: parsedTableId ?? 1,
-        walletPassword: pin,
-        deliveryLocation: null,
-        items: itemsPayload,
-      );
+//     try {
+//       final response = await ApiService().createOrder(
+//         shopId: widget.shopId,
+//         orderType: widget.orderType,
+//         foodTableId: parsedTableId ?? 1,
+//         walletPassword: pin,
+//         deliveryLocation: null,
+//         items: itemsPayload,
+//       );
 
-      setState(() => _isLoading = false);
-      if (response != null && response['success'] == true) {
-  final data = response['data'] ?? {};
+//       setState(() => _isLoading = false);
+//       if (response != null && response['success'] == true) {
+//   final data = response['data'] ?? {};
   
-  final String orderId = data['order_id']?.toString() ?? '';
-  final String qrToken = data['qr_code_token'] ?? '';
+//   final String orderId = data['order_id']?.toString() ?? '';
+//   final String qrToken = data['qr_code_token'] ?? '';
   
-  // FIX: Extract table_number from response data (falls back to widget.selectedSeatId if null)
-  final String tableNumber = data['table_number']?.toString() ?? widget.selectedSeatId ?? '';
+//   // FIX: Extract table_number from response data (falls back to widget.selectedSeatId if null)
+//   final String tableNumber = data['table_number']?.toString() ?? widget.selectedSeatId ?? '';
 
-  if (widget.onTransferCompleted != null) {
-    widget.onTransferCompleted!(amount, recipient);
+//   if (widget.onTransferCompleted != null) {
+//     widget.onTransferCompleted!(amount, recipient);
+//   }
+
+//   if (mounted) {
+//     Navigator.pushReplacement(
+//       context,
+//       MaterialPageRoute(
+//         builder: (_) => OrderSuccessScreen(
+//           shopName: recipient,
+//           orderType: widget.orderType,
+//           // Pass the retrieved tableNumber here
+//           selectedSeatId: tableNumber,
+//           cartItems: widget.cartItems,
+//           totalPoints: amount,
+//           note: widget.note,
+//           orderId: orderId,
+//           qrCodeToken: qrToken,
+//         ),
+//       ),
+//     );
+//   }
+// }
+//     } catch (e) {
+//       setState(() => _isLoading = false);
+//       _showApiErrorDialog(e.toString());
+//     }
+//   }
+Future<void> _submitOrderAndTransfer(int amount, String recipient) async {
+  final pin = _pinController.text.trim();
+  if (pin.length < 6) {
+    _showSnackBar('PIN နံပါတ် (၆) လုံး အပြည့်အစုံ ရိုက်ထည့်ပါ');
+    return;
   }
 
-  if (mounted) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => OrderSuccessScreen(
-          shopName: recipient,
-          orderType: widget.orderType,
-          // Pass the retrieved tableNumber here
-          selectedSeatId: tableNumber,
-          cartItems: widget.cartItems,
-          totalPoints: amount,
-          note: widget.note,
-          orderId: orderId,
-          qrCodeToken: qrToken,
-        ),
-      ),
+  // Safely parse table ID if order type is dine-in
+  int? parsedTableId;
+  if (widget.selectedSeatId != null) {
+    parsedTableId = int.tryParse(widget.selectedSeatId.toString());
+  }
+
+  // Format cart items properly
+  final List<Map<String, dynamic>> itemsPayload = widget.cartItems.map((item) {
+    final dynamic rawId = item["menu_id"] ?? item["menu_item_id"] ?? item["id"];
+    final dynamic rawQty = item["quantity"] ?? item["cartQuantity"];
+
+    return {
+      "menu_id": rawId != null ? int.parse(rawId.toString()) : 0,
+      "quantity": rawQty != null ? int.parse(rawQty.toString()) : 1,
+    };
+  }).toList();
+
+  // Show Loading Progress
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
+
+  try {
+    final response = await ApiService().createOrder(
+      shopId: widget.shopId,
+      orderType: widget.orderType, // e.g. "dine-in"
+      foodTableId: parsedTableId, // Selected table ID
+      walletPassword: pin,
+      deliveryLocation: widget.selectedSeatId, // Optional delivery detail text
+      items: itemsPayload,
     );
+
+    if (mounted) Navigator.pop(context); // Dismiss progress dialog
+
+    if (response != null && response['success'] == true) {
+      final responseData = response['data'] ?? response;
+
+      final String orderId = responseData['id']?.toString() ?? responseData['order_id']?.toString() ?? '';
+      final String qrToken = responseData['qr_code_token'] ?? '';
+
+      if (widget.onTransferCompleted != null) {
+        widget.onTransferCompleted!(
+          widget.initialAmount ?? 0,
+          widget.initialRecipient ?? '',
+        );
+      }
+
+      if (mounted) {
+        // Navigate to Order Success Screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OrderSuccessScreen(
+              shopName: widget.initialRecipient ?? '',
+              orderType: widget.orderType,
+              selectedSeatId: widget.selectedSeatId, // Pass table string for display UI
+              cartItems: widget.cartItems,
+              totalPoints: widget.initialAmount ?? 0,
+              note: widget.note,
+              orderId: orderId,
+              qrCodeToken: qrToken,
+            ),
+          ),
+        );
+      }
+    } else {
+      _showSnackBar(response?['message'] ?? 'မှာယူမှု မအောင်မြင်ပါ။');
+    }
+  } catch (error) {
+    if (mounted) Navigator.pop(context);
+    _showSnackBar(error.toString());
   }
 }
-    } catch (e) {
-      setState(() => _isLoading = false);
-      _showApiErrorDialog(e.toString());
-    }
-  }
-
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),

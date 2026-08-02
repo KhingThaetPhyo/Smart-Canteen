@@ -613,41 +613,72 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         !normalizedTransactionDate.isAfter(endDate);
   }
   
-List<TransactionModel> _getFilteredTransactions(List<TransactionModel> transactions) {
-    const int currentWalletId = 10; // လက်ရှိ login ဝင်ထားသော user ၏ wallet id
+// List<TransactionModel> _getFilteredTransactions(List<TransactionModel> transactions) {
+//     const int currentWalletId = 10; // လက်ရှိ login ဝင်ထားသော user ၏ wallet id
 
-    return transactions.where((transaction) {
-      // Tab အလိုက် စစ်ထုတ်ခြင်း
-      bool matchesTab = true;
-      if (_selectedTab == 1) {
-        // ပွိုင့်လက်ခံရရှိခြင်း
-        matchesTab = transaction.transactionType == 'top-up' && transaction.toWalletId == currentWalletId;
-      } else if (_selectedTab == 2) {
-        // ပွိုင့်လွှဲပြောင်းခြင်း (from_wallet_id က current user ဖြစ်ရမည်)
-        matchesTab = transaction.fromWalletId == currentWalletId && transaction.transactionType == 'TRANSFER';
-      } else if (_selectedTab == 3) {
-       // အော်ဒါငွေပေးချေခြင်း
-        matchesTab = transaction.transactionType == 'order_payment';
-      } 
+//     return transactions.where((transaction) {
+//       // Tab အလိုက် စစ်ထုတ်ခြင်း
+//       bool matchesTab = true;
+//       if (_selectedTab == 1) {
+//         // ပွိုင့်လက်ခံရရှိခြင်း
+//         matchesTab = transaction.transactionType == 'top-up' || transaction.toWalletId == currentWalletId;
+//       } else if (_selectedTab == 2) {
+//         // ပွိုင့်လွှဲပြောင်းခြင်း (from_wallet_id က current user ဖြစ်ရမည်)
+//         matchesTab = transaction.fromWalletId == currentWalletId && transaction.transactionType == 'TRANSFER';
+//       } else if (_selectedTab == 3) {
+//        // အော်ဒါငွေပေးချေခြင်း
+//         matchesTab = transaction.transactionType == 'order_payment';
+//       } 
 
-      // ရှာဖွေရန် စာသား (Search Query) စစ်ဆေးခြင်း
-      final query = _searchQuery.trim().toLowerCase();
-      final amountStr = transaction.amount.toString();
-      final displayAmountStr = transaction.displayAmount?.toLowerCase() ?? "";
+//       // ရှာဖွေရန် စာသား (Search Query) စစ်ဆေးခြင်း
+//       final query = _searchQuery.trim().toLowerCase();
+//       final amountStr = transaction.amount.toString();
+//       final displayAmountStr = transaction.displayAmount?.toLowerCase() ?? "";
       
-      final matchesSearch =
-          query.isEmpty ||
-          transaction.title.toLowerCase().contains(query) ||
-          transaction.subtitle.toLowerCase().contains(query) ||
-          amountStr.contains(query) ||
-          displayAmountStr.contains(query);
+//       final matchesSearch =
+//           query.isEmpty ||
+//           transaction.title.toLowerCase().contains(query) ||
+//           transaction.subtitle.toLowerCase().contains(query) ||
+//           amountStr.contains(query) ||
+//           displayAmountStr.contains(query);
 
-      // ရက်စွဲအလိုက် စစ်ဆေးခြင်း
-      final matchesDate = _isTransactionInsideDateRange(transaction.time);
+//       // ရက်စွဲအလိုက် စစ်ဆေးခြင်း
+//       final matchesDate = _isTransactionInsideDateRange(transaction.time);
 
-      return matchesTab && matchesSearch && matchesDate;
-    }).toList();
-  }
+//       return matchesTab && matchesSearch && matchesDate;
+//     }).toList();
+//   }
+List<TransactionModel> _getFilteredTransactions(List<TransactionModel> transactions) {
+  return transactions.where((transaction) {
+    bool matchesTab = true;
+
+    if (_selectedTab == 1) {
+      // ပွိုင့်လက်ခံရရှိခြင်း (inflow)
+      matchesTab = transaction.direction == 'inflow' || transaction.transactionType == 'top-up';
+    } else if (_selectedTab == 2) {
+      // ပွိုင့်လွှဲပြောင်းခြင်း (outflow transfers)
+      matchesTab = transaction.direction == 'outflow' &&
+          (transaction.transactionType == 'TRANSFER' || transaction.transactionType == 'transfer');
+    } else if (_selectedTab == 3) {
+      // အော်ဒါငွေပေးချေခြင်း
+      matchesTab = transaction.transactionType == 'order_payment';
+    }
+
+    final query = _searchQuery.trim().toLowerCase();
+    final amountStr = transaction.amount.toString();
+    final displayAmountStr = transaction.displayAmount?.toLowerCase() ?? "";
+
+    final matchesSearch = query.isEmpty ||
+        transaction.title.toLowerCase().contains(query) ||
+        transaction.subtitle.toLowerCase().contains(query) ||
+        amountStr.contains(query) ||
+        displayAmountStr.contains(query);
+
+    final matchesDate = _isTransactionInsideDateRange(transaction.time);
+
+    return matchesTab && matchesSearch && matchesDate;
+  }).toList();
+}
   Future<void> _selectDateRange() async {
     final now = DateTime.now();
 

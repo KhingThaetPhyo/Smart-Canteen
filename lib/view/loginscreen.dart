@@ -495,11 +495,14 @@
 // //   }
 // // }
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
+import 'package:smartcanteen/view/enter_email_screen.dart';
+import 'package:smartcanteen/view/forgot_password_screen.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -772,7 +775,10 @@ validator: validatePassword, // 👈 Connected validator here
                                 const Text(""),
                                 TextButton(
                                   onPressed: () {
-                                    // Forgot Password
+                                    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+      );
                                   },
                                   child: const Text(
                                     "Forgot Password?",
@@ -794,66 +800,167 @@ validator: validatePassword, // 👈 Connected validator here
                               width: double.infinity,
                               height: 55,
                               child: ElevatedButton(
-                                onPressed: () async {
-                                  print("Login button clicked");
+                                // onPressed: () async {
+                                //   print("Login button clicked");
 
-                                  if (_formKey.currentState!.validate()) {
-                                    print("Form validation passed");
+                                //   if (_formKey.currentState!.validate()) {
+                                //     print("Form validation passed");
 
-                                    try {
-                                      print("Calling loginUser API...");
+                                //     try {
+                                //       print("Calling loginUser API...");
 
-                                      final result = await ApiService().loginUser(
-                                        email: _emailController.text.trim(),
-                                        password: _passwordController.text.trim(),
-                                      );
+                                //       final result = await ApiService().loginUser(
+                                //         email: _emailController.text.trim(),
+                                //         password: _passwordController.text.trim(),
+                                //       );
 
-                                      print("API Result: $result");
+                                //       print("API Result: $result");
                                       
-                                      if (result != null && result.success == true) {
-                                        print("Login successful");
+                                //       if (result != null && result.success == true) {
+                                //         print("Login successful");
 
-                                        await Future.wait([
-                                          SharedPreferencesService.saveUser(result.user!),
-                                          if (result.token != null) ...[
-                                            SharedPreferencesService.saveToken(result.token!),
-                                            SecureStorageService.saveToken(result.token!),
-                                          ],
-                                          if (result.user?.fcmToken != null)
-                                            SecureStorageService.saveFcmToken(result.user!.fcmToken!),
-                                        ]);
+                                //         await Future.wait([
+                                //           SharedPreferencesService.saveUser(result.user!),
+                                //           if (result.token != null) ...[
+                                //             SharedPreferencesService.saveToken(result.token!),
+                                //             SecureStorageService.saveToken(result.token!),
+                                //           ],
+                                //           if (result.user?.fcmToken != null)
+                                //             SecureStorageService.saveFcmToken(result.user!.fcmToken!),
+                                //         ]);
 
-                                        final userName = result.user?.userName ?? '';
-                                        final studentId = result.user?.student?.studentId ?? '';
-                                        final qrData = '$userName $studentId'.trim();
+                                //         final userName = result.user?.userName ?? '';
+                                //         final studentId = result.user?.student?.studentId ?? result.user?.userId;
+                                //         final qrData = '$userName $studentId'.trim();
 
-                                        await SecureStorageService.saveQrData(qrData);
+                                //         await SecureStorageService.saveQrData(qrData);
 
-                                        if (!mounted) return;
+                                //         if (!mounted) return;
 
-                                        context.go(
-                                          '/navigation',
-                                          extra: qrData,
-                                        );
-                                      } else {
-                                        print("Login failed: ${result?.message}");
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              result?.message ?? "Invalid email or password",
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    } catch (e, stackTrace) {
-                                      print("Login Error: $e");
-                                      print("Stack trace: $stackTrace");
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(e.toString())),
-                                      );
-                                    }
-                                  }
-                                },
+                                //         context.go(
+                                //           '/navigation',
+                                //           extra: qrData,
+                                //         );
+                                //       } else {
+                                //         print("Login failed: ${result?.message}");
+                                //         ScaffoldMessenger.of(context).showSnackBar(
+                                //           SnackBar(
+                                //             content: Text(
+                                //               result?.message ?? "Invalid email or password",
+                                //             ),
+                                //           ),
+                                //         );
+                                //       }
+                                //     } catch (e, stackTrace) {
+                                //       print("Login Error: $e");
+                                //       print("Stack trace: $stackTrace");
+                                //       ScaffoldMessenger.of(context).showSnackBar(
+                                //         SnackBar(content: Text(e.toString())),
+                                //       );
+                                //     }
+                                //   }
+                                // },
+                                onPressed: () async {
+  print("Login button clicked");
+
+  if (_formKey.currentState!.validate()) {
+    print("Form validation passed");
+
+    try {
+      // 1. Fetch FCM Token first
+      print("Fetching FCM token...");
+      // String? fcmToken;
+      // try {
+      //   fcmToken = await FirebaseMessaging.instance.getToken();
+      //   print("Fetched FCM Token: $fcmToken");
+
+      //   // Save FCM token locally right away if retrieved successfully
+      //   if (fcmToken != null && fcmToken.isNotEmpty) {
+      //     await SecureStorageService.saveFcmToken(fcmToken);
+      //   }
+      // } catch (e) {
+      //   print("Error fetching FCM token: $e");
+      // }
+
+      // print("Calling loginUser API...");
+
+      // // 2. Pass fcmToken to your API call (if your ApiService supports it)
+      // final result = await ApiService().loginUser(
+      //   email: _emailController.text.trim(),
+      //   password: _passwordController.text.trim(),
+      //   // fcmToken: fcmToken, // 👈 Pass fcmToken here if supported in your ApiService
+      // );
+// 1. Fetch FCM Token
+String? fcmToken;
+try {
+  fcmToken = await FirebaseMessaging.instance.getToken();
+  print("Fetched FCM Token: $fcmToken");
+
+  if (fcmToken != null && fcmToken.isNotEmpty) {
+    await SecureStorageService.saveFcmToken(fcmToken);
+  }
+} catch (e) {
+  print("Error fetching FCM token: $e");
+}
+
+print("Calling loginUser API...");
+
+// 2. Pass fcmToken to your API call here!
+final result = await ApiService().loginUser(
+  email: _emailController.text.trim(),
+  password: _passwordController.text.trim(),
+  fcmToken: fcmToken, // 👈 Pass it here!
+);
+      print("API Result: $result");
+
+      if (result != null && result.success == true) {
+        print("Login successful");
+
+        // Save user data & auth tokens
+        await Future.wait([
+          SharedPreferencesService.saveUser(result.user!),
+          if (result.token != null) ...[
+            SharedPreferencesService.saveToken(result.token!),
+            SecureStorageService.saveToken(result.token!),
+          ],
+          // Fallback: save backend's returned fcmToken if available and not saved earlier
+          if (result.user?.fcmToken != null)
+            SecureStorageService.saveFcmToken(result.user!.fcmToken!),
+        ]);
+
+        final userName = result.user?.userName ?? '';
+        final studentId = result.user?.student?.studentId ?? result.user?.userId;
+        final qrData = '$userName $studentId'.trim();
+
+        await SecureStorageService.saveQrData(qrData);
+
+        if (!mounted) return;
+
+        context.go(
+          '/navigation',
+          extra: qrData,
+        );
+      } else {
+        print("Login failed: ${result?.message}");
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result?.message ?? "Invalid email or password",
+            ),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      print("Login Error: $e");
+      print("Stack trace: $stackTrace");
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+},
                                 style: ElevatedButton
                                     .styleFrom(
                                   backgroundColor:

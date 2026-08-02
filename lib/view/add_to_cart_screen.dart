@@ -2367,7 +2367,7 @@ class _AddToCartScreenState extends State<AddToCartScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "အော်ဒါမတင်မီ စားပွဲ ရွေးချယ်ပေးပါ။",
+                        "အော်ဒါမတင်မီ စားပွဲ ရွေးချယ်ပေးပါ။ အော်ဒါတင်ပြီး မိနစ်30အတွင်း pickupမလုပ်ပါက auto takeaway ဖြစ်မည်။",
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -2896,18 +2896,18 @@ class _SelectSeatScreenState extends State<SelectSeatScreen> {
                                     color: const Color(0xff34D399),
                                     label: "အားလပ်",
                                   ),
-                                  _buildLegendItem(
-                                    color: const Color(0xffF87171),
-                                    label: "လူရှိ",
-                                  ),
+                                  // _buildLegendItem(
+                                  //   color: const Color(0xffF87171),
+                                  //   label: "လူရှိ",
+                                  // ),
                                   _buildLegendItem(
                                     color: const Color(0xffFBBF24),
                                     label: "မှာထား",
                                   ),
-                                  _buildLegendItem(
-                                    color: Colors.grey.shade400,
-                                    label: "ပိတ်ထား",
-                                  ),
+                                  // _buildLegendItem(
+                                  //   color: Colors.grey.shade400,
+                                  //   label: "ပိတ်ထား",
+                                  // ),
                                 ],
                               ),
                             ],
@@ -2985,14 +2985,14 @@ class _SelectSeatScreenState extends State<SelectSeatScreen> {
       statusText = "ရွေးထားသည်";
     } else {
       switch (status) {
-        case "occupied":
-          bgColor = const Color(0xffFEE2E2);
-          borderColor = const Color(0xffFCA5A5);
-          iconColor = const Color(0xffEF4444);
-          textColor = const Color(0xff1E293B);
-          statusColor = const Color(0xffEF4444);
-          statusText = "လူရှိ";
-          break;
+        // case "occupied":
+        //   bgColor = const Color(0xffFEE2E2);
+        //   borderColor = const Color(0xffFCA5A5);
+        //   iconColor = const Color(0xffEF4444);
+        //   textColor = const Color(0xff1E293B);
+        //   statusColor = const Color(0xffEF4444);
+        //   statusText = "လူရှိ";
+        //   break;
         case "reserved":
           bgColor = const Color(0xffFEF3C7);
           borderColor = const Color(0xffFCD34D);
@@ -3001,14 +3001,14 @@ class _SelectSeatScreenState extends State<SelectSeatScreen> {
           statusColor = const Color(0xffD97706);
           statusText = "မှာထား";
           break;
-        case "disabled":
-          bgColor = Colors.grey.shade100;
-          borderColor = Colors.grey.shade200;
-          iconColor = Colors.grey.shade400;
-          textColor = Colors.grey.shade400;
-          statusColor = Colors.grey.shade400;
-          statusText = "ပိတ်ထား";
-          break;
+        // case "disabled":
+        //   bgColor = Colors.grey.shade100;
+        //   borderColor = Colors.grey.shade200;
+        //   iconColor = Colors.grey.shade400;
+        //   textColor = Colors.grey.shade400;
+        //   statusColor = Colors.grey.shade400;
+        //   statusText = "ပိတ်ထား";
+        //   break;
         case "available":
         default:
           bgColor = const Color(0xffECFDF5);

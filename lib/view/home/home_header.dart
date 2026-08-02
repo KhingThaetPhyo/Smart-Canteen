@@ -392,18 +392,38 @@ final String userName = currentUser?.userName ?? "Guest";
                     context.push('/user_qr');
                   }),
                 ),
-                _QuickAction(
+//                 _QuickAction(
+//   icon: Icons.send_rounded,
+//   title: "ပွိုင့်လွှဲ",
+//   onTap: () => _handleProtectedAction(() {
+//     final int currentBalance = context.read<UserProvider>().balancePoints;
+    
+//     context.push(
+//       '/transfer-point',
+//       extra: {
+//         'currentBalance': currentBalance,
+//         'initialRecipient': recipient,
+//         'onTransferCompleted': (int amount, String recipient) {
+//           // ပွိုင့်လွှဲပြီးသွားတဲ့အခါ လက်ကျန်ပွိုင့်ကို တွက်ချက်ပြီး Provider မှာ update လုပ်ရန်
+//           final newBalance = currentBalance - amount;
+//           context.read<UserProvider>().setBalance(newBalance);
+//         },
+//       },
+//     );
+//   }),
+// ),
+_QuickAction(
   icon: Icons.send_rounded,
   title: "ပွိုင့်လွှဲ",
   onTap: () => _handleProtectedAction(() {
     final int currentBalance = context.read<UserProvider>().balancePoints;
     
     context.push(
-      '/transfer_point',
+      '/transfer-point',
       extra: {
         'currentBalance': currentBalance,
+        'initialRecipient': null,
         'onTransferCompleted': (int amount, String recipient) {
-          // ပွိုင့်လွှဲပြီးသွားတဲ့အခါ လက်ကျန်ပွိုင့်ကို တွက်ချက်ပြီး Provider မှာ update လုပ်ရန်
           final newBalance = currentBalance - amount;
           context.read<UserProvider>().setBalance(newBalance);
         },

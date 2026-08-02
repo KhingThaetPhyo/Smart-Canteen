@@ -817,7 +817,7 @@ class _WalletInfoScreenState extends State<WalletInfoScreen> {
 
           if (!mounted) return;
           final userName = result.user?.userName ?? '';
-          final studentId = result.user?.student?.studentId ?? '';
+          final studentId = result.user?.student?.studentId ?? result.user?.userId;
           final qrData = '$userName $studentId'.trim();
           
           await SecureStorageService.saveQrData(qrData);

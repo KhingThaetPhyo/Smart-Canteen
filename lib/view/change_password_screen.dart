@@ -172,6 +172,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: primaryTeal,
       appBar: AppBar(
+        toolbarHeight: 80,
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(

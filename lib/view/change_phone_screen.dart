@@ -134,15 +134,18 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              Navigator.pop(context);
-            }
-          },
+        leading: Padding(
+          padding: const EdgeInsets.only(top: 30, left: 20),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          ),
         ),
       ),
       body: SafeArea(

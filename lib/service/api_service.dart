@@ -9,12 +9,13 @@ import 'package:smartcanteen/model/order_model.dart';
 import 'package:smartcanteen/model/register_model.dart';
 import 'package:smartcanteen/model/shop_model.dart';
 import 'package:smartcanteen/model/view_menu_model.dart';
-import 'package:smartcanteen/service/secure_storage_service.dart'; // Make sure this path is correct for your project
+import 'package:smartcanteen/service/secure_storage_service.dart';
+import 'package:smartcanteen/view/transfer_point_screen.dart'; // Make sure this path is correct for your project
 
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
   //static const String baseUrl = "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
-  static const String baseUrl = "http://192.168.1.3:8000/api";
+  static const String baseUrl = "http://192.168.1.8:8000/api";
 //https://0c087b6d8fabd90f-202-165-86-143.serveousercontent.com/api/login
   final Dio _dio = Dio(
     BaseOptions(
@@ -117,10 +118,10 @@ print(response.data);
 }
   }
 
-
 Future<LoginModel?> loginUser({
   required String email,
   required String password,
+  String? fcmToken, // 👈 1. Added optional fcmToken parameter
 }) async {
   try {
     print("Sending login request...");
@@ -130,6 +131,7 @@ Future<LoginModel?> loginUser({
       data: {
         'user_email': email,
         'user_password': password,
+        'fcm_token': fcmToken, // 👈 2. Included fcm_token in payload
       },
     );
 
@@ -139,22 +141,59 @@ Future<LoginModel?> loginUser({
       return LoginModel.fromJson(response.data);
     }
     return null;
-  }  on DioException catch (e) {
-  print("========== LOGIN DIO ERROR ==========");
-  print("Type: ${e.type}");
-  print("Message: ${e.message}");
-  print("Status Code: ${e.response?.statusCode}");
-  print("Response: ${e.response?.data}");
-  print("=====================================");
+  } on DioException catch (e) {
+    print("========== LOGIN DIO ERROR ==========");
+    print("Type: ${e.type}");
+    print("Message: ${e.message}");
+    print("Status Code: ${e.response?.statusCode}");
+    print("Response: ${e.response?.data}");
+    print("=====================================");
 
-  if (e.response != null) {
-    final data = e.response!.data;
-    throw data['message'] ?? 'Login failed.';
+    if (e.response != null) {
+      final data = e.response!.data;
+      throw data['message'] ?? 'Login failed.';
+    }
+
+    throw 'Unable to connect to server.';
   }
+}
+// Future<LoginModel?> loginUser({
+//   required String email,
+//   required String password,
+// }) async {
+//   try {
+//     print("Sending login request...");
 
-  throw 'Unable to connect to server.';
-}
-}
+//     final response = await _dio.post(
+//       '/login',
+//       data: {
+//         'user_email': email,
+//         'user_password': password,
+//       },
+//     );
+
+//     print("Login Response: ${response.data}");
+
+//     if (response.statusCode == 200) {
+//       return LoginModel.fromJson(response.data);
+//     }
+//     return null;
+//   }  on DioException catch (e) {
+//   print("========== LOGIN DIO ERROR ==========");
+//   print("Type: ${e.type}");
+//   print("Message: ${e.message}");
+//   print("Status Code: ${e.response?.statusCode}");
+//   print("Response: ${e.response?.data}");
+//   print("=====================================");
+
+//   if (e.response != null) {
+//     final data = e.response!.data;
+//     throw data['message'] ?? 'Login failed.';
+//   }
+
+//   throw 'Unable to connect to server.';
+// }
+// }
 
 /// Fetch Shops along with their Menu Items using ViewMenuModel
   Future<ViewMenuModel?> getShopsWithMenus() async {
@@ -302,36 +341,102 @@ Future<LoginModel?> loginUser({
 //   }
 // }
 
+// Future<Map<String, dynamic>?> createOrder({
+//   required int shopId,
+//   required String orderType,
+//   required String walletPassword,
+//   int? foodTableId,
+//   String? deliveryLocation,
+//   required List<Map<String, dynamic>> items,
+// }) async {
+//   final url = Uri.parse('$baseUrl/orders/order-create');
+//   final token = await SecureStorageService.getToken();
+
+//   // Ensures menu_id and quantity are parsed as integers to prevent validation errors
+//   final formattedItems = items.map((item) {
+//     return {
+//       "menu_id": int.parse(item['menu_id'].toString()),
+//       "quantity": int.parse(item['quantity'].toString()),
+//     };
+//   }).toList();
+
+//   final Map<String, dynamic> body = {
+//     "shop_id": shopId,
+//     "order_type": orderType,
+//     "food_tables_id": foodTableId,
+//     "wallet_password": walletPassword,
+//     "delivery_location": deliveryLocation,
+//     "items": formattedItems,
+//   };
+
+//   print("=== DEBUG API REQUEST BODY ===");
+//   print(jsonEncode(body));
+
+//   try {
+//     final response = await http.post(
+//       url,
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Accept': 'application/json',
+//         if (token != null) 'Authorization': 'Bearer $token',
+//       },
+//       body: jsonEncode(body),
+//     );
+
+//     print("=== DEBUG API RESPONSE ===");
+//     print("Status Code: ${response.statusCode}");
+//     print("Body: ${response.body}");
+
+//     final decoded = jsonDecode(response.body);
+
+//     if (response.statusCode == 200 || response.statusCode == 201) {
+//       return decoded is Map<String, dynamic>
+//           ? decoded
+//           : {"success": true, "data": decoded};
+//     } else {
+//       return {
+//         "success": false,
+//         "message": decoded is Map && decoded.containsKey("message")
+//             ? decoded["message"]
+//             : "အော်ဒါ မှာယူမှု မအောင်မြင်ပါ",
+//       };
+//     }
+//   } catch (e) {
+//     print("API Exception: $e");
+//     return {
+//       "success": false,
+//       "message": "ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ: $e",
+//     };
+//   }
+// }
+
 Future<Map<String, dynamic>?> createOrder({
   required int shopId,
   required String orderType,
   required String walletPassword,
-  int? foodTableId,
+  int? foodTableId, // Ensure this accepts an optional integer ID
   String? deliveryLocation,
   required List<Map<String, dynamic>> items,
 }) async {
   final url = Uri.parse('$baseUrl/orders/order-create');
   final token = await SecureStorageService.getToken();
 
-  // Ensures menu_id and quantity are parsed as integers to prevent validation errors
+  // Ensures menu_id and quantity are parsed as integers to avoid API format errors
   final formattedItems = items.map((item) {
     return {
-      "menu_id": int.parse(item['menu_id'].toString()),
-      "quantity": int.parse(item['quantity'].toString()),
+      "menu_id": int.parse((item['menu_id'] ?? item['id']).toString()),
+      "quantity": int.parse((item['quantity'] ?? item['cartQuantity']).toString()),
     };
   }).toList();
 
   final Map<String, dynamic> body = {
     "shop_id": shopId,
     "order_type": orderType,
-    "food_table_id": foodTableId,
+    "food_tables_id": foodTableId, // Transferred Table ID
     "wallet_password": walletPassword,
     "delivery_location": deliveryLocation,
     "items": formattedItems,
   };
-
-  print("=== DEBUG API REQUEST BODY ===");
-  print(jsonEncode(body));
 
   try {
     final response = await http.post(
@@ -343,10 +448,6 @@ Future<Map<String, dynamic>?> createOrder({
       },
       body: jsonEncode(body),
     );
-
-    print("=== DEBUG API RESPONSE ===");
-    print("Status Code: ${response.statusCode}");
-    print("Body: ${response.body}");
 
     final decoded = jsonDecode(response.body);
 
@@ -363,14 +464,12 @@ Future<Map<String, dynamic>?> createOrder({
       };
     }
   } catch (e) {
-    print("API Exception: $e");
     return {
       "success": false,
       "message": "ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ: $e",
     };
   }
 }
-
 /// Fetch updated user wallet balance directly
 Future<Map<String, dynamic>?> getWalletBalance() async {
   try {
@@ -576,14 +675,13 @@ Future<List<Map<String, dynamic>>> searchUsers(String query) async {
     }
   }
 
-
-/// Fetch User Transactions
+/// Fetch User Transactions History
 Future<List<dynamic>?> getTransactions() async {
   try {
     final token = await SecureStorageService.getToken();
 
     final response = await _dio.get(
-      "/transactions",
+      "/transactions/history", // Updated endpoint path
       options: Options(
         headers: {
           if (token != null) "Authorization": "Bearer $token",
@@ -602,10 +700,45 @@ Future<List<dynamic>?> getTransactions() async {
     print("Message: ${e.message}");
     print("Response: ${e.response?.data}");
     print("==============================================");
-    throw e.response?.data['message'] ?? 'Failed to load transactions.';
+    throw e.response?.data['message'] ?? 'Failed to load transaction history.';
   }
 }
 
+/// Fetch User Data by QR Payload (UCSTT code or digit string ID)
+Future<RecipientModel?> getUserByQr(String qrValue) async {
+  try {
+    final token = await SecureStorageService.getToken();
+
+    final response = await _dio.get(
+      "/user-info-by-qr/$qrValue",
+      options: Options(
+        headers: {
+          if (token != null) "Authorization": "Bearer $token",
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      final data = response.data['data'];
+      return RecipientModel(
+        userId: data['user_id'], // or null if not provided in response
+        name: data['user_name'] ?? '',
+        phone: data['user_phone'] ?? '',
+        role: data['role'],
+      );
+    }
+    return null;
+  } on DioException catch (e) {
+    print("========== GET USER BY QR ERROR ==========");
+    print("Type: ${e.type}");
+    print("Message: ${e.message}");
+    print("Response: ${e.response?.data}");
+    return null;
+  } catch (e) {
+    print("Error parsing user info: $e");
+    return null;
+  }
+}
 
   // ===== UPDATE Phone USER =====
   Future<bool> updatePhone({required String phone}) async {
@@ -680,6 +813,7 @@ Future<List<dynamic>?> getTransactions() async {
       throw 'Unable to connect to server.';
     }
   }
+
 
   // ===== RESET WALLET PIN =====
   Future<Map<String, dynamic>> resetPin({
@@ -854,23 +988,25 @@ Future<List<dynamic>?> getTransactions() async {
       return {'success': false, 'message': 'Unable to connect to server.'};
     }
   }
+// Future<Map<String, dynamic>> sendOtp(String email) async {
+//   try {
+//     // Call forgotPin directly instead of through _apiService
+//     bool isSuccess = await forgotPin(email); 
+//     return {
+//       'success': isSuccess,
+//       'message': isSuccess ? 'OTP ပို့ပြီးပါပြီ။' : 'Failed to send OTP.',
+//     };
+//   } catch (e) {
+//     print("Send OTP Error: $e");
+//     return {
+//       'success': false,
+//       'message': e.toString(),
+//     };
+//   }
+// }
 Future<Map<String, dynamic>> sendOtp(String email) async {
-  try {
-    // Call forgotPin directly instead of through _apiService
-    bool isSuccess = await forgotPin(email); 
-    return {
-      'success': isSuccess,
-      'message': isSuccess ? 'OTP ပို့ပြီးပါပြီ။' : 'Failed to send OTP.',
-    };
-  } catch (e) {
-    print("Send OTP Error: $e");
-    return {
-      'success': false,
-      'message': e.toString(),
-    };
+    return await forgotPassword(email);
   }
-}
-
 // ===== LOGOUT USER =====
   Future<Map<String, dynamic>> logoutUser() async {
     try {
@@ -914,6 +1050,111 @@ Future<Map<String, dynamic>> sendOtp(String email) async {
         }
       }
       return {'success': false, 'message': 'Unable to connect to server.'};
+    }
+  }
+
+ // ===== FORGOT PASSWORD (Send OTP) =====
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      final response = await _dio.post(
+        '/forgot-password',
+        data: {'user_email': email},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': response.data['success'] ?? true,
+          'message': response.data['message'] ?? 'OTP Code ကို အီးမေးလ်သို့ ပေးပို့လိုက်ပါပြီ။',
+        };
+      }
+      
+      return {
+        'success': false,
+        'message': response.data['message'] ?? 'အကောင့် ရှာမတွေ့ပါ။',
+      };
+    } on DioException catch (e) {
+      print("========== FORGOT PASSWORD DIO ERROR ==========");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+
+      if (e.response != null && e.response?.data != null) {
+        final data = e.response!.data;
+
+        // Extract error message from API response
+        if (data is Map<String, dynamic>) {
+          if (data["errors"] != null && data["errors"]["user_email"] != null) {
+            final List errors = data["errors"]["user_email"];
+            if (errors.isNotEmpty) {
+              return {'success': false, 'message': errors.first};
+            }
+          }
+          return {
+            'success': false,
+            'message': data['message'] ?? 'ဤအီးမေးလ်ဖြင့် အကောင့် ရှာမတွေ့ပါ။',
+          };
+        }
+      }
+      return {'success': false, 'message': 'ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ။'};
+    } catch (e) {
+      return {'success': false, 'message': 'အမှားတစ်ခု ဖြစ်ပေါ်နေပါသည်။'};
+    }
+  } 
+
+  // ===== RESET PASSWORD API =====
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String password,
+    required String confirmPassword,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/reset-password',
+        data: {
+          'user_email': email,
+          'otp': otp,
+          'user_password': password,
+          'user_password_confirmation': confirmPassword,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': response.data['success'] ?? true,
+          'message': response.data['message'] ?? 'အကောင့် စကားဝှက်ကို အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ။',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': response.data['message'] ?? 'စကားဝှက် ပြောင်းလဲခြင်း မအောင်မြင်ပါ။',
+      };
+    } on DioException catch (e) {
+      print("========== RESET PASSWORD DIO ERROR ==========");
+      print("Status Code: ${e.response?.statusCode}");
+      print("Response: ${e.response?.data}");
+
+      if (e.response != null && e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map<String, dynamic>) {
+          if (data["errors"] != null && data["errors"] is Map) {
+            String errorMessage = "";
+            (data["errors"] as Map).forEach((key, value) {
+              if (value is List && value.isNotEmpty) {
+                errorMessage += "${value.first}\n";
+              }
+            });
+            return {'success': false, 'message': errorMessage.trim()};
+          }
+          return {
+            'success': false,
+            'message': data['message'] ?? 'စကားဝှက် ပြောင်းလဲခြင်း မအောင်မြင်ပါ။',
+          };
+        }
+      }
+      return {'success': false, 'message': 'ဆာဗာနှင့် ချိတ်ဆက်၍ မရပါ။'};
+    } catch (e) {
+      return {'success': false, 'message': 'အမှားတစ်ခု ဖြစ်ပေါ်နေပါသည်။'};
     }
   }
 }

@@ -741,8 +741,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       initials = 'U';
     }
   }
-
-  // Screen အလယ်တွင် ပြသပေးမည့် Dynamic Custom Success Dialog Box
+// Screen အလယ်တွင် ပြသပေးမည့် Dynamic Custom Success Dialog Box
   void _showSuccessDialog({required IconData icon, required String message}) {
     showDialog(
       context: context,
@@ -786,6 +785,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     height: 1.4,
                   ),
                 ),
+                const SizedBox(height: 24),
+                // --- OK Button Added Here ---
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF007A87),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'အတည်ပြုသည်', // OK
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -793,7 +816,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
-
   final ApiService _apiService = ApiService();
 
   Future<void> _handleLogout() async {
@@ -910,11 +932,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         actions: [
           if (isLoggedin)
-            IconButton(
-              icon: const Icon(Icons.logout_rounded, color: Colors.white),
-              onPressed: () {
-                _showLogoutConfirmationDialog();
-              },
+            Padding(
+              padding: const EdgeInsets.only(top: 25.0, right: 20),
+              child: IconButton(
+                icon: const Icon(Icons.logout_sharp, color: Colors.white),
+                onPressed: () {
+                  _showLogoutConfirmationDialog();
+                },
+              ),
             ),
         ],
         backgroundColor: primaryTeal,
