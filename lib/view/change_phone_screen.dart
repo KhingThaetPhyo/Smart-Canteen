@@ -137,7 +137,7 @@ class _ChangePhoneScreenState extends State<ChangePhoneScreen> {
         leading: Padding(
           padding: const EdgeInsets.only(top: 30, left: 20),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
             onPressed: () {
               if (context.canPop()) {
                 context.pop();

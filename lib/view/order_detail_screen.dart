@@ -1122,7 +1122,7 @@ class OrderDetailScreen extends StatelessWidget {
 
   // QR ကုဒ်ပြမည့် Dialog (order_id နှင့် qr_code_token နှစ်ခုစလုံးကို ပေါင်းစပ်ထားသည်)
   void _showPickUpCodeDialog(BuildContext context, dynamic orderId, String qrCodeToken) {
-    final String qrData = "Order ID: $orderId\nToken: $qrCodeToken";
+    final String qrData = "$orderId";
 
     showDialog(
       context: context,

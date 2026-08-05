@@ -1274,42 +1274,45 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   Widget _buildActionButtons(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            icon: const Icon(
-              Icons.track_changes_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
-            label: const Text(
-              'အော်ဒါ ခြေရာခံမည်',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
+        // SizedBox(
+        //   width: double.infinity,
+        //   height: 50,
+        //   child: ElevatedButton.icon(
+        //     onPressed: () {
+        //       Navigator.of(context).popUntil((route) => route.isFirst);
+        //     },
+        //     icon: const Icon(
+        //       Icons.track_changes_rounded,
+        //       color: Colors.white,
+        //       size: 18,
+        //     ),
+        //     label: const Text(
+        //       'အော်ဒါ ခြေရာခံမည်',
+        //       style: TextStyle(
+        //         color: Colors.white,
+        //         fontWeight: FontWeight.bold,
+        //         fontSize: 14,
+        //       ),
+        //     ),
+        //     style: ElevatedButton.styleFrom(
+        //       backgroundColor: primaryColor,
+        //       elevation: 0,
+        //       shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(14),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           height: 50,
           child: OutlinedButton.icon(
-            onPressed: () =>
-                context.go('/navigation'),
+            // onPressed: () =>
+            //     context.go('/navigation'),
+            onPressed: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
             icon: Icon(
               Icons.home_outlined,
               color: Colors.grey.shade700,

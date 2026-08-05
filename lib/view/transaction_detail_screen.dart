@@ -1478,19 +1478,19 @@ class TransactionDetailScreen extends StatelessWidget {
                         receiverName,
                       ),
 
-                    // 5. Sender Wallet (ID)
-                    if (transaction.fromWalletId != null)
-                      _buildDetailRow(
-                        "ပေးပို့သည့် Wallet (ID)",
-                        "${transaction.fromWalletId}",
-                      ),
+                    // // 5. Sender Wallet (ID)
+                    // if (transaction.fromWalletId != null)
+                    //   _buildDetailRow(
+                    //     "ပေးပို့သည့် Wallet (ID)",
+                    //     "${transaction.fromWalletId}",
+                    //   ),
 
-                    // 6. Receiver Wallet (ID)
-                    if (transaction.toWalletId != null)
-                      _buildDetailRow(
-                        "လက်ခံသည့် Wallet (ID)",
-                        "${transaction.toWalletId}",
-                      ),
+                    // // 6. Receiver Wallet (ID)
+                    // if (transaction.toWalletId != null)
+                    //   _buildDetailRow(
+                    //     "လက်ခံသည့် Wallet (ID)",
+                    //     "${transaction.toWalletId}",
+                    //   ),
 
                     // 7. Order ID
                     if (transaction.orderId != null)

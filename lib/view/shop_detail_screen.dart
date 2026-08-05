@@ -1226,52 +1226,52 @@ Future<void> _loadUserData() async {
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.access_time_filled_rounded,
-                      color: primaryColor,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "မနက်စာ: $breakfastTime",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(width: 1, height: 12, color: Colors.grey.shade300),
-                    const Spacer(),
-                    const Icon(
-                      Icons.lunch_dining_rounded,
-                      color: Colors.orange,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "နေ့လည်စာ: $lunchTime",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // SliverToBoxAdapter(
+            //   child: Container(
+            //     margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            //     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            //     decoration: BoxDecoration(
+            //       color: Colors.white,
+            //       borderRadius: BorderRadius.circular(14),
+            //       border: Border.all(color: Colors.grey.shade200),
+            //     ),
+            //     child: Row(
+            //       children: [
+            //         const Icon(
+            //           Icons.access_time_filled_rounded,
+            //           color: primaryColor,
+            //           size: 18,
+            //         ),
+            //         const SizedBox(width: 8),
+            //         Text(
+            //           "မနက်စာ: $breakfastTime",
+            //           style: TextStyle(
+            //             fontSize: 11,
+            //             fontWeight: FontWeight.w600,
+            //             color: Colors.grey.shade700,
+            //           ),
+            //         ),
+            //         const Spacer(),
+            //         Container(width: 1, height: 12, color: Colors.grey.shade300),
+            //         const Spacer(),
+            //         const Icon(
+            //           Icons.lunch_dining_rounded,
+            //           color: Colors.orange,
+            //           size: 18,
+            //         ),
+            //         const SizedBox(width: 8),
+            //         Text(
+            //           "နေ့လည်စာ: $lunchTime",
+            //           style: TextStyle(
+            //             fontSize: 11,
+            //             fontWeight: FontWeight.w600,
+            //             color: Colors.grey.shade700,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -1322,61 +1322,61 @@ Future<void> _loadUserData() async {
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    children: mealTypes.map((type) {
-                      final isSelected = selectedMealType == type;
+            // SliverToBoxAdapter(
+            //   child: Padding(
+            //     padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+            //     child: Container(
+            //       padding: const EdgeInsets.all(4),
+            //       decoration: BoxDecoration(
+            //         color: Colors.grey.shade200,
+            //         borderRadius: BorderRadius.circular(14),
+            //       ),
+            //       child: Row(
+            //         children: mealTypes.map((type) {
+            //           final isSelected = selectedMealType == type;
         
-                      return Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() => selectedMealType = type),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? Colors.white
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 4,
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                            child: Center(
-                              child: Text(
-                                type,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.w500,
-                                  color: isSelected
-                                      ? primaryColor
-                                      : Colors.grey.shade600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ),
+            //           return Expanded(
+            //             child: GestureDetector(
+            //               onTap: () => setState(() => selectedMealType = type),
+            //               child: AnimatedContainer(
+            //                 duration: const Duration(milliseconds: 200),
+            //                 padding: const EdgeInsets.symmetric(vertical: 8),
+            //                 decoration: BoxDecoration(
+            //                   color: isSelected
+            //                       ? Colors.white
+            //                       : Colors.transparent,
+            //                   borderRadius: BorderRadius.circular(10),
+            //                   boxShadow: isSelected
+            //                       ? [
+            //                           BoxShadow(
+            //                             color: Colors.black.withOpacity(0.05),
+            //                             blurRadius: 4,
+            //                           ),
+            //                         ]
+            //                       : null,
+            //                 ),
+            //                 child: Center(
+            //                   child: Text(
+            //                     type,
+            //                     style: TextStyle(
+            //                       fontSize: 13,
+            //                       fontWeight: isSelected
+            //                           ? FontWeight.bold
+            //                           : FontWeight.w500,
+            //                       color: isSelected
+            //                           ? primaryColor
+            //                           : Colors.grey.shade600,
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //             ),
+            //           );
+            //         }).toList(),
+            //       ),
+            //     ),
+            //   ),
+            // ),
             SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

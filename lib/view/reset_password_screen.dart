@@ -156,25 +156,111 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     if (!mounted) return;
 
-    if (result['success'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result['message'] ?? 'အကောင့် စကားဝှက်ကို အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ။'),
-          backgroundColor: const Color(0xFF007A87),
+  //   if (result['success'] == true) {
+  //     // ScaffoldMessenger.of(context).showSnackBar(
+  //     //   SnackBar(
+  //     //     content: Text(result['message'] ?? 'အကောင့် စကားဝှက်ကို အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ။'),
+  //     //     backgroundColor: const Color(0xFF007A87),
+  //     //   ),
+  //     // );
+  //     // Return to login screen
+  //     Navigator.popUntil(context, (route) => route.isFirst);
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(result['message'] ?? 'ခေတ္တချို့ယွင်းချက်ရှိနေပါသည်။'),
+  //         backgroundColor: Colors.redAccent,
+  //       ),
+  //     );
+  //   }
+  // }
+if (result['success'] == true) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevents closing the dialog by tapping outside
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        elevation: 10,
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF007A87).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: Color(0xFF007A87),
+                  size: 48,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'အောင်မြင်ပါသည်',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF007A87),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                result['message'] ?? 'လုပ်ဆောင်ချက် အောင်မြင်စွာ ပြောင်းလဲပြီးပါပြီ။',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF007A87),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.popUntil(context, (route) => route.isFirst); // Return to first screen
+                  },
+                  child: const Text(
+                    'လက်ခံမည်',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       );
-      // Return to login screen
-      Navigator.popUntil(context, (route) => route.isFirst);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result['message'] ?? 'ခေတ္တချို့ယွင်းချက်ရှိနေပါသည်။'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    }
+    },
+  );
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(result['message'] ?? 'ခေတ္တချို့ယွင်းချက်ရှိနေပါသည်။'),
+      backgroundColor: Colors.redAccent,
+    ),
+  );
+}
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

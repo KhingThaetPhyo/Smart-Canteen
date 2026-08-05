@@ -639,6 +639,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartcanteen/model/user_model.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/service/secure_storage_service.dart';
@@ -692,8 +693,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return rawId;
   }
 
-  // Fetch user data from SharedPreferences
-  Future<void> _loadUserData() async {
+
+    // Load saved notification preference along with user data
+Future<void> _loadUserData() async {
+  final prefs = await SharedPreferences.getInstance();
+  if (mounted) {
+    setState(() {
+      // Default to true if not previously set
+      isNotificationOn = prefs.getBool('is_notification_on') ?? true;
+    });
+  }
+
     try {
       UserModel? user = await SharedPreferencesService.getUser();
       if (user != null && mounted) {
@@ -913,7 +923,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const primaryTeal = Color(0xff117992);
+    const primaryTeal = Color(0xff0D6B80);
     const lightBgColor = Color(0xFFEBF6F7);
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
@@ -1096,17 +1106,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-                              _buildSettingItem(
-                                icon: Icons.notifications_none,
-                                title: 'အသိပေးချက်များ',
-                                trailing: Switch(
-                                  value: isNotificationOn,
-                                  activeThumbColor: primaryTeal,
-                                  onChanged: (val) {
-                                    setState(() => isNotificationOn = val);
-                                  },
-                                ),
-                              ),
+                              // _buildSettingItem(
+                              //   icon: Icons.notifications_none,
+                              //   title: 'အသိပေးချက်များ',
+                              //   trailing: Switch(
+                              //     value: isNotificationOn,
+                              //     activeThumbColor: primaryTeal,
+                              //     onChanged: (val) {
+                              //       setState(() => isNotificationOn = val);
+                              //     },
+                              //   ),
+                              // ),
+                              // In _buildSettingItem for Notifications:
+_buildSettingItem(
+  icon: Icons.notifications_none,
+  title: 'အသိပေးချက်များ',
+  trailing: Switch(
+    value: isNotificationOn,
+    activeThumbColor: primaryTeal,
+    onChanged: (val) async {
+      setState(() => isNotificationOn = val);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_notification_on', val);
+    },
+  ),
+),
                               _buildSettingItem(
                                 icon: Icons.phone,
                                 title: 'ဖုန်းနံပါတ် ပြောင်းရန်',

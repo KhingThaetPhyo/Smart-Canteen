@@ -29,12 +29,12 @@ class _EnterEmailScreenState extends State<EnterEmailScreen> {
     if (!mounted) return;
 
     if (result['success'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('OTP နံပါတ်ကို အီးမေးလ်သို့ ပို့လိုက်ပါပြီ။'),
-          backgroundColor: Color(0xff117992),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   // const SnackBar(
+      //   //   content: Text('OTP နံပါတ်ကို အီးမေးလ်သို့ ပို့လိုက်ပါပြီ။'),
+      //   //   backgroundColor: Color(0xff117992),
+      //   // ),
+      // );
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => ResetPinScreen(email: email)),
@@ -53,40 +53,79 @@ class _EnterEmailScreenState extends State<EnterEmailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
+      // appBar: PreferredSize(
+      //   preferredSize: const Size.fromHeight(65.0),
+      //   child: Container(
+      //     margin: const EdgeInsets.only(top: 8, left: 12, right: 12),
+      //     decoration: BoxDecoration(
+      //       color: const Color(0xFF007A87),
+      //       borderRadius: BorderRadius.circular(20),
+      //       boxShadow: [
+      //         BoxShadow(
+      //           color: const Color(0xFF007A87).withOpacity(0.3),
+      //           blurRadius: 12,
+      //           offset: const Offset(0, 4),
+      //         ),
+      //       ],
+      //     ),
+      //     child: AppBar(
+      //       title: Padding(
+      //         padding: const EdgeInsets.all(8.0),
+      //         child: const Text(
+      //           'Wallet PIN မေ့နေပါသလား',
+      //           style: TextStyle(
+      //             color: Colors.white,
+      //             fontWeight: FontWeight.bold,
+      //             fontSize: 18,
+      //           ),
+      //         ),
+      //       ),
+      //       backgroundColor: Colors.transparent,
+      //       elevation: 0,
+      //       centerTitle: true,
+      //       iconTheme:  IconThemeData(color: Colors.white),
+      //     ),
+      //   ),
+      // ),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(65.0),
-        child: Container(
-          margin: const EdgeInsets.only(top: 8, left: 12, right: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF007A87),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF007A87).withOpacity(0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: AppBar(
-            title: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: const Text(
-                'Wallet PIN မေ့နေပါသလား',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            centerTitle: true,
-            iconTheme:  IconThemeData(color: Colors.white),
+  preferredSize: const Size.fromHeight(65.0),
+  child: Container(
+    margin: const EdgeInsets.only(top: 8, left: 12, right: 12),
+    decoration: BoxDecoration(
+      color: const Color(0xFF007A87),
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: const Color(0xFF007A87).withOpacity(0.3),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: AppBar(
+      // Custom back arrow icon added here
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, size: 20), // standard iOS arrow
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      title: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Text(
+          'Wallet PIN မေ့နေပါသလား',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
       ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      centerTitle: true,
+      iconTheme: const IconThemeData(color: Colors.white),
+    ),
+  ),
+),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),

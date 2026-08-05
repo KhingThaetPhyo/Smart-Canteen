@@ -111,5 +111,18 @@ class SharedPreferencesService {
     await prefs.clear();
   }
 
-  
+// Inside SharedPreferencesService class
+static const String _notificationKey = 'is_notification_on';
+
+// Save notification toggle status
+static Future<void> saveNotificationStatus(bool isEnabled) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(_notificationKey, isEnabled);
+}
+
+// Get notification toggle status (defaults to true)
+static Future<bool> getNotificationStatus() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getBool(_notificationKey) ?? true;
+}
 }

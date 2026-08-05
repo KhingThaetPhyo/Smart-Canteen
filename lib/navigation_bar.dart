@@ -338,7 +338,7 @@ Future<void> _loadQrData() async {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color(0xff117992),
+      backgroundColor:  Color(0xff0D6B80),
       extendBody: true,
       body: SafeArea(
         bottom: false,

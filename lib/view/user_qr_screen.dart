@@ -489,7 +489,7 @@ class _UserQrScreenState extends State<UserQrScreen> {
         backgroundColor: brandColor,
         elevation: 2,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () => context.go('/navigation'),
         ),
         title: const Text(

@@ -1617,18 +1617,18 @@
 //     _futureMenuItems = _fetchDisplayItems();
 //   }
 
-//   /// Helper to guard actions that require authentication
-//   static Future<void> _handleProtectedAction(
-//       BuildContext context, VoidCallback onAuthenticated) async {
-//     final currentUser = await SharedPreferencesService.getUser();
-//     if (context.mounted) {
-//       if (currentUser == null) {
-//         context.go('/login');
-//       } else {
-//         context.go('/shop_detail');
-//       }
-//     }
-//   }
+  // /// Helper to guard actions that require authentication
+  // static Future<void> _handleProtectedAction(
+  //     BuildContext context, VoidCallback onAuthenticated) async {
+  //   final currentUser = await SharedPreferencesService.getUser();
+  //   if (context.mounted) {
+  //     if (currentUser == null) {
+  //       context.go('/login');
+  //     } else {
+  //       context.go('/shop_detail');
+  //     }
+  //   }
+  // }
 // Future<List<_DisplayMenuItem>> _fetchDisplayItems() async {
 //   try {
 //     final response = await _apiService.getShopsWithMenus();
@@ -2093,15 +2093,14 @@ import 'package:smartcanteen/model/shop_model.dart';
 import 'package:smartcanteen/service/api_service.dart';
 import 'package:smartcanteen/service/shared_preferences_service.dart';
 import 'package:smartcanteen/view/favourite_screen.dart';
-
 class MenuSection extends StatefulWidget {
   const MenuSection({super.key});
 
   @override
-  State<MenuSection> createState() => _MenuSectionState();
+  State<MenuSection> createState() => MenuSectionState();
 }
 
-class _MenuSectionState extends State<MenuSection> {
+class MenuSectionState extends State<MenuSection> {
   static const Color primaryColor = Color(0xff117992);
   final ApiService _apiService = ApiService();
 
@@ -2111,11 +2110,22 @@ class _MenuSectionState extends State<MenuSection> {
   // Selected category ID (null indicates "All")
   int? _selectedCategoryId;
 
+  // State flag to toggle showing 5 items vs all items
+  bool _showAllMenus = false;
+
   @override
   void initState() {
     super.initState();
     _futureCategories = _apiService.getCategories();
     _futureMenuItems = _fetchDisplayItems();
+  }
+
+  // Public method to refresh menus (used during pull-to-refresh)
+  Future<void> refreshMenu() async {
+    setState(() {
+      _futureCategories = _apiService.getCategories();
+      _futureMenuItems = _fetchDisplayItems();
+    });
   }
 
   /// Helper to guard actions that require authentication
@@ -2126,36 +2136,29 @@ class _MenuSectionState extends State<MenuSection> {
       if (currentUser == null) {
         context.go('/login');
       } else {
-        onAuthenticated();
+        context.go('/shop_detail');
       }
     }
   }
-
   Future<List<_DisplayMenuItem>> _fetchDisplayItems() async {
-    try {
-      final response = await _apiService.getShopsWithMenus();
-      List<_DisplayMenuItem> displayItems = [];
+    final response = await _apiService.getShopsWithMenus();
+    List<_DisplayMenuItem> displayItems = [];
 
-      if (response != null && response.success) {
-        for (var shop in response.data) {
-          if (shop.menus != null && shop.menus!.isNotEmpty) {
-            for (var menu in shop.menus!) {
-              displayItems.add(
-                _DisplayMenuItem(
-                  shopName: shop.shopName ?? 'Unknown Shop',
-                  menu: menu,
-                ),
-              );
-            }
+    if (response != null && response.success) {
+      for (var shop in response.data) {
+        if (shop.menus != null) {
+          for (var menu in shop.menus!) {
+            displayItems.add(
+              _DisplayMenuItem(
+                shopName: shop.shopName,
+                menu: menu,
+              ),
+            );
           }
         }
       }
-      return displayItems;
-    } catch (e, stackTrace) {
-      print("DEBUG ERROR in _fetchDisplayItems: $e");
-      print("DEBUG STACKTRACE: $stackTrace");
-      rethrow;
     }
+    return displayItems;
   }
 
   Widget _buildCategoryButton({
@@ -2197,7 +2200,7 @@ class _MenuSectionState extends State<MenuSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// CATEGORIES HEADER
+        /// CATEGORIES HEADER & "အားလုံးကြည့်ရန်"
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
@@ -2213,13 +2216,13 @@ class _MenuSectionState extends State<MenuSection> {
               ),
               TextButton(
                 onPressed: () {
-                  // _handleProtectedAction(context, () {
-                  //   context.push('/all_menus');
-                  // });
+                  setState(() {
+                    _showAllMenus = !_showAllMenus; // Toggle limit
+                  });
                 },
-                child: const Text(
-                  "အားလုံးကြည့်ရန်",
-                  style: TextStyle(
+                child: Text(
+                  _showAllMenus ? "လျှော့ကြည့်ရန်" : "အားလုံးကြည့်ရန်",
+                  style: const TextStyle(
                     color: primaryColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -2295,7 +2298,7 @@ class _MenuSectionState extends State<MenuSection> {
 
         const SizedBox(height: 16),
 
-        /// MENU GRID SECTION (FILTERED)
+        /// MENU GRID SECTION (LIMITED TO 5 OR ALL)
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: FutureBuilder<List<_DisplayMenuItem>>(
@@ -2329,6 +2332,8 @@ class _MenuSectionState extends State<MenuSection> {
               }
 
               final allMenuItems = snapshot.data!;
+
+              // 1. Filter by selected category
               final filteredMenuItems = _selectedCategoryId == null
                   ? allMenuItems
                   : allMenuItems.where((item) {
@@ -2344,17 +2349,291 @@ class _MenuSectionState extends State<MenuSection> {
                 );
               }
 
+              // 2. Limit display count to 5 unless _showAllMenus is true
+              final displayedList = _showAllMenus
+                  ? filteredMenuItems
+                  : filteredMenuItems.take(5).toList();
+
               return GridView.builder(
-                key: ValueKey(_selectedCategoryId),
+                key: ValueKey("${_selectedCategoryId}_$_showAllMenus"),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: filteredMenuItems.length,
+                itemCount: displayedList.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 14,
                   mainAxisSpacing: 16,
                   childAspectRatio: 0.85,
                 ),
+// class MenuSection extends StatefulWidget {
+//   const MenuSection({super.key});
+
+//   @override
+//   State<MenuSection> createState() => MenuSectionState();
+// }
+
+// class MenuSectionState extends State<MenuSection> {
+//   static const Color primaryColor = Color(0xff117992);
+//   final ApiService _apiService = ApiService();
+
+//   late Future<List<CategoryModel>> _futureCategories;
+//   late Future<List<_DisplayMenuItem>> _futureMenuItems;
+
+//   // Selected category ID (null indicates "All")
+//   int? _selectedCategoryId;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     refreshMenu();
+//     _futureCategories = _apiService.getCategories();
+//     _futureMenuItems = _fetchDisplayItems();
+//   }
+// // Method to re-fetch menu categories & grid items
+//   Future<void> refreshMenu() async {
+//     setState(() {
+//       _futureCategories = _apiService.getCategories();
+//       _futureMenuItems = _fetchDisplayItems();
+//     });
+//     await Future.wait([_futureCategories, _futureMenuItems]);
+//   }
+//   /// Helper to guard actions that require authentication
+//   static Future<void> _handleProtectedAction(
+//       BuildContext context, VoidCallback onAuthenticated) async {
+//     final currentUser = await SharedPreferencesService.getUser();
+//     if (context.mounted) {
+//       if (currentUser == null) {
+//         context.go('/login');
+//       } else {
+//         onAuthenticated();
+//       }
+//     }
+//   }
+
+//   Future<List<_DisplayMenuItem>> _fetchDisplayItems() async {
+//     try {
+//       final response = await _apiService.getShopsWithMenus();
+//       List<_DisplayMenuItem> displayItems = [];
+
+//       if (response != null && response.success) {
+//         for (var shop in response.data) {
+//           if (shop.menus != null && shop.menus!.isNotEmpty) {
+//             for (var menu in shop.menus!) {
+//               displayItems.add(
+//                 _DisplayMenuItem(
+//                   shopName: shop.shopName ?? 'Unknown Shop',
+//                   menu: menu,
+//                 ),
+//               );
+//             }
+//           }
+//         }
+//       }
+//       return displayItems;
+//     } catch (e, stackTrace) {
+//       print("DEBUG ERROR in _fetchDisplayItems: $e");
+//       print("DEBUG STACKTRACE: $stackTrace");
+//       rethrow;
+//     }
+//   }
+
+//   Widget _buildCategoryButton({
+//     required String title,
+//     required bool isSelected,
+//     required VoidCallback onTap,
+//   }) {
+//     return Container(
+//       margin: const EdgeInsets.only(right: 8),
+//       decoration: BoxDecoration(
+//         color: isSelected ? primaryColor : Colors.white,
+//         borderRadius: BorderRadius.circular(25),
+//         border: Border.all(
+//           color: isSelected ? primaryColor : Colors.grey.shade300,
+//           width: 1,
+//         ),
+//       ),
+//       child: TextButton(
+//         onPressed: onTap,
+//         style: TextButton.styleFrom(
+//           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+//           minimumSize: Size.zero,
+//           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+//         ),
+//         child: Text(
+//           title,
+//           style: TextStyle(
+//             color: isSelected ? Colors.white : Colors.black87,
+//             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+//             fontSize: 12,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         /// CATEGORIES HEADER
+//         Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 20),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               const Text(
+//                 "အမျိုးအစားများ",
+//                 style: TextStyle(
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.bold,
+//                   color: Colors.black87,
+//                 ),
+//               ),
+//               TextButton(
+//                 onPressed: () {
+//                   // _handleProtectedAction(context, () {
+//                   //   context.push('/all_menus');
+//                   // });
+//                 },
+//                 child: const Text(
+//                   "အားလုံးကြည့်ရန်",
+//                   style: TextStyle(
+//                     color: primaryColor,
+//                     fontWeight: FontWeight.w600,
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+
+//         /// DYNAMIC CATEGORY PILLS (API)
+//         FutureBuilder<List<CategoryModel>>(
+//           future: _futureCategories,
+//           builder: (context, snapshot) {
+//             if (snapshot.connectionState == ConnectionState.waiting) {
+//               return const SizedBox(
+//                 height: 38,
+//                 child: Center(
+//                   child: SizedBox(
+//                     width: 20,
+//                     height: 20,
+//                     child: CircularProgressIndicator(
+//                       strokeWidth: 2,
+//                       color: primaryColor,
+//                     ),
+//                   ),
+//                 ),
+//               );
+//             } else if (snapshot.hasError) {
+//               return Padding(
+//                 padding: const EdgeInsets.symmetric(horizontal: 20),
+//                 child: Text(
+//                   "အမျိုးအစားများ ရယူ၍ မရပါ: ${snapshot.error}",
+//                   style: const TextStyle(color: Colors.red, fontSize: 12),
+//                 ),
+//               );
+//             }
+
+//             final categories = snapshot.data ?? [];
+
+//             return SingleChildScrollView(
+//               scrollDirection: Axis.horizontal,
+//               padding: const EdgeInsets.symmetric(horizontal: 20),
+//               child: Row(
+//                 children: [
+//                   _buildCategoryButton(
+//                     title: "အားလုံး",
+//                     isSelected: _selectedCategoryId == null,
+//                     onTap: () {
+//                       setState(() {
+//                         _selectedCategoryId = null;
+//                       });
+//                     },
+//                   ),
+//                   ...categories.map((category) {
+//                     final categoryId = category.categoryId;
+//                     final isSelected = _selectedCategoryId == categoryId;
+
+//                     return _buildCategoryButton(
+//                       title: category.categoryName,
+//                       isSelected: isSelected,
+//                       onTap: () {
+//                         setState(() {
+//                           _selectedCategoryId = categoryId;
+//                         });
+//                       },
+//                     );
+//                   }),
+//                 ],
+//               ),
+//             );
+//           },
+//         ),
+
+//         const SizedBox(height: 16),
+
+//         /// MENU GRID SECTION (FILTERED)
+//         Padding(
+//           padding: const EdgeInsets.symmetric(horizontal: 20),
+//           child: FutureBuilder<List<_DisplayMenuItem>>(
+//             future: _futureMenuItems,
+//             builder: (context, snapshot) {
+//               if (snapshot.connectionState == ConnectionState.waiting) {
+//                 return const Center(
+//                   child: Padding(
+//                     padding: EdgeInsets.all(32.0),
+//                     child: CircularProgressIndicator(color: primaryColor),
+//                   ),
+//                 );
+//               } else if (snapshot.hasError) {
+//                 return Center(
+//                   child: Padding(
+//                     padding: const EdgeInsets.all(16.0),
+//                     child: Text(
+//                       "အချက်အလက် ရယူ၍ မရပါ: ${snapshot.error}",
+//                       textAlign: TextAlign.center,
+//                       style: const TextStyle(color: Colors.red),
+//                     ),
+//                   ),
+//                 );
+//               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+//                 return const Center(
+//                   child: Padding(
+//                     padding: EdgeInsets.all(16.0),
+//                     child: Text("Menu များ မရှိသေးပါ။"),
+//                   ),
+//                 );
+//               }
+
+//               final allMenuItems = snapshot.data!;
+//               final filteredMenuItems = _selectedCategoryId == null
+//                   ? allMenuItems
+//                   : allMenuItems.where((item) {
+//                       return item.menu.categoryId == _selectedCategoryId;
+//                     }).toList();
+
+//               if (filteredMenuItems.isEmpty) {
+//                 return const Center(
+//                   child: Padding(
+//                     padding: EdgeInsets.all(24.0),
+//                     child: Text("ဤအမျိုးအစားတွင် Menu များ မရှိသေးပါ။"),
+//                   ),
+//                 );
+//               }
+
+//               return GridView.builder(
+//                 key: ValueKey(_selectedCategoryId),
+//                 shrinkWrap: true,
+//                 physics: const NeverScrollableScrollPhysics(),
+//                 itemCount: filteredMenuItems.length,
+//                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//                   crossAxisCount: 2,
+//                   crossAxisSpacing: 14,
+//                   mainAxisSpacing: 16,
+//                   childAspectRatio: 0.85,
+//                 ),
                 itemBuilder: (context, index) {
                   final item = filteredMenuItems[index];
                   return _PopularMenuCard(

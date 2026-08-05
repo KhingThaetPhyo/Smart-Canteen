@@ -15,7 +15,7 @@ class StudentInfoScreen extends StatefulWidget {
 
 class _StudentInfoScreenState extends State<StudentInfoScreen> {
   
-  String? selectedYearBatch = "(22-23)";
+  String? selectedYearBatch = "(19-20)";
   String? selectedSemester;
   String? selectedYearLevel;
 

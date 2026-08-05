@@ -15,7 +15,7 @@ import 'package:smartcanteen/view/transfer_point_screen.dart'; // Make sure this
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
   //static const String baseUrl = "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
-  static const String baseUrl = "http://192.168.1.8:8000/api";
+  static const String baseUrl = "http://192.168.1.11:8000/api";
 //https://0c087b6d8fabd90f-202-165-86-143.serveousercontent.com/api/login
   final Dio _dio = Dio(
     BaseOptions(
@@ -819,14 +819,14 @@ Future<RecipientModel?> getUserByQr(String qrValue) async {
   Future<Map<String, dynamic>> resetPin({
     required String email,
     required String otp,
-    required String newPin,
+    required String new_Pin,
   }) async {
     try {
       final token = await SecureStorageService.getToken();
 
       final response = await _dio.post(
         '/reset-pin',
-        data: {'email': email, 'otp': otp, 'new_pin': newPin},
+        data: {'email': email, 'otp': otp, 'new_pin': new_Pin},
         options: Options(
           headers: {
             if (token != null && token.isNotEmpty)
@@ -1004,9 +1004,21 @@ Future<RecipientModel?> getUserByQr(String qrValue) async {
 //     };
 //   }
 // }
+// Replace sendOtp in ApiService with:
 Future<Map<String, dynamic>> sendOtp(String email) async {
-    return await forgotPassword(email);
+  try {
+    bool isSuccess = await forgotPin(email);
+    return {
+      'success': isSuccess,
+      'message': isSuccess ? 'OTP ပို့ပြီးပါပြီ။' : 'OTP ပို့ခြင်း မအောင်မြင်ပါ။',
+    };
+  } catch (e) {
+    return {
+      'success': false,
+      'message': e.toString(),
+    };
   }
+}
 // ===== LOGOUT USER =====
   Future<Map<String, dynamic>> logoutUser() async {
     try {
