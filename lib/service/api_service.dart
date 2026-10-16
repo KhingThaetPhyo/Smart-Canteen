@@ -15,7 +15,7 @@ import 'package:smartcanteen/view/transfer_point_screen.dart'; // Make sure this
 class ApiService {
   // Update this to 'http://10.0.2.2:8000/api' if using an Android Emulator
   //static const String baseUrl = "https://81eb70f126dfa7de-202-165-86-247.serveousercontent.com/api";
-  static const String baseUrl = "http://192.168.1.11:8000/api";
+  static const String baseUrl = "http://192.168.1.17:8000/api";
 //https://0c087b6d8fabd90f-202-165-86-143.serveousercontent.com/api/login
   final Dio _dio = Dio(
     BaseOptions(
